@@ -1,0 +1,16 @@
+// Desktop, large screen devices
+$flexbin-row-height: 200px; // height of image rows
+$flexbin-space: 0px; // space between images
+
+// Tablet, medium screen devices
+$flexbin-tablet-max: 800px;
+$flexbin-row-height-tablet: 150px;
+$flexbin-space-tablet: 0px;
+
+// Phone, small screen devices
+$flexbin-phone-max: 400px;
+$flexbin-row-height-phone: 100px;
+$flexbin-space-phone: 0px;
+
+@import "../../node_modules/flexbin/flexbin.scss";
+
