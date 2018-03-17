@@ -17,6 +17,7 @@ import Views.Errors as Errors
 import Views.Page as Page
 import Views.Misc exposing (viewKeywords)
 import Maybe.Extra
+import Route exposing (Route)
 
 
 -- MODEL --
@@ -85,11 +86,31 @@ viewImage photo =
     in
         div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 m-0 p-0" ]
             [ div [ class "mx-auto" ]
-                [ node "picture"
-                    []
-                  <|
-                    scaled
-                        ++ [ img [ src photo.originalImageURL, class "img-fluid" ] [] ]
+                [ div []
+                    [ node "picture"
+                        []
+                      <|
+                        scaled
+                            ++ [ img [ src photo.originalImageURL, class "img-fluid" ] [] ]
+                    , a
+                        (case photo.previous of
+                            Nothing ->
+                                []
+
+                            Just url ->
+                                [ Route.href (Route.Photo (Url.urlToString url)) ]
+                        )
+                        [ div [ class "previous-image-overlay" ] [] ]
+                    , a
+                        (case photo.next of
+                            Nothing ->
+                                []
+
+                            Just url ->
+                                [ Route.href (Route.Photo (Url.urlToString url)) ]
+                        )
+                        [ div [ class "next-image-overlay" ] [] ]
+                    ]
                 ]
             ]
 

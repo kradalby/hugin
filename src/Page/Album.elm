@@ -1,9 +1,9 @@
-module Page.Album exposing (Model, Msg, init, update, view)
+module Page.Album exposing (Model, Msg(..), init, update, view)
 
 {-| Viewing a user's album.
 -}
 
-import Data.Album exposing (Album)
+import Data.Album as Album exposing (Album)
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
@@ -11,7 +11,6 @@ import Html.Attributes exposing (..)
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Album
-import Request.Photo
 import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
@@ -27,7 +26,6 @@ type alias Model =
     { errors : List String
     , album : Album
     , nestedAlbums : List Album
-    , photos : List Photo
     }
 
 
@@ -45,18 +43,11 @@ init url =
                         Task.sequence (List.map (\url -> Request.Album.get url |> Http.toTask) album.albums)
                     )
 
-        loadPhotos =
-            loadAlbum
-                |> Task.andThen
-                    (\album ->
-                        Task.sequence (List.map (\url -> Request.Photo.get url |> Http.toTask) album.photos)
-                    )
-
         handleLoadError _ =
             "Album is currently unavailable."
                 |> pageLoadError (Page.Album url)
     in
-        Task.map3 (Model []) loadAlbum loadNestedAlbums loadPhotos
+        Task.map2 (Model []) loadAlbum loadNestedAlbums
             |> Task.mapError handleLoadError
 
 
@@ -72,9 +63,6 @@ view model =
 
         nestedAlbums =
             model.nestedAlbums
-
-        photos =
-            model.photos
     in
         div [ class "album-page" ]
             [ Errors.view DismissErrors
@@ -83,7 +71,7 @@ view model =
                 [ class "container-fluid" ]
                 [ div [ class "row" ]
                     [ viewNestedAlbums nestedAlbums ]
-                , div [ class "row" ] [ viewPhotos photos ]
+                , div [ class "row" ] [ viewPhotos album.photos ]
                 , div [ class "row" ]
                     [ viewKeywords
                         "People"
@@ -92,7 +80,7 @@ view model =
                         "Tags"
                         album.keywords
                     ]
-                , div [ class "row" ] [ viewMap photos ]
+                , div [ class "row" ] [ viewMap album.photos ]
                 ]
             ]
 
@@ -121,18 +109,18 @@ viewNestedAlbum album =
         text ""
 
 
-viewPhotos : List Photo -> Html Msg
+viewPhotos : List Album.PhotoInAlbum -> Html Msg
 viewPhotos photos =
     div [ class "flexbin" ] <| List.map viewPhoto photos
 
 
-viewPhoto : Photo -> Html Msg
+viewPhoto : Album.PhotoInAlbum -> Html Msg
 viewPhoto photo =
     a [ Route.href (Route.Photo (Url.urlToString photo.url)) ]
-        [ img [ src (Photo.thumbnail photo) ] [] ]
+        [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
 
 
-viewMap : List Photo -> Html Msg
+viewMap : List Album.PhotoInAlbum -> Html Msg
 viewMap photos =
     div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
         [ div [ class "mt-3" ]
@@ -158,7 +146,7 @@ viewMap photos =
         ]
 
 
-photoMapMarker : Photo -> Html Msg
+photoMapMarker : Album.PhotoInAlbum -> Html Msg
 photoMapMarker photo =
     case photo.gps of
         Nothing ->
@@ -172,7 +160,7 @@ photoMapMarker photo =
                 , attribute "slot" "markers"
                 ]
                 [ img
-                    [ src (Photo.thumbnail photo)
+                    [ src (Photo.thumbnail photo.scaledPhotos)
                     ]
                     []
                 ]
@@ -180,6 +168,7 @@ photoMapMarker photo =
 
 type Msg
     = DismissErrors
+    | AlbumLoaded (Result Http.Error Album)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -191,3 +180,15 @@ update msg model =
         case msg of
             DismissErrors ->
                 { model | errors = [] } => Cmd.none
+
+            AlbumLoaded (Ok response) ->
+                ( { model
+                    | nestedAlbums = response :: model.nestedAlbums
+                  }
+                , Cmd.none
+                )
+
+            AlbumLoaded (Err _) ->
+                ( model
+                , Cmd.none
+                )

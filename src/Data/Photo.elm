@@ -1,4 +1,4 @@
-module Data.Photo exposing (Photo, GPS, thumbnail, decoder)
+module Data.Photo exposing (Photo, GPS, ScaledPhoto, scaledPhotoDecoder, gpsDecoder, thumbnail, decoder)
 
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
@@ -13,24 +13,26 @@ type alias Photo =
     , lensModel : Maybe String
     , people : List String
     , url : Url
-    , owner : String
+    , owner : Maybe String
     , meteringMode : Maybe Int
     , cameraMake : Maybe String
     , isoSpeed : List Int
-    , dateTime : String
+    , dateTime : Maybe String
     , name : String
     , keywords : List String
     , originalImageURL : String
     , modifiedDate : String
     , fNumber : Maybe Float
-    , height : Int
-    , width : Int
+    , height : Maybe Int
+    , width : Maybe Int
     , scaledPhotos : List ScaledPhoto
     , aperture : Maybe Float
-    , copyright : String
+    , copyright : Maybe String
     , cameraModel : Maybe String
     , focalLength : Maybe Float
     , gps : Maybe GPS
+    , previous : Maybe Url
+    , next : Maybe Url
     }
 
 
@@ -50,28 +52,30 @@ type alias GPS =
 decoder : Decoder Photo
 decoder =
     decode Photo
-        |> required "shutterSpeed" (Decode.nullable Decode.float)
-        |> required "lensModel" (Decode.nullable Decode.string)
+        |> optional "shutterSpeed" (Decode.nullable Decode.float) Nothing
+        |> optional "lensModel" (Decode.nullable Decode.string) Nothing
         |> required "people" (Decode.list Decode.string)
         |> required "url" Url.urlDecoder
-        |> required "owner" Decode.string
-        |> required "meteringMode" (Decode.nullable Decode.int)
-        |> required "cameraMake" (Decode.nullable Decode.string)
+        |> optional "owner" (Decode.nullable Decode.string) Nothing
+        |> optional "meteringMode" (Decode.nullable Decode.int) Nothing
+        |> optional "cameraMake" (Decode.nullable Decode.string) Nothing
         |> required "isoSpeed" (Decode.list Decode.int)
-        |> required "dateTime" Decode.string
+        |> optional "dateTime" (Decode.nullable Decode.string) Nothing
         |> required "name" Decode.string
         |> required "keywords" (Decode.list Decode.string)
         |> required "originalImageURL" Decode.string
         |> required "modifiedDate" Decode.string
-        |> required "fNumber" (Decode.nullable Decode.float)
-        |> required "height" Decode.int
-        |> required "width" Decode.int
+        |> optional "fNumber" (Decode.nullable Decode.float) Nothing
+        |> optional "height" (Decode.nullable Decode.int) Nothing
+        |> optional "width" (Decode.nullable Decode.int) Nothing
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
-        |> required "aperture" (Decode.nullable Decode.float)
-        |> required "copyright" Decode.string
-        |> required "cameraModel" (Decode.nullable Decode.string)
-        |> required "focalLength" (Decode.nullable Decode.float)
-        |> required "gps" (Decode.nullable gpsDecoder)
+        |> optional "aperture" (Decode.nullable Decode.float) Nothing
+        |> optional "copyright" (Decode.nullable Decode.string) Nothing
+        |> optional "cameraModel" (Decode.nullable Decode.string) Nothing
+        |> optional "focalLength" (Decode.nullable Decode.float) Nothing
+        |> optional "gps" (Decode.nullable gpsDecoder) Nothing
+        |> optional "previous" (Decode.nullable Url.urlDecoder) Nothing
+        |> optional "next" (Decode.nullable Url.urlDecoder) Nothing
 
 
 scaledPhotoDecoder : Decoder ScaledPhoto
@@ -93,9 +97,9 @@ gpsDecoder =
 -- HELPERS --
 
 
-thumbnail : Photo -> String
-thumbnail photo =
-    case (List.Extra.last photo.scaledPhotos) of
+thumbnail : List ScaledPhoto -> String
+thumbnail scaledPhotos =
+    case (List.Extra.last scaledPhotos) of
         Nothing ->
             ""
 

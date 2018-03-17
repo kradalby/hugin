@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack",
+    "build": "cross-env NODE_ENV=development webpack",
     "watch": "webpack -w",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --port 8000",
     "dev-pub": "cross-env NODE_ENV=development webpack-dev-server --hot --port 8000 --host 0.0.0.0",
