@@ -18,6 +18,7 @@ import Views.Page as Page
 import Views.Misc exposing (viewKeywords)
 import Maybe.Extra
 import Route exposing (Route)
+import Date.Format
 
 
 -- MODEL --
@@ -132,7 +133,8 @@ viewInformation photo =
             row name (toString value)
 
         rows =
-            [ photo.cameraMake |> Maybe.map (row "Camera")
+            [ photo.dateTime |> Maybe.map (Date.Format.format "%A %d %B %Y %H:%M:%S" >> row "Date")
+            , photo.cameraMake |> Maybe.map (row "Camera")
             , photo.cameraModel |> Maybe.map (row "Model")
             , photo.lensModel |> Maybe.map (row "Lens")
             , photo.focalLength |> Maybe.map (rowWithToString "Focal length")

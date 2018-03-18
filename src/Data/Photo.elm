@@ -3,9 +3,11 @@ module Data.Photo exposing (Photo, GPS, ScaledPhoto, scaledPhotoDecoder, gpsDeco
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode.Extra
 import List.Extra
 import Random
 import Random.List
+import Date exposing (Date)
 
 
 type alias Photo =
@@ -17,7 +19,7 @@ type alias Photo =
     , meteringMode : Maybe Int
     , cameraMake : Maybe String
     , isoSpeed : List Int
-    , dateTime : Maybe String
+    , dateTime : Maybe Date
     , name : String
     , keywords : List String
     , originalImageURL : String
@@ -60,7 +62,7 @@ decoder =
         |> optional "meteringMode" (Decode.nullable Decode.int) Nothing
         |> optional "cameraMake" (Decode.nullable Decode.string) Nothing
         |> required "isoSpeed" (Decode.list Decode.int)
-        |> optional "dateTime" (Decode.nullable Decode.string) Nothing
+        |> optional "dateTime" (Decode.nullable Json.Decode.Extra.date) Nothing
         |> required "name" Decode.string
         |> required "keywords" (Decode.list Decode.string)
         |> required "originalImageURL" Decode.string
