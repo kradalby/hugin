@@ -8,6 +8,7 @@ import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Lazy
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Album
@@ -70,13 +71,13 @@ view model =
             , div
                 [ class "container-fluid" ]
                 [ div [ class "row" ]
-                    [ viewNestedAlbums nestedAlbums ]
-                , div [ class "row" ] [ viewPhotos album.photos ]
+                    [ Html.Lazy.lazy viewNestedAlbums nestedAlbums ]
+                , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
                 , div [ class "row" ]
-                    [ viewKeywords
+                    [ Html.Lazy.lazy2 viewKeywords
                         "People"
                         album.people
-                    , viewKeywords
+                    , Html.Lazy.lazy2 viewKeywords
                         "Tags"
                         album.keywords
                     ]

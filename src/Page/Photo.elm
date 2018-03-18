@@ -8,6 +8,7 @@ import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Lazy
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Photo
@@ -64,8 +65,8 @@ view model =
                     , viewKeywords "Tags" photo.keywords
                     ]
                 , div [ class "row" ]
-                    [ viewInformation photo
-                    , viewMap photo
+                    [ Html.Lazy.lazy viewInformation photo
+                    , Html.Lazy.lazy viewMap photo
                     ]
                 ]
             ]
@@ -129,6 +130,13 @@ viewInformation photo =
                     ]
                 ]
 
+        original =
+            tr []
+                [ th [ scope "row" ]
+                    [ text "Original" ]
+                , td [] [ a [ href photo.originalImageURL ] [ text "Link" ] ]
+                ]
+
         rowWithToString name value =
             row name (toString value)
 
@@ -141,6 +149,7 @@ viewInformation photo =
             , photo.fNumber |> Maybe.map (rowWithToString "f/")
             , photo.shutterSpeed |> Maybe.map (rowWithToString "Shutter speed")
             , (List.head photo.isoSpeed) |> Maybe.map (rowWithToString "ISO")
+            , Just original
             ]
     in
         div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
