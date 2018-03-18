@@ -84,7 +84,7 @@ viewNestedAlbums albums =
 
         _ ->
             div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mt-3 mb-5" ]
-                [ div [ class "d-flex justify-content-around" ] <|
+                [ div [ class "d-flex justify-content-around flex-wrap" ] <|
                     List.map viewNestedAlbum albums
                 ]
 
