@@ -15,6 +15,7 @@ import Request.Album
 import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
+import Views.Assets as Assets
 import Views.Page as Page
 import Views.Misc exposing (viewKeywords)
 import Route exposing (Route)
@@ -82,22 +83,24 @@ viewNestedAlbums albums =
             text ""
 
         _ ->
-            div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-3" ] <|
-                List.map viewNestedAlbum albums
+            div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mt-3 mb-5" ]
+                [ div [ class "d-flex justify-content-around" ] <|
+                    List.map viewNestedAlbum albums
+                ]
 
 
 viewNestedAlbum : Album.AlbumInAlbum -> Html Msg
 viewNestedAlbum album =
-    div [ class "" ]
+    div [ class "image-album-container" ]
         [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
-            [ h3 [] [ text album.name ]
-            , (case album.scaledPhotos of
+            [ (case album.scaledPhotos of
                 [] ->
-                    img [ src "" ] []
+                    img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300 ] []
 
                 _ ->
                     img [ src (Photo.thumbnail album.scaledPhotos) ] []
               )
+            , h3 [] [ text album.name ]
             ]
         ]
 

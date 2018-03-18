@@ -1,4 +1,4 @@
-module Views.Assets exposing (error, src)
+module Views.Assets exposing (error, placeholder, src)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -22,6 +22,11 @@ type Image
 error : Image
 error =
     Image "/assets/images/error.jpg"
+
+
+placeholder : Image
+placeholder =
+    Image "/assets/images/placeholder.png"
 
 
 
