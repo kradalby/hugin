@@ -1,4 +1,4 @@
-module Data.Album exposing (Album, PhotoInAlbum, decoder)
+module Data.Album exposing (Album, PhotoInAlbum, AlbumInAlbum, decoder)
 
 import Data.Url as Url exposing (Url)
 import Data.Photo as Photo exposing (Photo)
@@ -9,7 +9,7 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 type alias Album =
     { url : Url
     , photos : List PhotoInAlbum
-    , albums : List Url
+    , albums : List AlbumInAlbum
     , people : List String
     , keywords : List String
     , name : String
@@ -23,6 +23,13 @@ type alias PhotoInAlbum =
     }
 
 
+type alias AlbumInAlbum =
+    { url : Url
+    , name : String
+    , scaledPhotos : List Photo.ScaledPhoto
+    }
+
+
 
 -- SERIALIZATION --
 
@@ -32,7 +39,7 @@ decoder =
     decode Album
         |> required "url" Url.urlDecoder
         |> required "photos" (Decode.list photoInAlbumDecoder)
-        |> required "albums" (Decode.list Url.urlDecoder)
+        |> required "albums" (Decode.list albumInAlbumDecoder)
         |> required "people" (Decode.list Decode.string)
         |> required "keywords" (Decode.list Decode.string)
         |> required "name" Decode.string
@@ -44,6 +51,14 @@ photoInAlbumDecoder =
         |> required "url" Url.urlDecoder
         |> required "scaledPhotos" (Decode.list Photo.scaledPhotoDecoder)
         |> optional "gps" (Decode.nullable Photo.gpsDecoder) Nothing
+
+
+albumInAlbumDecoder : Decoder AlbumInAlbum
+albumInAlbumDecoder =
+    decode AlbumInAlbum
+        |> required "url" Url.urlDecoder
+        |> required "name" Decode.string
+        |> required "scaledPhotos" (Decode.list Photo.scaledPhotoDecoder)
 
 
 

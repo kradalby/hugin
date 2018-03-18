@@ -26,7 +26,6 @@ import Route exposing (Route)
 type alias Model =
     { errors : List String
     , album : Album
-    , nestedAlbums : List Album
     }
 
 
@@ -37,18 +36,11 @@ init url =
             Request.Album.get url
                 |> Http.toTask
 
-        loadNestedAlbums =
-            loadAlbum
-                |> Task.andThen
-                    (\album ->
-                        Task.sequence (List.map (\url -> Request.Album.get url |> Http.toTask) album.albums)
-                    )
-
         handleLoadError _ =
             "Album is currently unavailable."
                 |> pageLoadError (Page.Album url)
     in
-        Task.map2 (Model []) loadAlbum loadNestedAlbums
+        Task.map (Model []) loadAlbum
             |> Task.mapError handleLoadError
 
 
@@ -61,9 +53,6 @@ view model =
     let
         album =
             model.album
-
-        nestedAlbums =
-            model.nestedAlbums
     in
         div [ class "album-page" ]
             [ Errors.view DismissErrors
@@ -71,7 +60,7 @@ view model =
             , div
                 [ class "container-fluid" ]
                 [ div [ class "row" ]
-                    [ Html.Lazy.lazy viewNestedAlbums nestedAlbums ]
+                    [ Html.Lazy.lazy viewNestedAlbums album.albums ]
                 , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy2 viewKeywords
@@ -86,28 +75,31 @@ view model =
             ]
 
 
-viewNestedAlbums : List Album -> Html Msg
+viewNestedAlbums : List Album.AlbumInAlbum -> Html Msg
 viewNestedAlbums albums =
     case albums of
         [] ->
             text ""
 
         _ ->
-            div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-3" ]
-                [ ul [ class "nav nav-fill" ] <|
-                    List.map viewNestedAlbum albums
-                ]
+            div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mt-3" ] <|
+                List.map viewNestedAlbum albums
 
 
-viewNestedAlbum : Album -> Html Msg
+viewNestedAlbum : Album.AlbumInAlbum -> Html Msg
 viewNestedAlbum album =
-    if album.photos /= [] || album.albums /= [] then
-        li [ class "nav-item" ]
-            [ a [ class "nav-link", Route.href (Route.Album (Url.urlToString album.url)) ]
-                [ h3 [] [ text album.name ] ]
+    div [ class "" ]
+        [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
+            [ h3 [] [ text album.name ]
+            , (case album.scaledPhotos of
+                [] ->
+                    img [ src "" ] []
+
+                _ ->
+                    img [ src (Photo.thumbnail album.scaledPhotos) ] []
+              )
             ]
-    else
-        text ""
+        ]
 
 
 viewPhotos : List Album.PhotoInAlbum -> Html Msg
@@ -169,7 +161,6 @@ photoMapMarker photo =
 
 type Msg
     = DismissErrors
-    | AlbumLoaded (Result Http.Error Album)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -181,15 +172,3 @@ update msg model =
         case msg of
             DismissErrors ->
                 { model | errors = [] } => Cmd.none
-
-            AlbumLoaded (Ok response) ->
-                ( { model
-                    | nestedAlbums = response :: model.nestedAlbums
-                  }
-                , Cmd.none
-                )
-
-            AlbumLoaded (Err _) ->
-                ( model
-                , Cmd.none
-                )
