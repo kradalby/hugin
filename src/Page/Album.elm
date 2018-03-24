@@ -17,7 +17,7 @@ import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
 import Views.Assets as Assets
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords)
+import Views.Misc exposing (viewKeywords, viewPath)
 import Route exposing (Route)
 
 
@@ -60,7 +60,8 @@ view model =
                 model.errors
             , div
                 [ class "container-fluid" ]
-                [ div [ class "row" ]
+                [ div [ class "row" ] [ viewPath album.parents ]
+                , div [ class "row" ]
                     [ Html.Lazy.lazy viewNestedAlbums album.albums ]
                 , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
                 , div [ class "row" ]
@@ -84,23 +85,25 @@ viewNestedAlbums albums =
 
         _ ->
             div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mt-3 mb-5" ]
-                [ div [ class "d-flex justify-content-around flex-wrap" ] <|
+                [ div [ class "row justify-content-center" ] <|
                     List.map viewNestedAlbum albums
                 ]
 
 
 viewNestedAlbum : Album.AlbumInAlbum -> Html Msg
 viewNestedAlbum album =
-    div [ class "image-album-container" ]
-        [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
-            [ (case album.scaledPhotos of
-                [] ->
-                    img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300 ] []
+    div [ class "col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3" ]
+        [ div [ class "image-album-container" ]
+            [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
+                [ (case album.scaledPhotos of
+                    [] ->
+                        img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300 ] []
 
-                _ ->
-                    img [ src (Photo.thumbnail album.scaledPhotos) ] []
-              )
-            , h3 [] [ text album.name ]
+                    _ ->
+                        img [ src (Photo.thumbnail album.scaledPhotos) ] []
+                  )
+                , h3 [] [ text album.name ]
+                ]
             ]
         ]
 

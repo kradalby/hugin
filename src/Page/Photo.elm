@@ -3,7 +3,6 @@ module Page.Photo exposing (Model, Msg, init, update, view)
 {-| Viewing a user's photo.
 -}
 
-import Data.Photo exposing (Photo)
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
@@ -16,7 +15,7 @@ import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords)
+import Views.Misc exposing (viewKeywords, viewPath)
 import Maybe.Extra
 import Route exposing (Route)
 import Date.Format
@@ -59,7 +58,8 @@ view model =
         div [ class "photo-page" ]
             [ Errors.view DismissErrors model.errors
             , div [ class "container-fluid" ]
-                [ div [ class "row" ] [ viewImage photo ]
+                [ div [ class "row" ] [ viewPath photo.parents ]
+                , div [ class "row" ] [ viewImage photo ]
                 , div [ class "row" ]
                     [ viewKeywords "People" photo.people
                     , viewKeywords "Tags" photo.keywords

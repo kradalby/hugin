@@ -13,6 +13,7 @@ type alias Album =
     , people : List String
     , keywords : List String
     , name : String
+    , parents : List Photo.Parent
     }
 
 
@@ -43,6 +44,7 @@ decoder =
         |> required "people" (Decode.list Decode.string)
         |> required "keywords" (Decode.list Decode.string)
         |> required "name" Decode.string
+        |> required "parents" (Decode.list Photo.parentDecoder)
 
 
 photoInAlbumDecoder : Decoder PhotoInAlbum

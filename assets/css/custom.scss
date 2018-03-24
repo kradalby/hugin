@@ -1,0 +1,106 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+/* Bootstrap variables override */
+$theme-colors: (
+  "darklight": $gray-700
+);
+
+// Add new theme-colors as backgrounds
+@each $color, $value in $theme-colors {
+  @include bg-variant(".bg-#{$color}", $value);
+}
+
+
+google-map {
+  display: block;
+  height: 400px;
+}
+
+.previous-image-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 50%;
+  opacity: 0;
+}
+
+.next-image-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 0;
+  height: 100%;
+  width: 50%;
+  opacity: 0;
+}
+
+.image-album-container {
+  display: inline-block;
+  position: relative;
+}
+
+.image-album-container img {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+}
+
+.image-album-container h3 {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: 100%;
+  color: white;
+  //font: bold 24px/45px Helvetica, Sans-Serif; 
+  letter-spacing: -1px;
+  background: rgb(0, 0, 0); /* fallback color */
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+}
+
+/* Logo
+-------------------------------------------------- */
+.flexiday-logo {
+  display: block;
+  text-indent: -9999px;
+  width: 160px;
+  height: 40px;
+  background: url("../images/hugin_white.svg");
+  background-size: 160px 40px;
+  background-repeat: no-repeat;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
+
+.container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}

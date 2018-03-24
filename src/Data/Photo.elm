@@ -1,12 +1,10 @@
-module Data.Photo exposing (Photo, GPS, ScaledPhoto, scaledPhotoDecoder, gpsDecoder, thumbnail, decoder)
+module Data.Photo exposing (Photo, GPS, ScaledPhoto, scaledPhotoDecoder, gpsDecoder, thumbnail, decoder, Parent, parentDecoder)
 
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 import Json.Decode.Extra
 import List.Extra
-import Random
-import Random.List
 import Date exposing (Date)
 
 
@@ -35,6 +33,7 @@ type alias Photo =
     , gps : Maybe GPS
     , previous : Maybe Url
     , next : Maybe Url
+    , parents : List Parent
     }
 
 
@@ -48,6 +47,12 @@ type alias GPS =
     { latitude : Float
     , longitude : Float
     , altitude : Float
+    }
+
+
+type alias Parent =
+    { url : Url
+    , name : String
     }
 
 
@@ -78,6 +83,7 @@ decoder =
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing
         |> optional "previous" (Decode.nullable Url.urlDecoder) Nothing
         |> optional "next" (Decode.nullable Url.urlDecoder) Nothing
+        |> required "parents" (Decode.list parentDecoder)
 
 
 scaledPhotoDecoder : Decoder ScaledPhoto
@@ -93,6 +99,13 @@ gpsDecoder =
         |> required "latitude" Decode.float
         |> required "longitude" Decode.float
         |> required "altitude" Decode.float
+
+
+parentDecoder : Decoder Parent
+parentDecoder =
+    decode Parent
+        |> required "url" Url.urlDecoder
+        |> required "name" Decode.string
 
 
 

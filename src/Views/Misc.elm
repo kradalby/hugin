@@ -1,4 +1,4 @@
-module Views.Misc exposing (viewKeywords)
+module Views.Misc exposing (viewKeywords, viewPath)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -9,6 +9,9 @@ all of them. One source of truth!
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Data.Photo as Photo exposing (Photo)
+import Data.Url as Url exposing (Url)
+import Route exposing (Route)
 
 
 viewKeywords : String -> List String -> Html msg
@@ -28,3 +31,15 @@ viewKeywords name keywords =
                 ]
             ]
         ]
+
+
+viewPath : List Photo.Parent -> Html msg
+viewPath parents =
+    div [ class "col-12 pl-4 bg-darklight" ] <|
+        List.intersperse (i [ class "fas fa-angle-right text-white ml-2 mr-2" ] [])
+            (List.map
+                (\parent ->
+                    a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
+                )
+                parents
+            )

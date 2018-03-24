@@ -1,10 +1,10 @@
 // require('./styles/reset.css');
 // require('materialize-css/sass/materialize.scss')
 //
-require('bootstrap/scss/bootstrap.scss')
-require('../assets/css/sticky-footer.css')
-require('../assets/css/logo.css')
-require('../assets/css/override.scss')
+require('@fortawesome/fontawesome')
+require('@fortawesome/fontawesome-free-solid')
+
+require('../assets/css/custom.scss')
 require('../assets/css/flexbin.scss')
 require('./index.html')
 
