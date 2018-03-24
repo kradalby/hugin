@@ -3,7 +3,7 @@ module Request.Helpers exposing (rootUrl, apiUrl)
 
 rootUrl : String
 rootUrl =
-    "out/krapic/index.json"
+    "content/root/index.json"
 
 
 apiUrl : String -> String

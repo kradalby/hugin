@@ -67,9 +67,9 @@ module.exports = {
 
   devServer: {
     proxy: {
-      '/out': {
+      '/content': {
         target: 'http://localhost:3000/',
-        pathRewrite: {'^/out': ''}
+        pathRewrite: {'^/content': ''}
       }
     },
     inline: true,
