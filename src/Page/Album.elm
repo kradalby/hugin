@@ -86,7 +86,7 @@ viewNestedAlbums albums =
         _ ->
             div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mt-3 mb-5" ]
                 [ div [ class "row justify-content-center" ] <|
-                    List.map viewNestedAlbum albums
+                    List.map viewNestedAlbum (List.sortBy .name albums)
                 ]
 
 
@@ -110,7 +110,7 @@ viewNestedAlbum album =
 
 viewPhotos : List Album.PhotoInAlbum -> Html Msg
 viewPhotos photos =
-    div [ class "flexbin" ] <| List.map viewPhoto photos
+    div [ class "flexbin" ] <| List.map viewPhoto (List.sortBy (\photo -> Url.urlToString photo.url) photos)
 
 
 viewPhoto : Album.PhotoInAlbum -> Html Msg
