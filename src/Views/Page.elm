@@ -51,14 +51,9 @@ viewHeader page isLoading =
             [ text "" ]
         , div [ class "ml-auto row" ]
             [ div [ class "container" ]
-                []
+                [ lazy2 Util.viewIf isLoading spinner ]
             ]
         ]
-
-
-
---                lazy2 Util.viewIf isLoading spinner
---                    :: navbarLink page (Route.Home "") [ text "Home" ]
 
 
 viewFooter : Html msg

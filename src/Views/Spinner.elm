@@ -1,14 +1,10 @@
 module Views.Spinner exposing (spinner)
 
-import Html exposing (Attribute, Html, div, li)
+import Html exposing (Attribute, Html, i)
 import Html.Attributes exposing (class, style)
-import Util exposing ((=>))
 
 
 spinner : Html msg
 spinner =
-    li [ class "sk-three-bounce", style [ "float" => "left", "margin" => "8px" ] ]
-        [ div [ class "sk-child sk-bounce1" ] []
-        , div [ class "sk-child sk-bounce2" ] []
-        , div [ class "sk-child sk-bounce3" ] []
-        ]
+    i [ class "fas fa-2x fa-spinner fa-spin text-white" ]
+        []
