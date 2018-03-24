@@ -84,15 +84,15 @@ viewNestedAlbums albums =
             text ""
 
         _ ->
-            div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mt-3 mb-5" ]
-                [ div [ class "row justify-content-center" ] <|
+            div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mb-5" ]
+                [ div [ class "row" ] <|
                     List.map viewNestedAlbum (List.sortBy .name albums)
                 ]
 
 
 viewNestedAlbum : Album.AlbumInAlbum -> Html Msg
 viewNestedAlbum album =
-    div [ class "col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3" ]
+    div [ class "col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mt-3 d-flex justify-content-around" ]
         [ div [ class "image-album-container" ]
             [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
                 [ (case album.scaledPhotos of
@@ -102,7 +102,7 @@ viewNestedAlbum album =
                     _ ->
                         img [ src (Photo.thumbnail album.scaledPhotos) ] []
                   )
-                , h3 [] [ text album.name ]
+                , h4 [] [ text album.name ]
                 ]
             ]
         ]
