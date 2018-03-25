@@ -46,7 +46,7 @@ frame isLoading page content =
 
 viewHeader : ActivePage -> Bool -> Html msg
 viewHeader page isLoading =
-    nav [ class "navbar navbar-expand-md navbar-dark bg-dark " ]
+    nav [ class "navbar navbar-expand-md navbar-dark bg-dark pl-1" ]
         [ a [ class "navbar-brand flexiday-logo", href "#" ]
             [ text "" ]
         , div [ class "ml-auto row" ]

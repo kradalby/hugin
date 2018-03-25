@@ -124,37 +124,38 @@ viewPhoto photo =
 
 viewMap : List Album.PhotoInAlbum -> Html Msg
 viewMap photos =
-    div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
-        [ div [ class "mt-3" ]
-            (case photos of
-                [] ->
-                    []
+    let
+        markers =
+            Debug.log "markers: " <|
+                List.filterMap
+                    (\photo ->
+                        photoMapMarker photo
+                    )
+                    photos
+    in
+        div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
+            [ div [ class "mt-3" ]
+                (case markers of
+                    [] ->
+                        []
 
-                locations ->
-                    [ googleMap
-                        [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
-                        , attribute "fit-to-markers" ""
-                        , attribute "disable-default-ui" "true"
-                        , attribute "disable-zoom" "true"
+                    _ ->
+                        [ googleMap
+                            [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
+                            , attribute "fit-to-markers" ""
+                            , attribute "disable-default-ui" "true"
+                            , attribute "disable-zoom" "true"
+                            ]
+                            markers
                         ]
-                      <|
-                        List.map
-                            (\photo ->
-                                photoMapMarker photo
-                            )
-                            locations
-                    ]
-            )
-        ]
+                )
+            ]
 
 
-photoMapMarker : Album.PhotoInAlbum -> Html Msg
+photoMapMarker : Album.PhotoInAlbum -> Maybe (Html Msg)
 photoMapMarker photo =
-    case photo.gps of
-        Nothing ->
-            text ""
-
-        Just gps ->
+    Maybe.map
+        (\gps ->
             googleMapMarker
                 [ attribute "latitude" (toString gps.latitude)
                 , attribute "longitude" (toString gps.longitude)
@@ -166,6 +167,8 @@ photoMapMarker photo =
                     ]
                     []
                 ]
+        )
+        photo.gps
 
 
 type Msg

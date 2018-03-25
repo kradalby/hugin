@@ -170,7 +170,9 @@ viewMap photo =
         [ div [ class "mt-3 mb-5" ]
             (case photo.gps of
                 Nothing ->
-                    []
+                    [ h4 [] [ text "No map available  ", i [ class "fas fa-map" ] [] ]
+                    , p [] [ text "Looks like this photo does not have any tagged location ", i [ class "fas fa-map-marker-alt" ] [] ]
+                    ]
 
                 Just gps ->
                     [ googleMap
