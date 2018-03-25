@@ -35,12 +35,12 @@ viewKeywords name keywords =
 
 viewPath : List Photo.Parent -> Html msg
 viewPath parents =
-    div [ class "col-12 pl-4 bg-darklight" ] <|
-        case parents of
-            [] ->
-                []
+    case parents of
+        [] ->
+            text ""
 
-            _ ->
+        _ ->
+            div [ class "col-12 pl-4 bg-darklight" ] <|
                 List.intersperse
                     (i [ class "fas fa-angle-right text-white ml-2 mr-2" ] [])
                     (List.map
