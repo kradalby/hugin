@@ -63,7 +63,7 @@ view model =
                 model.errors
             , div
                 [ class "container-fluid" ]
-                [ div [ class "row" ] [ viewPath album.parents ]
+                [ div [ class "row bg-darklight" ] [ viewPath album.parents ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewNestedAlbums album.albums ]
                 , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]

@@ -58,7 +58,10 @@ view model =
         div [ class "photo-page" ]
             [ Errors.view DismissErrors model.errors
             , div [ class "container-fluid" ]
-                [ div [ class "row" ] [ viewPath photo.parents ]
+                [ div [ class "row bg-darklight" ]
+                    [ viewPath photo.parents
+                    , viewDownloadButton photo
+                    ]
                 , div [ class "row" ] [ viewImage photo ]
                 , div [ class "row" ]
                     [ viewKeywords "People" photo.people
@@ -70,6 +73,11 @@ view model =
                     ]
                 ]
             ]
+
+
+viewDownloadButton : Photo -> Html Msg
+viewDownloadButton photo =
+    div [ class "ml-auto mr-2" ] [ a [ href photo.originalImageURL, downloadAs photo.name ] [ i [ class "fas fa-download text-white" ] [] ] ]
 
 
 viewImage : Photo -> Html Msg
