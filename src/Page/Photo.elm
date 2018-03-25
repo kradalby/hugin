@@ -12,7 +12,7 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Photo
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
+import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker, formatExposureTime)
 import Views.Errors as Errors
 import Views.Page as Page
 import Views.Misc exposing (viewKeywords, viewPath)
@@ -155,7 +155,7 @@ viewInformation photo =
             , photo.lensModel |> Maybe.map (row "Lens")
             , photo.focalLength |> Maybe.map (rowWithToString "Focal length")
             , photo.fNumber |> Maybe.map (rowWithToString "f/")
-            , photo.shutterSpeed |> Maybe.map (rowWithToString "Shutter speed")
+            , photo.exposureTime |> Maybe.map (formatExposureTime >> row "Shutter speed")
             , (List.head photo.isoSpeed) |> Maybe.map (rowWithToString "ISO")
             , Just original
             ]

@@ -1,4 +1,4 @@
-module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, googleMap, googleMapMarker)
+module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, googleMap, googleMapMarker, formatExposureTime)
 
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
@@ -72,3 +72,12 @@ googleMap =
 googleMapMarker : List (Attribute a) -> List (Html a) -> Html a
 googleMapMarker =
     Html.node "google-map-marker"
+
+
+formatExposureTime : Float -> String
+formatExposureTime exposure =
+    let
+        denominator =
+            1 / exposure
+    in
+        "1/" ++ (toString denominator)

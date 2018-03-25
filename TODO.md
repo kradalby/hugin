@@ -2,15 +2,9 @@
 
 ## Bugs
 
-* Remove map when no coordinates is available
 * Start on top of photos page
 * Google maps sometimes undefined causing markers not to render
 
-
-* Prettier album
-    - Change to smaller font
-    - More spacing
-    - Better justification
 * Keywords on root page need to look prettier
 * Shutter/exposer time
 

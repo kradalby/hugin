@@ -30,6 +30,7 @@ type alias Photo =
     , copyright : Maybe String
     , cameraModel : Maybe String
     , focalLength : Maybe Float
+    , exposureTime : Maybe Float
     , gps : Maybe GPS
     , previous : Maybe Url
     , next : Maybe Url
@@ -80,6 +81,7 @@ decoder =
         |> optional "copyright" (Decode.nullable Decode.string) Nothing
         |> optional "cameraModel" (Decode.nullable Decode.string) Nothing
         |> optional "focalLength" (Decode.nullable Decode.float) Nothing
+        |> optional "exposureTime" (Decode.nullable Decode.float) Nothing
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing
         |> optional "previous" (Decode.nullable Url.urlDecoder) Nothing
         |> optional "next" (Decode.nullable Url.urlDecoder) Nothing
