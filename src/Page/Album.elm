@@ -85,7 +85,7 @@ viewNestedAlbums albums =
 
         _ ->
             div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0 mb-5" ]
-                [ div [ class "row" ] <|
+                [ div [ class "row m-0" ] <|
                     List.map viewNestedAlbum (List.sortBy .name albums)
                 ]
 
