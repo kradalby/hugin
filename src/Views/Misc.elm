@@ -1,4 +1,4 @@
-module Views.Misc exposing (viewKeywords, viewPath)
+module Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -9,12 +9,14 @@ all of them. One source of truth!
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Data.Photo as Photo exposing (Photo)
+import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
+import Data.Photo as Photo exposing (Photo)
 import Route exposing (Route)
+import Util exposing (googleMap, googleMapMarker)
 
 
-viewKeywords : String -> List Photo.KeywordPointer -> Html msg
+viewKeywords : String -> List KeywordPointer -> Html msg
 viewKeywords name keywords =
     let
         links =
@@ -35,7 +37,7 @@ viewKeywords name keywords =
             ]
 
 
-viewPath : List Photo.Parent -> Html msg
+viewPath : List Parent -> Html msg
 viewPath parents =
     case parents of
         [] ->
@@ -51,3 +53,63 @@ viewPath parents =
                         )
                         parents
                     )
+
+
+viewPhotos : List PhotoInAlbum -> Html msg
+viewPhotos photos =
+    div [ class "flexbin" ] <| List.map viewPhoto (List.sortBy (\photo -> Url.urlToString photo.url) photos)
+
+
+viewPhoto : PhotoInAlbum -> Html msg
+viewPhoto photo =
+    a [ Route.href (Route.Photo (Url.urlToString photo.url)) ]
+        [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
+
+
+viewMap : List PhotoInAlbum -> Html msg
+viewMap photos =
+    let
+        markers =
+            Debug.log "markers: " <|
+                List.filterMap
+                    (\photo ->
+                        viewPhotoMapMarker photo
+                    )
+                    photos
+    in
+        div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
+            [ div [ class "mt-3" ]
+                (case markers of
+                    [] ->
+                        []
+
+                    _ ->
+                        [ googleMap
+                            [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
+                            , attribute "fit-to-markers" ""
+                            , attribute "disable-default-ui" "true"
+                            , attribute "disable-zoom" "true"
+                            ]
+                            markers
+                        ]
+                )
+            ]
+
+
+viewPhotoMapMarker : PhotoInAlbum -> Maybe (Html msg)
+viewPhotoMapMarker photo =
+    Maybe.map
+        (\gps ->
+            googleMapMarker
+                [ attribute "latitude" (toString gps.latitude)
+                , attribute "longitude" (toString gps.longitude)
+                , attribute "draggable" "false"
+                , attribute "slot" "markers"
+                ]
+                [ img
+                    [ src (Photo.thumbnail photo.scaledPhotos)
+                    ]
+                    []
+                ]
+        )
+        photo.gps

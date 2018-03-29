@@ -5,6 +5,7 @@ module Page.Album exposing (Model, Msg(..), init, update, view)
 
 import Data.Album as Album exposing (Album)
 import Data.Photo as Photo exposing (Photo)
+import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -17,7 +18,7 @@ import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
 import Views.Assets as Assets
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords, viewPath)
+import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
 import Route exposing (Route)
 
 
@@ -80,7 +81,7 @@ view model =
             ]
 
 
-viewNestedAlbums : List Album.AlbumInAlbum -> Html Msg
+viewNestedAlbums : List AlbumInAlbum -> Html Msg
 viewNestedAlbums albums =
     case albums of
         [] ->
@@ -93,7 +94,7 @@ viewNestedAlbums albums =
                 ]
 
 
-viewNestedAlbum : Album.AlbumInAlbum -> Html Msg
+viewNestedAlbum : AlbumInAlbum -> Html Msg
 viewNestedAlbum album =
     div [ class "col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mt-3 d-flex justify-content-around" ]
         [ div [ class "image-album-container" ]
@@ -109,66 +110,6 @@ viewNestedAlbum album =
                 ]
             ]
         ]
-
-
-viewPhotos : List Album.PhotoInAlbum -> Html Msg
-viewPhotos photos =
-    div [ class "flexbin" ] <| List.map viewPhoto (List.sortBy (\photo -> Url.urlToString photo.url) photos)
-
-
-viewPhoto : Album.PhotoInAlbum -> Html Msg
-viewPhoto photo =
-    a [ Route.href (Route.Photo (Url.urlToString photo.url)) ]
-        [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
-
-
-viewMap : List Album.PhotoInAlbum -> Html Msg
-viewMap photos =
-    let
-        markers =
-            Debug.log "markers: " <|
-                List.filterMap
-                    (\photo ->
-                        photoMapMarker photo
-                    )
-                    photos
-    in
-        div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
-            [ div [ class "mt-3" ]
-                (case markers of
-                    [] ->
-                        []
-
-                    _ ->
-                        [ googleMap
-                            [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
-                            , attribute "fit-to-markers" ""
-                            , attribute "disable-default-ui" "true"
-                            , attribute "disable-zoom" "true"
-                            ]
-                            markers
-                        ]
-                )
-            ]
-
-
-photoMapMarker : Album.PhotoInAlbum -> Maybe (Html Msg)
-photoMapMarker photo =
-    Maybe.map
-        (\gps ->
-            googleMapMarker
-                [ attribute "latitude" (toString gps.latitude)
-                , attribute "longitude" (toString gps.longitude)
-                , attribute "draggable" "false"
-                , attribute "slot" "markers"
-                ]
-                [ img
-                    [ src (Photo.thumbnail photo.scaledPhotos)
-                    ]
-                    []
-                ]
-        )
-        photo.gps
 
 
 type Msg

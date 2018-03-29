@@ -1,6 +1,7 @@
-module Data.Photo exposing (Photo, GPS, ScaledPhoto, KeywordPointer, scaledPhotoDecoder, gpsDecoder, thumbnail, decoder, Parent, parentDecoder, keywordPointerDecoder)
+module Data.Photo exposing (Photo, thumbnail, decoder)
 
 import Data.Url as Url exposing (Url)
+import Data.Misc as Misc exposing (..)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 import Json.Decode.Extra
@@ -38,31 +39,6 @@ type alias Photo =
     }
 
 
-type alias ScaledPhoto =
-    { url : String
-    , maxResolution : Int
-    }
-
-
-type alias GPS =
-    { latitude : Float
-    , longitude : Float
-    , altitude : Float
-    }
-
-
-type alias Parent =
-    { url : Url
-    , name : String
-    }
-
-
-type alias KeywordPointer =
-    { url : Url
-    , name : String
-    }
-
-
 decoder : Decoder Photo
 decoder =
     decode Photo
@@ -92,35 +68,6 @@ decoder =
         |> optional "previous" (Decode.nullable Url.urlDecoder) Nothing
         |> optional "next" (Decode.nullable Url.urlDecoder) Nothing
         |> required "parents" (Decode.list parentDecoder)
-
-
-scaledPhotoDecoder : Decoder ScaledPhoto
-scaledPhotoDecoder =
-    decode ScaledPhoto
-        |> required "url" Decode.string
-        |> required "maxResolution" Decode.int
-
-
-gpsDecoder : Decoder GPS
-gpsDecoder =
-    decode GPS
-        |> required "latitude" Decode.float
-        |> required "longitude" Decode.float
-        |> required "altitude" Decode.float
-
-
-parentDecoder : Decoder Parent
-parentDecoder =
-    decode Parent
-        |> required "url" Url.urlDecoder
-        |> required "name" Decode.string
-
-
-keywordPointerDecoder : Decoder KeywordPointer
-keywordPointerDecoder =
-    decode KeywordPointer
-        |> required "url" Url.urlDecoder
-        |> required "name" Decode.string
 
 
 
