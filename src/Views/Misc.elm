@@ -14,23 +14,25 @@ import Data.Url as Url exposing (Url)
 import Route exposing (Route)
 
 
-viewKeywords : String -> List String -> Html msg
+viewKeywords : String -> List Photo.KeywordPointer -> Html msg
 viewKeywords name keywords =
-    div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
-        [ div [ class "mt-3" ] <|
-            [ h5 [] [ text name ]
-            , p []
-                [ text <|
-                    (case keywords of
-                        [] ->
-                            "-"
-
-                        _ ->
-                            String.join ", " keywords
+    let
+        links =
+            List.intersperse (text ", ") <|
+                List.map
+                    (\keyword ->
+                        a
+                            [ class "", Route.href (Route.Keyword (Url.urlToString keyword.url)) ]
+                            [ text keyword.name ]
                     )
+                    (List.sortBy .name keywords)
+    in
+        div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
+            [ div [ class "mt-3" ] <|
+                [ h5 [] [ text name ]
                 ]
+                    ++ links
             ]
-        ]
 
 
 viewPath : List Photo.Parent -> Html msg

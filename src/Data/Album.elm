@@ -1,4 +1,4 @@
-module Data.Album exposing (Album, PhotoInAlbum, AlbumInAlbum, decoder)
+module Data.Album exposing (Album, PhotoInAlbum, AlbumInAlbum, decoder, photoInAlbumDecoder)
 
 import Data.Url as Url exposing (Url)
 import Data.Photo as Photo exposing (Photo)
@@ -10,8 +10,8 @@ type alias Album =
     { url : Url
     , photos : List PhotoInAlbum
     , albums : List AlbumInAlbum
-    , people : List String
-    , keywords : List String
+    , people : List Photo.KeywordPointer
+    , keywords : List Photo.KeywordPointer
     , name : String
     , parents : List Photo.Parent
     }
@@ -41,8 +41,8 @@ decoder =
         |> required "url" Url.urlDecoder
         |> required "photos" (Decode.list photoInAlbumDecoder)
         |> required "albums" (Decode.list albumInAlbumDecoder)
-        |> required "people" (Decode.list Decode.string)
-        |> required "keywords" (Decode.list Decode.string)
+        |> required "people" (Decode.list Photo.keywordPointerDecoder)
+        |> required "keywords" (Decode.list Photo.keywordPointerDecoder)
         |> required "name" Decode.string
         |> required "parents" (Decode.list Photo.parentDecoder)
 

@@ -1,4 +1,4 @@
-module Data.Photo exposing (Photo, GPS, ScaledPhoto, scaledPhotoDecoder, gpsDecoder, thumbnail, decoder, Parent, parentDecoder)
+module Data.Photo exposing (Photo, GPS, ScaledPhoto, KeywordPointer, scaledPhotoDecoder, gpsDecoder, thumbnail, decoder, Parent, parentDecoder, keywordPointerDecoder)
 
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
@@ -11,7 +11,7 @@ import Date exposing (Date)
 type alias Photo =
     { shutterSpeed : Maybe Float
     , lensModel : Maybe String
-    , people : List String
+    , people : List KeywordPointer
     , url : Url
     , owner : Maybe String
     , meteringMode : Maybe Int
@@ -19,7 +19,7 @@ type alias Photo =
     , isoSpeed : List Int
     , dateTime : Maybe Date
     , name : String
-    , keywords : List String
+    , keywords : List KeywordPointer
     , originalImageURL : String
     , modifiedDate : String
     , fNumber : Maybe Float
@@ -57,12 +57,18 @@ type alias Parent =
     }
 
 
+type alias KeywordPointer =
+    { url : Url
+    , name : String
+    }
+
+
 decoder : Decoder Photo
 decoder =
     decode Photo
         |> optional "shutterSpeed" (Decode.nullable Decode.float) Nothing
         |> optional "lensModel" (Decode.nullable Decode.string) Nothing
-        |> required "people" (Decode.list Decode.string)
+        |> required "people" (Decode.list keywordPointerDecoder)
         |> required "url" Url.urlDecoder
         |> optional "owner" (Decode.nullable Decode.string) Nothing
         |> optional "meteringMode" (Decode.nullable Decode.int) Nothing
@@ -70,7 +76,7 @@ decoder =
         |> required "isoSpeed" (Decode.list Decode.int)
         |> optional "dateTime" (Decode.nullable Json.Decode.Extra.date) Nothing
         |> required "name" Decode.string
-        |> required "keywords" (Decode.list Decode.string)
+        |> required "keywords" (Decode.list keywordPointerDecoder)
         |> required "originalImageURL" Decode.string
         |> required "modifiedDate" Decode.string
         |> optional "fNumber" (Decode.nullable Decode.float) Nothing
@@ -106,6 +112,13 @@ gpsDecoder =
 parentDecoder : Decoder Parent
 parentDecoder =
     decode Parent
+        |> required "url" Url.urlDecoder
+        |> required "name" Decode.string
+
+
+keywordPointerDecoder : Decoder KeywordPointer
+keywordPointerDecoder =
+    decode KeywordPointer
         |> required "url" Url.urlDecoder
         |> required "name" Decode.string
 

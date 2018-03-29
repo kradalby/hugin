@@ -6,6 +6,7 @@ import Navigation exposing (Location)
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Album as Album
 import Page.Photo as Photo
+import Page.Keyword as Keyword
 import Page.NotFound as NotFound
 import Route exposing (Route)
 import Task
@@ -13,9 +14,6 @@ import Util exposing ((=>))
 import Views.Page as Page exposing (ActivePage)
 import Data.Url
 import Request.Helpers exposing (rootUrl)
-import Request.Photo
-import Http
-import Date
 
 
 -- WARNING: Based on discussions around how asset management features
@@ -31,6 +29,7 @@ type Page
     | Home Album.Model
     | Album Data.Url.Url Album.Model
     | Photo Data.Url.Url Photo.Model
+    | Keyword Data.Url.Url Keyword.Model
 
 
 type PageState
@@ -109,6 +108,11 @@ viewPage isLoading page =
                     |> frame (Page.Photo url)
                     |> Html.map PhotoMsg
 
+            Keyword url subModel ->
+                Keyword.view subModel
+                    |> frame (Page.Keyword url)
+                    |> Html.map KeywordMsg
+
 
 
 -- SUBSCRIPTIONS --
@@ -155,6 +159,9 @@ pageSubscriptions page =
         Photo _ _ ->
             Sub.none
 
+        Keyword _ _ ->
+            Sub.none
+
 
 
 -- UPDATE --
@@ -168,6 +175,8 @@ type Msg
     | AlbumMsg Album.Msg
     | PhotoLoaded Data.Url.Url (Result PageLoadError Photo.Model)
     | PhotoMsg Photo.Msg
+    | KeywordLoaded Data.Url.Url (Result PageLoadError Keyword.Model)
+    | KeywordMsg Keyword.Msg
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -195,6 +204,9 @@ setRoute maybeRoute model =
 
             Just (Route.Photo url) ->
                 transition (PhotoLoaded (Data.Url.Url url)) (Photo.init (Data.Url.Url url))
+
+            Just (Route.Keyword url) ->
+                transition (KeywordLoaded (Data.Url.Url url)) (Keyword.init (Data.Url.Url url))
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -254,6 +266,15 @@ updatePage page msg model =
 
             ( PhotoMsg subMsg, Photo url subModel ) ->
                 toPage (Photo url) PhotoMsg (Photo.update) subMsg subModel
+
+            ( KeywordLoaded url (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Keyword url subModel) } => Cmd.none
+
+            ( KeywordLoaded url (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( KeywordMsg subMsg, Keyword url subModel ) ->
+                toPage (Keyword url) KeywordMsg (Keyword.update) subMsg subModel
 
             ( _, NotFound ) ->
                 -- Disregard incoming messages when we're on the
