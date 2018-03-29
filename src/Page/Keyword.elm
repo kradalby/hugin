@@ -4,9 +4,6 @@ module Page.Keyword exposing (Model, Msg(..), init, update, view)
 -}
 
 import Data.Keyword as Keyword exposing (Keyword)
-import Data.Album as Album exposing (Album)
-import Data.Photo as Photo exposing (Photo)
-import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -18,7 +15,6 @@ import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
 import Views.Page as Page
-import Route exposing (Route)
 import Views.Misc exposing (viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
 
 
