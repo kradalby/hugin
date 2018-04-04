@@ -59,7 +59,7 @@ view model =
             [ Errors.view DismissErrors model.errors
             , div [ class "container-fluid" ]
                 [ div [ class "row bg-darklight" ]
-                    [ viewPath photo.parents
+                    [ viewPath photo.parents photo.name
                     , viewDownloadButton photo
                     ]
                 , div [ class "row" ] [ viewImage photo ]

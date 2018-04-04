@@ -37,27 +37,25 @@ viewKeywords name keywords =
             ]
 
 
-viewPath : List Parent -> Html msg
-viewPath parents =
-    let
-        test =
-            Debug.log "viewPath: " parents
-    in
-        case parents of
-            [] ->
-                text ""
+viewPath : List Parent -> String -> Html msg
+viewPath parents current =
+    case parents of
+        [] ->
+            text ""
 
-            _ ->
-                div [ class "col-11 pl-2" ] <|
-                    List.intersperse
-                        --(i [ class "fas fa-angle-right text-white ml-2 mr-2" ] [])
-                        (span [ class "text-white ml-2 mr-2" ] [ text ">" ])
-                        (List.map
-                            (\parent ->
-                                a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
-                            )
-                            parents
+        _ ->
+            div [ class "col-11 pl-2" ] <|
+                List.intersperse
+                    --(i [ class "fas fa-angle-right text-white ml-2 mr-2" ] [])
+                    (span [ class "text-light ml-2 mr-2" ] [ text ">" ])
+                    ((List.map
+                        (\parent ->
+                            a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
                         )
+                        parents
+                     )
+                        ++ [ span [ class "text-secondary" ] [ text current ] ]
+                    )
 
 
 viewPhotos : List PhotoInAlbum -> Html msg
