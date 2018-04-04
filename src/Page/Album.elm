@@ -55,9 +55,6 @@ view model =
     let
         album =
             model.album
-
-        test =
-            Debug.log "parents album: " album.parents
     in
         div [ class "album-page" ]
             [ Errors.view DismissErrors
