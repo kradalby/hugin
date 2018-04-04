@@ -1,4 +1,4 @@
-module Data.Photo exposing (Photo, thumbnail, decoder)
+module Data.Photo exposing (Photo, thumbnail, biggest, decoder)
 
 import Data.Url as Url exposing (Url)
 import Data.Misc as Misc exposing (..)
@@ -82,3 +82,13 @@ thumbnail scaledPhotos =
 
         Just thumb ->
             thumb.url
+
+
+biggest : List ScaledPhoto -> String
+biggest scaledPhotos =
+    case (List.head scaledPhotos) of
+        Nothing ->
+            ""
+
+        Just photo ->
+            photo.url

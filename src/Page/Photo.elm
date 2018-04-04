@@ -101,7 +101,7 @@ viewImage photo =
                         []
                       <|
                         scaled
-                            ++ [ img [ src photo.originalImageURL, class "img-fluid" ] [] ]
+                            ++ [ img [ src <| Photo.biggest photo.scaledPhotos, class "mx-auto d-block img-fluid" ] [] ]
                     , a
                         (case photo.previous of
                             Nothing ->
