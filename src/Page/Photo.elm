@@ -93,6 +93,14 @@ viewImage photo =
                         []
                 )
                 photo.scaledPhotos
+
+        image =
+            case photo.scaledPhotos of
+                [] ->
+                    img [ src <| Photo.biggest photo.scaledPhotos, class "mx-auto d-block img-fluid" ] []
+
+                scaledPhotos ->
+                    img [ src <| Photo.biggest scaledPhotos, class "mx-auto d-block img-fluid" ] []
     in
         div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 m-0 p-0" ]
             [ div [ class "mx-auto" ]
@@ -101,7 +109,7 @@ viewImage photo =
                         []
                       <|
                         scaled
-                            ++ [ img [ src <| Photo.biggest photo.scaledPhotos, class "mx-auto d-block img-fluid" ] [] ]
+                            ++ [ image ]
                     , a
                         (case photo.previous of
                             Nothing ->
