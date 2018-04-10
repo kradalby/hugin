@@ -1,8 +1,9 @@
-module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, googleMap, googleMapMarker, formatExposureTime)
+module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, googleMap, googleMapMarker, formatExposureTime, cleanOwnerToName)
 
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
 import Json.Decode as Decode
+import String.Extra
 
 
 (=>) : a -> b -> ( a, b )
@@ -81,3 +82,12 @@ formatExposureTime exposure =
             1 / exposure
     in
         "1/" ++ (toString denominator)
+
+
+cleanOwnerToName : String -> String
+cleanOwnerToName owner =
+    let
+        keywords =
+            [ "Copyright", "copyright", "Photograph", "photograph" ]
+    in
+        List.foldl (\word acc -> String.Extra.replace word "" acc) owner keywords

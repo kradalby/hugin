@@ -12,7 +12,7 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Photo
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker, formatExposureTime)
+import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker, formatExposureTime, cleanOwnerToName)
 import Views.Errors as Errors
 import Views.Page as Page
 import Views.Misc exposing (viewKeywords, viewPath)
@@ -157,7 +157,8 @@ viewInformation photo =
             row name (toString value)
 
         rows =
-            [ photo.dateTime |> Maybe.map (Date.Format.format "%A %d %B %Y %H:%M:%S" >> row "Date")
+            [ photo.owner |> Maybe.map (cleanOwnerToName >> row "Photographer")
+            , photo.dateTime |> Maybe.map (Date.Format.format "%A %d %B %Y %H:%M:%S" >> row "Date")
             , photo.cameraMake |> Maybe.map (row "Camera")
             , photo.cameraModel |> Maybe.map (row "Model")
             , photo.lensModel |> Maybe.map (row "Lens")
