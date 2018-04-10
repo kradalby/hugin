@@ -157,7 +157,7 @@ viewInformation photo =
             row name (toString value)
 
         rows =
-            [ photo.owner |> Maybe.map (cleanOwnerToName >> row "Photographer")
+            [ photo.copyright |> Maybe.map (cleanOwnerToName >> row "Photographer")
             , photo.dateTime |> Maybe.map (Date.Format.format "%A %d %B %Y %H:%M:%S" >> row "Date")
             , photo.cameraMake |> Maybe.map (row "Camera")
             , photo.cameraModel |> Maybe.map (row "Model")
