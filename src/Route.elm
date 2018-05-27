@@ -16,6 +16,7 @@ type Route
     | Album String
     | Photo String
     | Keyword String
+    | Locations String
 
 
 route : Parser (Route -> a) a
@@ -28,6 +29,7 @@ route =
         , UrlParser.map (Album << String.join "/") (s "album" </> Url.rest)
         , UrlParser.map (Photo << String.join "/") (s "photo" </> Url.rest)
         , UrlParser.map (Keyword << String.join "/") (s "keyword" </> Url.rest)
+        , UrlParser.map (Locations << String.join "/") (s "locations" </> Url.rest)
         ]
 
 
@@ -54,6 +56,9 @@ routeToString page =
 
                 Keyword url ->
                     [ "keyword", url ]
+
+                Locations url ->
+                    [ "locations", url ]
     in
         "#/" ++ String.join "/" pieces
 

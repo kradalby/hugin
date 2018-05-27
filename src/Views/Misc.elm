@@ -30,7 +30,7 @@ viewKeywords name keywords =
                     (List.sortBy .name keywords)
     in
         div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
-            [ div [ class "mt-3" ] <|
+            [ div [ class "mt-3 mb-3" ] <|
                 [ h5 [] [ text name ]
                 ]
                     ++ links
@@ -69,8 +69,8 @@ viewPhoto photo =
         [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
 
 
-viewMap : List PhotoInAlbum -> Html msg
-viewMap photos =
+viewMap : Bool -> List PhotoInAlbum -> Html msg
+viewMap fullScreen photos =
     let
         markers =
             Debug.log "markers: " <|
@@ -79,24 +79,31 @@ viewMap photos =
                         viewPhotoMapMarker photo
                     )
                     photos
+
+        classes =
+            case fullScreen of
+                False ->
+                    ""
+
+                True ->
+                    "full-map"
     in
         div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
-            [ div [ class "mt-3" ]
-                (case markers of
-                    [] ->
-                        []
+            (case markers of
+                [] ->
+                    []
 
-                    _ ->
-                        [ googleMap
-                            [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
-                            , attribute "fit-to-markers" ""
-                            , attribute "disable-default-ui" "true"
-                            , attribute "disable-zoom" "true"
-                            ]
-                            markers
+                _ ->
+                    [ googleMap
+                        [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
+                        , attribute "fit-to-markers" ""
+                        , attribute "disable-default-ui" "true"
+                        , attribute "disable-zoom" "true"
+                        , class classes
                         ]
-                )
-            ]
+                        markers
+                    ]
+            )
 
 
 viewPhotoMapMarker : PhotoInAlbum -> Maybe (Html msg)

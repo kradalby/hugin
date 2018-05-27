@@ -1,21 +1,24 @@
-module Page.Keyword exposing (Model, Msg(..), init, update, view)
+module Page.Locations exposing (Model, Msg(..), init, update, view)
 
 {-| Viewing a user's album.
 -}
 
-import Data.Keyword as Keyword exposing (Keyword)
+import Data.Location as Location exposing (Locations)
+import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
-import Request.Keyword
+import Request.Locations
 import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
 import Views.Errors as Errors
+import Views.Assets as Assets
 import Views.Page as Page
-import Views.Misc exposing (viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
+import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
+import Route exposing (Route)
 
 
 -- MODEL --
@@ -23,22 +26,22 @@ import Views.Misc exposing (viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
 
 type alias Model =
     { errors : List String
-    , keyword : Keyword
+    , locations : Locations
     }
 
 
 init : Url -> Task PageLoadError Model
 init url =
     let
-        loadKeyword =
-            Request.Keyword.get url
+        loadLocations =
+            Request.Locations.get url
                 |> Http.toTask
 
         handleLoadError _ =
-            "Keyword is currently unavailable."
-                |> pageLoadError (Page.Keyword url)
+            "Locations is currently unavailable."
+                |> pageLoadError (Page.Locations url)
     in
-        Task.map (Model []) loadKeyword
+        Task.map (Model []) loadLocations
             |> Task.mapError handleLoadError
 
 
@@ -53,9 +56,7 @@ view model =
             model.errors
         , div
             [ class "container-fluid" ]
-            [ div [ class "row" ] [ h1 [ class "ml-2" ] [ text model.keyword.name ] ]
-            , div [ class "row" ] [ Html.Lazy.lazy viewPhotos model.keyword.photos ]
-            , div [ class "row" ] [ viewMap False model.keyword.photos ]
+            [ div [ class "row" ] [ viewMap True model.locations ]
             ]
         ]
 

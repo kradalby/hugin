@@ -7,6 +7,7 @@ import Page.Errored as Errored exposing (PageLoadError)
 import Page.Album as Album
 import Page.Photo as Photo
 import Page.Keyword as Keyword
+import Page.Locations as Locations
 import Page.NotFound as NotFound
 import Route exposing (Route)
 import Task
@@ -30,6 +31,7 @@ type Page
     | Album Data.Url.Url Album.Model
     | Photo Data.Url.Url Photo.Model
     | Keyword Data.Url.Url Keyword.Model
+    | Locations Data.Url.Url Locations.Model
 
 
 type PageState
@@ -113,6 +115,11 @@ viewPage isLoading page =
                     |> frame (Page.Keyword url)
                     |> Html.map KeywordMsg
 
+            Locations url subModel ->
+                Locations.view subModel
+                    |> frame (Page.Locations url)
+                    |> Html.map LocationsMsg
+
 
 
 -- SUBSCRIPTIONS --
@@ -162,6 +169,9 @@ pageSubscriptions page =
         Keyword _ _ ->
             Sub.none
 
+        Locations _ _ ->
+            Sub.none
+
 
 
 -- UPDATE --
@@ -177,6 +187,8 @@ type Msg
     | PhotoMsg Photo.Msg
     | KeywordLoaded Data.Url.Url (Result PageLoadError Keyword.Model)
     | KeywordMsg Keyword.Msg
+    | LocationsLoaded Data.Url.Url (Result PageLoadError Locations.Model)
+    | LocationsMsg Locations.Msg
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -207,6 +219,9 @@ setRoute maybeRoute model =
 
             Just (Route.Keyword url) ->
                 transition (KeywordLoaded (Data.Url.Url url)) (Keyword.init (Data.Url.Url url))
+
+            Just (Route.Locations url) ->
+                transition (LocationsLoaded (Data.Url.Url url)) (Locations.init (Data.Url.Url url))
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -275,6 +290,15 @@ updatePage page msg model =
 
             ( KeywordMsg subMsg, Keyword url subModel ) ->
                 toPage (Keyword url) KeywordMsg (Keyword.update) subMsg subModel
+
+            ( LocationsLoaded url (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Locations url subModel) } => Cmd.none
+
+            ( LocationsLoaded url (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( LocationsMsg subMsg, Locations url subModel ) ->
+                toPage (Locations url) LocationsMsg (Locations.update) subMsg subModel
 
             ( _, NotFound ) ->
                 -- Disregard incoming messages when we're on the

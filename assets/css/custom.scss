@@ -10,10 +10,13 @@ $theme-colors: (
   @include bg-variant(".bg-#{$color}", $value);
 }
 
-
 google-map {
   display: block;
-  height: 400px;
+  min-height: 400px;
+}
+
+.full-map {
+  height: calc(100vh - 56px - 60px);
 }
 
 .previous-image-overlay {

@@ -25,6 +25,7 @@ type ActivePage
     | Album Data.Url.Url
     | Photo Data.Url.Url
     | Keyword Data.Url.Url
+    | Locations Data.Url.Url
 
 
 {-| Take a page's Html and frame it with a header and footer.

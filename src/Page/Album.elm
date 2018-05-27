@@ -73,7 +73,7 @@ view model =
                         "Tags"
                         album.keywords
                     ]
-                , div [ class "row" ] [ viewMap album.photos ]
+                , div [ class "row" ] [ viewMap False album.photos ]
                 ]
             ]
 
