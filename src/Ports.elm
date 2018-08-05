@@ -1,4 +1,4 @@
-port module Ports exposing (onSessionChange, storeSession)
+port module Ports exposing (downloadImages, downloadProgress)
 
 import Json.Encode exposing (Value)
 
@@ -7,3 +7,9 @@ port storeSession : Maybe String -> Cmd msg
 
 
 port onSessionChange : (Value -> msg) -> Sub msg
+
+
+port downloadImages : List String -> Cmd msg
+
+
+port downloadProgress : (Value -> msg) -> Sub msg

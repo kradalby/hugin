@@ -33,21 +33,5 @@ decoder =
         |> required "parents" (Decode.list parentDecoder)
 
 
-photoInAlbumDecoder : Decoder PhotoInAlbum
-photoInAlbumDecoder =
-    decode PhotoInAlbum
-        |> required "url" Url.urlDecoder
-        |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
-        |> optional "gps" (Decode.nullable gpsDecoder) Nothing
-
-
-albumInAlbumDecoder : Decoder AlbumInAlbum
-albumInAlbumDecoder =
-    decode AlbumInAlbum
-        |> required "url" Url.urlDecoder
-        |> required "name" Decode.string
-        |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
-
-
 
 -- IDENTIFIERS --

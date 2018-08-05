@@ -73,12 +73,11 @@ viewMap : Bool -> List PhotoInAlbum -> Html msg
 viewMap fullScreen photos =
     let
         markers =
-            Debug.log "markers: " <|
-                List.filterMap
-                    (\photo ->
-                        viewPhotoMapMarker photo
-                    )
-                    photos
+            List.filterMap
+                (\photo ->
+                    viewPhotoMapMarker photo
+                )
+                photos
 
         classes =
             case fullScreen of

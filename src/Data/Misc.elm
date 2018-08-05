@@ -7,6 +7,7 @@ import Json.Decode.Pipeline exposing (decode, required, optional)
 
 type alias PhotoInAlbum =
     { url : Url
+    , originalImageURL : String
     , scaledPhotos : List ScaledPhoto
     , gps : Maybe GPS
     }
@@ -60,6 +61,7 @@ photoInAlbumDecoder : Decoder PhotoInAlbum
 photoInAlbumDecoder =
     decode PhotoInAlbum
         |> required "url" Url.urlDecoder
+        |> required "originalImageURL" Decode.string
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing
 

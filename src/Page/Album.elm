@@ -1,4 +1,4 @@
-module Page.Album exposing (Model, Msg(..), init, update, view)
+module Page.Album exposing (Model, Msg(..), init, update, view, subscriptions)
 
 {-| Viewing a user's album.
 -}
@@ -9,6 +9,7 @@ import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Html.Lazy
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
@@ -20,6 +21,8 @@ import Views.Assets as Assets
 import Views.Page as Page
 import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
 import Route exposing (Route)
+import Ports
+import Json.Decode as Decode
 
 
 -- MODEL --
@@ -27,6 +30,8 @@ import Route exposing (Route)
 
 type alias Model =
     { errors : List String
+    , showDownloadModal : Bool
+    , downloadProgress : Float
     , album : Album
     }
 
@@ -42,7 +47,7 @@ init url =
             "Album is currently unavailable."
                 |> pageLoadError (Page.Album url)
     in
-        Task.map (Model []) loadAlbum
+        Task.map (Model [] False 0.0) loadAlbum
             |> Task.mapError handleLoadError
 
 
@@ -61,7 +66,8 @@ view model =
                 model.errors
             , div
                 [ class "container-fluid" ]
-                [ div [ class "row bg-darklight" ] [ viewPath album.parents album.name ]
+                [ div [ class "row bg-darklight" ] [ viewPath album.parents album.name, viewDownloadButton ]
+                , viewIf model.showDownloadModal (viewDownloadModal model)
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewNestedAlbums album.albums ]
                 , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
@@ -76,6 +82,55 @@ view model =
                 , div [ class "row" ] [ viewMap False album.photos ]
                 ]
             ]
+
+
+viewDownloadButton : Html Msg
+viewDownloadButton =
+    div [ class "ml-auto mr-2" ] [ a [ onClick ToggleDownloadModal ] [ i [ class "fas fa-download text-white" ] [] ] ]
+
+
+viewDownloadModal : Model -> Html Msg
+viewDownloadModal model =
+    div [ style [ ( "display", "block" ) ], attribute "aria-hidden" "false", attribute "aria-labelledby" "downloadModal", class "modal", id "downloadModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
+        [ div [ class "modal-dialog modal-dialog-centered", attribute "role" "document" ]
+            [ div [ class "modal-content" ]
+                [ div [ class "modal-header" ]
+                    [ h5 [ class "modal-title", id "downloadModalTitle" ]
+                        [ text "Download album" ]
+                    , button [ onClick ToggleDownloadModal, attribute "aria-label" "Close", class "close", attribute "data-dismiss" "modal", type_ "button" ]
+                        [ span [ attribute "aria-hidden" "true" ]
+                            [ text "×" ]
+                        ]
+                    ]
+                , div [ class "modal-body" ]
+                    [ text "This feature is experimental, and will probably at best crash your browser."
+                    , hr [] []
+                    , div
+                        [ class "progress" ]
+                        [ div
+                            [ attribute "aria-valuemax" "100"
+                            , attribute "aria-valuemin" "0"
+                            , attribute "aria-valuenow" "25"
+                            , class "progress-bar"
+                            , attribute "role" "progressbar"
+                            , attribute "style"
+                                ("width:"
+                                    ++ (toString model.downloadProgress)
+                                    ++ "%;"
+                                )
+                            ]
+                            [ text <| (toString model.downloadProgress) ++ "%" ]
+                        ]
+                    ]
+                , div [ class "modal-footer" ]
+                    [ button [ onClick ToggleDownloadModal, class "btn btn-secondary", attribute "data-dismiss" "modal", type_ "button" ]
+                        [ text "Close" ]
+                    , button [ onClick Download, class "btn btn-primary", type_ "button" ]
+                        [ text "Download" ]
+                    ]
+                ]
+            ]
+        ]
 
 
 viewNestedAlbums : List AlbumInAlbum -> Html Msg
@@ -111,6 +166,9 @@ viewNestedAlbum album =
 
 type Msg
     = DismissErrors
+    | ToggleDownloadModal
+    | Download
+    | OnDownloadProgressUpdate (Maybe Float)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -122,3 +180,35 @@ update msg model =
         case msg of
             DismissErrors ->
                 { model | errors = [] } => Cmd.none
+
+            ToggleDownloadModal ->
+                { model
+                    | showDownloadModal = not model.showDownloadModal
+                    , downloadProgress = 0.0
+                }
+                    => Cmd.none
+
+            Download ->
+                let
+                    urls =
+                        List.map
+                            .originalImageURL
+                            album.photos
+                in
+                    { model | downloadProgress = 0.0 } => Ports.downloadImages urls
+
+            OnDownloadProgressUpdate (Just progress) ->
+                { model | downloadProgress = progress } => Cmd.none
+
+            OnDownloadProgressUpdate Nothing ->
+                model => Cmd.none
+
+
+onDownloadProgressUpdate : Sub (Maybe Float)
+onDownloadProgressUpdate =
+    Ports.downloadProgress (Decode.decodeValue Decode.float >> Result.toMaybe)
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.map OnDownloadProgressUpdate onDownloadProgressUpdate

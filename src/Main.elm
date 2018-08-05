@@ -160,8 +160,8 @@ pageSubscriptions page =
         Home _ ->
             Sub.none
 
-        Album _ _ ->
-            Sub.none
+        Album _ subModel ->
+            Sub.map AlbumMsg (Album.subscriptions subModel)
 
         Photo _ _ ->
             Sub.none
