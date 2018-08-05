@@ -32,6 +32,14 @@ type alias GPS =
     }
 
 
+type alias LocationData =
+    { city : String
+    , state : String
+    , locationCode : String
+    , locationName : String
+    }
+
+
 type alias Parent =
     { url : Url
     , name : String
@@ -77,6 +85,15 @@ gpsDecoder =
         |> required "latitude" Decode.float
         |> required "longitude" Decode.float
         |> required "altitude" Decode.float
+
+
+locationDataDecoder : Decoder LocationData
+locationDataDecoder =
+    decode LocationData
+        |> required "city" Decode.string
+        |> required "state" Decode.string
+        |> required "locationCode" Decode.string
+        |> required "locationName" Decode.string
 
 
 parentDecoder : Decoder Parent

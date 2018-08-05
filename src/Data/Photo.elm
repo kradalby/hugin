@@ -33,6 +33,7 @@ type alias Photo =
     , focalLength : Maybe Float
     , exposureTime : Maybe Float
     , gps : Maybe GPS
+    , location : Maybe LocationData
     , previous : Maybe Url
     , next : Maybe Url
     , parents : List Parent
@@ -65,6 +66,7 @@ decoder =
         |> optional "focalLength" (Decode.nullable Decode.float) Nothing
         |> optional "exposureTime" (Decode.nullable Decode.float) Nothing
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing
+        |> optional "location" (Decode.nullable locationDataDecoder) Nothing
         |> optional "previous" (Decode.nullable Url.urlDecoder) Nothing
         |> optional "next" (Decode.nullable Url.urlDecoder) Nothing
         |> required "parents" (Decode.list parentDecoder)
