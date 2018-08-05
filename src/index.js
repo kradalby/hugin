@@ -55,14 +55,25 @@ function initMap (coordinates) {
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v9',
       zoom: 13,
-      center: coordinates[0]
+      interactive: false,
+      maxZoom: 10,
+      minZoom: 2
     })
+
+    let bounds = new mapboxgl.LngLatBounds()
 
     // Draw markers
     coordinates.forEach((coordinate) => {
       new mapboxgl.Marker()
         .setLngLat(coordinate)
         .addTo(map)
+
+      bounds.extend(coordinate)
+    })
+    map.fitBounds(bounds, {
+      padding: {top: 65, bottom: 50, left: 50, right: 50},
+      linear: false,
+      maxZoom: 10
     })
   })
 }
