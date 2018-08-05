@@ -69,7 +69,7 @@ view model =
                     ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewInformation photo
-                    , viewMap
+                    , viewMap model.photo.name
                     ]
                 ]
             ]
@@ -200,7 +200,7 @@ initMap : Model -> Cmd msg
 initMap model =
     case model.photo.gps of
         Nothing ->
-            Util.initMap []
+            Util.initMap model.photo.name []
 
         Just gps ->
-            Util.initMap [ gps ]
+            Util.initMap model.photo.name [ gps ]

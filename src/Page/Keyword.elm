@@ -55,7 +55,7 @@ view model =
             [ class "container-fluid" ]
             [ div [ class "row" ] [ h1 [ class "ml-2" ] [ text model.keyword.name ] ]
             , div [ class "row" ] [ Html.Lazy.lazy viewPhotos model.keyword.photos ]
-            , div [ class "row" ] [ viewMap ]
+            , div [ class "row" ] [ viewMap model.keyword.name ]
             ]
         ]
 
@@ -73,4 +73,4 @@ update msg model =
 
 initMap : Model -> Cmd msg
 initMap model =
-    Util.initMap <| List.filterMap .gps model.keyword.photos
+    Util.initMap model.keyword.name <| List.filterMap .gps model.keyword.photos

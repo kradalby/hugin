@@ -85,8 +85,8 @@ cleanOwnerToName owner =
         List.foldl (\word acc -> String.Extra.replace word "" acc) owner keywords
 
 
-initMap : List Data.Misc.GPS -> Cmd msg
-initMap coordinates =
+initMap : String -> List Data.Misc.GPS -> Cmd msg
+initMap name coordinates =
     let
         gpsToLongLat gps =
             ( gps.longitude, gps.latitude )
@@ -99,4 +99,4 @@ initMap coordinates =
                 Cmd.none
 
             _ ->
-                Ports.initMap longLats
+                Ports.initMap ( name, longLats )

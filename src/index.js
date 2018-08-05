@@ -39,20 +39,25 @@ function checkElementById (selector) {
   }
 }
 
-app.ports.initMap.subscribe((coordinates) => {
-  initMap(coordinates)
+app.ports.initMap.subscribe((data) => {
+  initMap(data)
 })
-// coordinates: [[-80.425, 46.437], [-71.516, 46.437]]
-function initMap (coordinates) {
-  console.log('initMap called with: ', coordinates)
+// coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]]
+function initMap (data) {
+  console.log('initMap called with: ', data)
+  console.log('map: ', map)
   if (map) {
     map = null
   }
+  console.log('map2: ', map)
 
-  checkElementById('map').then(() => {
+  let divName = 'map-' + data[0]
+  let coordinates = data[1]
+
+  checkElementById(divName).then(() => {
     // Create map
     map = new mapboxgl.Map({
-      container: 'map',
+      container: divName,
       style: 'mapbox://styles/mapbox/light-v9',
       zoom: 13,
       interactive: false,

@@ -68,8 +68,8 @@ viewPhoto photo =
         [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
 
 
-viewMap : Html msg
-viewMap =
+viewMap : String -> Html msg
+viewMap name =
     div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
-        [ div [ id "map" ] []
+        [ div [ id <| "map-" ++ name, class "map" ] []
         ]

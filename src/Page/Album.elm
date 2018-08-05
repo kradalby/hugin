@@ -79,7 +79,7 @@ view model =
                         "Tags"
                         album.keywords
                     ]
-                , div [ class "row" ] [ viewMap ]
+                , div [ class "row" ] [ viewMap model.album.name ]
                 ]
             ]
 
@@ -216,4 +216,4 @@ subscriptions model =
 
 initMap : Model -> Cmd msg
 initMap model =
-    Util.initMap <| List.filterMap .gps model.album.photos
+    Util.initMap model.album.name <| List.filterMap .gps model.album.photos

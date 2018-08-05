@@ -10,7 +10,7 @@ $theme-colors: (
   @include bg-variant(".bg-#{$color}", $value);
 }
 
-#map {
+.map {
   display: block;
   min-height: 400px;
 }
