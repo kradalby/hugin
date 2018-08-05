@@ -42,14 +42,13 @@ function checkElementById (selector) {
 app.ports.initMap.subscribe((data) => {
   initMap(data)
 })
-// coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]]
+// coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]] : List ( Float, Float ) ]
 function initMap (data) {
   console.log('initMap called with: ', data)
-  console.log('map: ', map)
+  // Try to force some garbage collection
   if (map) {
     map = null
   }
-  console.log('map2: ', map)
 
   let divName = 'map-' + data[0]
   let coordinates = data[1]
