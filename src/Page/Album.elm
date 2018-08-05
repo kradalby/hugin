@@ -15,11 +15,11 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Album
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
+import Util exposing ((=>), pair, viewIf)
 import Views.Errors as Errors
 import Views.Assets as Assets
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
+import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap)
 import Route exposing (Route)
 import Ports
 import Json.Decode as Decode
@@ -79,7 +79,7 @@ view model =
                         "Tags"
                         album.keywords
                     ]
-                , div [ class "row" ] [ viewMap False album.photos ]
+                , div [ class "row" ] [ viewMap ]
                 ]
             ]
 
@@ -110,7 +110,7 @@ viewDownloadModal model =
                         [ div
                             [ attribute "aria-valuemax" "100"
                             , attribute "aria-valuemin" "0"
-                            , attribute "aria-valuenow" "25"
+                            , attribute "aria-valuenow" (toString model.downloadProgress)
                             , class "progress-bar"
                             , attribute "role" "progressbar"
                             , attribute "style"

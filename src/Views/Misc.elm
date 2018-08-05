@@ -1,4 +1,4 @@
-module Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
+module Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -13,7 +13,6 @@ import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Data.Photo as Photo exposing (Photo)
 import Route exposing (Route)
-import Util exposing (googleMap, googleMapMarker)
 
 
 viewKeywords : String -> List KeywordPointer -> Html msg
@@ -69,56 +68,8 @@ viewPhoto photo =
         [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
 
 
-viewMap : Bool -> List PhotoInAlbum -> Html msg
-viewMap fullScreen photos =
-    let
-        markers =
-            List.filterMap
-                (\photo ->
-                    viewPhotoMapMarker photo
-                )
-                photos
-
-        classes =
-            case fullScreen of
-                False ->
-                    ""
-
-                True ->
-                    "full-map"
-    in
-        div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
-            (case markers of
-                [] ->
-                    []
-
-                _ ->
-                    [ googleMap
-                        [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
-                        , attribute "fit-to-markers" ""
-                        , attribute "disable-default-ui" "true"
-                        , attribute "disable-zoom" "true"
-                        , class classes
-                        ]
-                        markers
-                    ]
-            )
-
-
-viewPhotoMapMarker : PhotoInAlbum -> Maybe (Html msg)
-viewPhotoMapMarker photo =
-    Maybe.map
-        (\gps ->
-            googleMapMarker
-                [ attribute "latitude" (toString gps.latitude)
-                , attribute "longitude" (toString gps.longitude)
-                , attribute "draggable" "false"
-                , attribute "slot" "markers"
-                ]
-                [ img
-                    [ src (Photo.thumbnail photo.scaledPhotos)
-                    ]
-                    []
-                ]
-        )
-        photo.gps
+viewMap : Html msg
+viewMap =
+    div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 p-0" ]
+        [ div [ id "map" ] []
+        ]

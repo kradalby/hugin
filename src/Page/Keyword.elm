@@ -12,10 +12,10 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Keyword
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
+import Util exposing ((=>), pair, viewIf)
 import Views.Errors as Errors
 import Views.Page as Page
-import Views.Misc exposing (viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
+import Views.Misc exposing (viewPhotos, viewPhoto, viewMap)
 
 
 -- MODEL --
@@ -55,7 +55,7 @@ view model =
             [ class "container-fluid" ]
             [ div [ class "row" ] [ h1 [ class "ml-2" ] [ text model.keyword.name ] ]
             , div [ class "row" ] [ Html.Lazy.lazy viewPhotos model.keyword.photos ]
-            , div [ class "row" ] [ viewMap False model.keyword.photos ]
+            , div [ class "row" ] [ viewMap ]
             ]
         ]
 

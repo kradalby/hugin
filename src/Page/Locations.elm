@@ -13,11 +13,11 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Locations
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker)
+import Util exposing ((=>), pair, viewIf)
 import Views.Errors as Errors
 import Views.Assets as Assets
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, viewPhotoMapMarker)
+import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap)
 import Route exposing (Route)
 
 
@@ -56,7 +56,7 @@ view model =
             model.errors
         , div
             [ class "container-fluid" ]
-            [ div [ class "row" ] [ viewMap True model.locations ]
+            [ div [ class "row" ] [ viewMap ]
             ]
         ]
 

@@ -12,10 +12,10 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Photo
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, googleMap, googleMapMarker, formatExposureTime, cleanOwnerToName)
+import Util exposing ((=>), pair, viewIf, formatExposureTime, cleanOwnerToName)
 import Views.Errors as Errors
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords, viewPath)
+import Views.Misc exposing (viewKeywords, viewPath, viewMap)
 import Maybe.Extra
 import Route exposing (Route)
 import Date.Format
@@ -69,7 +69,7 @@ view model =
                     ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewInformation photo
-                    , Html.Lazy.lazy viewMap photo
+                    , viewMap
                     ]
                 ]
             ]
@@ -179,36 +179,6 @@ viewInformation photo =
                     ]
                 ]
             ]
-
-
-viewMap : Photo -> Html Msg
-viewMap photo =
-    div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
-        [ div [ class "mt-3 mb-5" ]
-            (case photo.gps of
-                Nothing ->
-                    [ h4 [] [ text "No map available  ", i [ class "fas fa-map" ] [] ]
-                    , p [] [ text "Looks like this photo does not have any tagged location ", i [ class "fas fa-map-marker-alt" ] [] ]
-                    ]
-
-                Just gps ->
-                    [ googleMap
-                        [ attribute "api-key" "AIzaSyDO4CHjsXnGLSDbrlmG7tOOr3OMcKt4fQI"
-                        , attribute "fit-to-markers" ""
-                        , attribute "disable-default-ui" "true"
-                        , attribute "disable-zoom" "true"
-                        ]
-                        [ googleMapMarker
-                            [ attribute "latitude" (toString gps.latitude)
-                            , attribute "longitude" (toString gps.longitude)
-                            , attribute "draggable" "false"
-                            , attribute "slot" "markers"
-                            ]
-                            []
-                        ]
-                    ]
-            )
-        ]
 
 
 type Msg
