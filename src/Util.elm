@@ -1,4 +1,4 @@
-module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, formatExposureTime, cleanOwnerToName, initMap)
+module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, formatExposureTime, cleanOwnerToName, initMap, fuzzyKeywordReduce)
 
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
@@ -6,6 +6,7 @@ import Json.Decode as Decode
 import String.Extra
 import Data.Misc
 import Ports
+import Fuzzy
 
 
 (=>) : a -> b -> ( a, b )
@@ -100,3 +101,23 @@ initMap name coordinates =
 
             _ ->
                 Ports.initMap ( name, longLats )
+
+
+fuzzyKeywordReduce : String -> List Data.Misc.KeywordPointer -> List Data.Misc.KeywordPointer
+fuzzyKeywordReduce searchString keywordPointers =
+    let
+        test =
+            Debug.log "searchString: " searchString
+
+        keywords =
+            Debug.log "Keywords: " <|
+                List.map .name keywordPointers
+
+        match input =
+            Fuzzy.match [] [] searchString input |> .score
+
+        results =
+            Debug.log "Results: " <|
+                List.map match keywords
+    in
+        []

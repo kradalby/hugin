@@ -15,7 +15,7 @@ import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Album
 import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf)
+import Util exposing ((=>), pair, viewIf, fuzzyKeywordReduce)
 import Views.Errors as Errors
 import Views.Assets as Assets
 import Views.Page as Page
@@ -32,6 +32,7 @@ type alias Model =
     { errors : List String
     , showDownloadModal : Bool
     , downloadProgress : Float
+    , keywordFilter : String
     , album : Album
     }
 
@@ -47,7 +48,7 @@ init url =
             "Album is currently unavailable."
                 |> pageLoadError (Page.Album url)
     in
-        Task.map (Model [] False 0.0) loadAlbum
+        Task.map (Model [] False 0.0 "") loadAlbum
             |> Task.mapError handleLoadError
 
 
@@ -60,6 +61,9 @@ view model =
     let
         album =
             model.album
+
+        test =
+            Util.fuzzyKeywordReduce model.keywordFilter album.keywords
     in
         div [ class "album-page" ]
             [ Errors.view DismissErrors
@@ -71,6 +75,7 @@ view model =
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewNestedAlbums album.albums ]
                 , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
+                , div [ class "row" ] [ viewKeywordFilter model.keywordFilter ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy2 viewKeywords
                         "People"
@@ -164,11 +169,24 @@ viewNestedAlbum album =
         ]
 
 
+viewKeywordFilter : String -> Html Msg
+viewKeywordFilter keywordFilter =
+    div [ class "input-group mb-3" ]
+        [ div [ class "input-group-prepend" ]
+            [ span [ class "input-group-text", id "inputGroup-sizing-default" ]
+                [ text "Keyword filter" ]
+            ]
+        , input [ attribute "aria-describedby" "inputGroup-sizing-default", attribute "aria-label" "Keyword filter", class "form-control", type_ "text", onInput UpdateKeywordFilter, value keywordFilter ]
+            []
+        ]
+
+
 type Msg
     = DismissErrors
     | ToggleDownloadModal
     | Download
     | OnDownloadProgressUpdate (Maybe Float)
+    | UpdateKeywordFilter String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -202,6 +220,13 @@ update msg model =
 
             OnDownloadProgressUpdate Nothing ->
                 model => Cmd.none
+
+            UpdateKeywordFilter value ->
+                let
+                    test =
+                        Debug.log "update value: " value
+                in
+                    { model | keywordFilter = value } => Cmd.none
 
 
 onDownloadProgressUpdate : Sub (Maybe Float)
