@@ -12,6 +12,9 @@ require('bootstrap/js/dist/modal')
 
 let saveAs = require('./FileSaver.js')
 
+let mapboxgl = require('mapbox-gl')
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9'
+
 let JSZip = require('jszip')
 let JSZipUtils = require('jszip-utils')
 
@@ -19,7 +22,41 @@ let Elm = require('./Main.elm')
 
 let app = Elm.Main.fullscreen()
 
-app.ports.downloadImages.subscribe(function (urls) {
+var map = null
+
+app.ports.initMap.subscribe((center) => {
+  initMap(center)
+})
+// center: [-80.425, 46.437]
+function initMap (center) {
+  if (map) {
+    map = null
+  }
+
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v9',
+    zoom: 13,
+    center: center
+  })
+}
+
+app.ports.addMarkers.subscribe((coordinates) => {
+  addMarkers(coordinates)
+})
+// coordinates: [[-80.425, 46.437], [-71.516, 46.437]]
+function addMarkers (coordinates) {
+  if (map) {
+    coordinates.foreach((coordinate) => {
+      new mapboxgl.Marker()
+        .setLngLat(coordinate)
+        .addTo(map)
+    })
+  }
+}
+
+// Download albums
+app.ports.downloadImages.subscribe((urls) => {
   downloadImages(urls)
 })
 

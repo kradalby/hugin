@@ -13,3 +13,9 @@ port downloadImages : List String -> Cmd msg
 
 
 port downloadProgress : (Value -> msg) -> Sub msg
+
+
+port initMap : ( Float, Float ) -> Cmd msg
+
+
+port addMarkers : List ( Float, Float ) -> Cmd msg
