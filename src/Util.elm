@@ -80,7 +80,7 @@ cleanOwnerToName : String -> String
 cleanOwnerToName owner =
     let
         keywords =
-            [ "Copyright", "copyright", "Photograph", "photograph", "Copyright: ", "copyright: ", "Photograph: ", "photograph: " ]
+            [ "Copyright: ", "copyright: ", "Photograph: ", "photograph: ", "Copyright", "copyright", "Photograph", "photograph" ]
     in
         List.foldl (\word acc -> String.Extra.replace word "" acc) owner keywords
 
