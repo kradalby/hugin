@@ -12,8 +12,9 @@ require('bootstrap/js/dist/modal')
 
 let saveAs = require('./FileSaver.js')
 
+require('mapbox-gl/dist/mapbox-gl.css')
 let mapboxgl = require('mapbox-gl')
-mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9'
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9.ziohBVzNJe3_miSeuFFp5g'
 
 let JSZip = require('jszip')
 let JSZipUtils = require('jszip-utils')
@@ -24,35 +25,46 @@ let app = Elm.Main.fullscreen()
 
 var map = null
 
-app.ports.initMap.subscribe((center) => {
-  initMap(center)
+function rafAsync () {
+  return new Promise(resolve => {
+    requestAnimationFrame(resolve) // faster than set time out
+  })
+}
+
+function checkElementById (selector) {
+  if (document.getElementById(selector) === null) {
+    return rafAsync().then(() => checkElementById(selector))
+  } else {
+    return Promise.resolve(document.getElementById(selector))
+  }
+}
+
+app.ports.initMap.subscribe((coordinates) => {
+  initMap(coordinates)
 })
-// center: [-80.425, 46.437]
-function initMap (center) {
+// coordinates: [[-80.425, 46.437], [-71.516, 46.437]]
+function initMap (coordinates) {
+  console.log('initMap called with: ', coordinates)
   if (map) {
     map = null
   }
 
-  map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/light-v9',
-    zoom: 13,
-    center: center
-  })
-}
+  checkElementById('map').then(() => {
+    // Create map
+    map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v9',
+      zoom: 13,
+      center: coordinates[0]
+    })
 
-app.ports.addMarkers.subscribe((coordinates) => {
-  addMarkers(coordinates)
-})
-// coordinates: [[-80.425, 46.437], [-71.516, 46.437]]
-function addMarkers (coordinates) {
-  if (map) {
-    coordinates.foreach((coordinate) => {
+    // Draw markers
+    coordinates.forEach((coordinate) => {
       new mapboxgl.Marker()
         .setLngLat(coordinate)
         .addTo(map)
     })
-  }
+  })
 }
 
 // Download albums

@@ -11,7 +11,7 @@ import Page.Locations as Locations
 import Page.NotFound as NotFound
 import Route exposing (Route)
 import Task
-import Util exposing ((=>))
+import Util exposing ((=>), initMap)
 import Views.Page as Page exposing (ActivePage)
 import Data.Url
 import Request.Helpers exposing (rootUrl)
@@ -265,7 +265,7 @@ updatePage page msg model =
                 toPage (Album (Data.Url.Url rootUrl)) AlbumMsg (Album.update) subMsg subModel
 
             ( AlbumLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Album url subModel) } => Cmd.none
+                { model | pageState = Loaded (Album url subModel) } => (Album.initMap subModel)
 
             ( AlbumLoaded url (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
@@ -274,7 +274,7 @@ updatePage page msg model =
                 toPage (Album url) AlbumMsg (Album.update) subMsg subModel
 
             ( PhotoLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Photo url subModel) } => Cmd.none
+                { model | pageState = Loaded (Photo url subModel) } => (Photo.initMap subModel)
 
             ( PhotoLoaded url (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
@@ -283,7 +283,7 @@ updatePage page msg model =
                 toPage (Photo url) PhotoMsg (Photo.update) subMsg subModel
 
             ( KeywordLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Keyword url subModel) } => Cmd.none
+                { model | pageState = Loaded (Keyword url subModel) } => (Keyword.initMap subModel)
 
             ( KeywordLoaded url (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none

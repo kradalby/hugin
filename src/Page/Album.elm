@@ -1,4 +1,4 @@
-module Page.Album exposing (Model, Msg(..), init, update, view, subscriptions)
+module Page.Album exposing (Model, Msg(..), init, update, view, subscriptions, initMap)
 
 {-| Viewing a user's album.
 -}
@@ -212,3 +212,8 @@ onDownloadProgressUpdate =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.map OnDownloadProgressUpdate onDownloadProgressUpdate
+
+
+initMap : Model -> Cmd msg
+initMap model =
+    Util.initMap <| List.filterMap .gps model.album.photos

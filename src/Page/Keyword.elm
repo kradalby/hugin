@@ -1,4 +1,4 @@
-module Page.Keyword exposing (Model, Msg(..), init, update, view)
+module Page.Keyword exposing (Model, Msg(..), init, update, view, initMap)
 
 {-| Viewing a user's album.
 -}
@@ -69,3 +69,8 @@ update msg model =
     case msg of
         DismissErrors ->
             { model | errors = [] } => Cmd.none
+
+
+initMap : Model -> Cmd msg
+initMap model =
+    Util.initMap <| List.filterMap .gps model.keyword.photos

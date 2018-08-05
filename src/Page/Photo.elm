@@ -1,4 +1,4 @@
-module Page.Photo exposing (Model, Msg, init, update, view)
+module Page.Photo exposing (Model, Msg, init, update, view, initMap)
 
 {-| Viewing a user's photo.
 -}
@@ -194,3 +194,13 @@ update msg model =
         case msg of
             DismissErrors ->
                 { model | errors = [] } => Cmd.none
+
+
+initMap : Model -> Cmd msg
+initMap model =
+    case model.photo.gps of
+        Nothing ->
+            Util.initMap []
+
+        Just gps ->
+            Util.initMap [ gps ]

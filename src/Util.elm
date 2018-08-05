@@ -1,9 +1,11 @@
-module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, formatExposureTime, cleanOwnerToName)
+module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, formatExposureTime, cleanOwnerToName, initMap)
 
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
 import Json.Decode as Decode
 import String.Extra
+import Data.Misc
+import Ports
 
 
 (=>) : a -> b -> ( a, b )
@@ -81,3 +83,20 @@ cleanOwnerToName owner =
             [ "Copyright", "copyright", "Photograph", "photograph", "Copyright: ", "copyright: ", "Photograph: ", "photograph: " ]
     in
         List.foldl (\word acc -> String.Extra.replace word "" acc) owner keywords
+
+
+initMap : List Data.Misc.GPS -> Cmd msg
+initMap coordinates =
+    let
+        gpsToLongLat gps =
+            ( gps.longitude, gps.latitude )
+
+        longLats =
+            List.map gpsToLongLat coordinates
+    in
+        case longLats of
+            [] ->
+                Cmd.none
+
+            _ ->
+                Ports.initMap longLats

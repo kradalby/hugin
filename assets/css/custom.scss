@@ -10,7 +10,7 @@ $theme-colors: (
   @include bg-variant(".bg-#{$color}", $value);
 }
 
-google-map {
+#map {
   display: block;
   min-height: 400px;
 }
