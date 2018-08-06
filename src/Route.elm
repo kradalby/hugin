@@ -11,8 +11,7 @@ import Data.Url as Url exposing (Url)
 
 
 type Route
-    = Home
-    | Root
+    = Root
     | Album String
     | Photo String
     | Keyword String
@@ -22,10 +21,7 @@ type Route
 route : Parser (Route -> a) a
 route =
     oneOf
-        [ UrlParser.map Home (s "")
-
-        --, Url.map Album (s "album" </> Data.Url.urlParser)
-        --, Url.map Photo (s "photo" </> Data.Url.urlParser)
+        [ UrlParser.map Root (s "")
         , UrlParser.map (Album << String.join "/") (s "album" </> Url.rest)
         , UrlParser.map (Photo << String.join "/") (s "photo" </> Url.rest)
         , UrlParser.map (Keyword << String.join "/") (s "keyword" </> Url.rest)
@@ -42,9 +38,6 @@ routeToString page =
     let
         pieces =
             case page of
-                Home ->
-                    []
-
                 Root ->
                     []
 

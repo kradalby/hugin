@@ -21,7 +21,6 @@ under Other.
 -}
 type ActivePage
     = Other
-    | Home
     | Album Data.Url.Url
     | Photo Data.Url.Url
     | Keyword Data.Url.Url
@@ -90,9 +89,6 @@ navbarLink page route linkContent =
 isActive : ActivePage -> Route -> Bool
 isActive page route =
     case ( page, route ) of
-        ( Home, Route.Home ) ->
-            True
-
         ( Album pageUrl, Route.Album routeUrl ) ->
             (Data.Url.urlToString pageUrl) == routeUrl
 

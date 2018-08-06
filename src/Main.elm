@@ -27,7 +27,6 @@ type Page
     = Blank
     | NotFound
     | Errored PageLoadError
-    | Home Album.Model
     | Album Data.Url.Url Album.Model
     | Photo Data.Url.Url Photo.Model
     | Keyword Data.Url.Url Keyword.Model
@@ -95,11 +94,6 @@ viewPage isLoading page =
                 Errored.view subModel
                     |> frame Page.Other
 
-            Home subModel ->
-                Album.view subModel
-                    |> frame (Page.Album (Data.Url.Url rootUrl))
-                    |> Html.map AlbumMsg
-
             Album url subModel ->
                 Album.view subModel
                     |> frame (Page.Album url)
@@ -157,9 +151,6 @@ pageSubscriptions page =
         NotFound ->
             Sub.none
 
-        Home _ ->
-            Sub.none
-
         Album _ subModel ->
             Sub.map AlbumMsg (Album.subscriptions subModel)
 
@@ -179,8 +170,6 @@ pageSubscriptions page =
 
 type Msg
     = SetRoute (Maybe Route)
-    | HomeLoaded (Result PageLoadError Album.Model)
-    | HomeMsg Album.Msg
     | AlbumLoaded Data.Url.Url (Result PageLoadError Album.Model)
     | AlbumMsg Album.Msg
     | PhotoLoaded Data.Url.Url (Result PageLoadError Photo.Model)
@@ -205,12 +194,10 @@ setRoute maybeRoute model =
             Nothing ->
                 { model | pageState = Loaded NotFound } => Cmd.none
 
-            Just Route.Home ->
-                transition HomeLoaded (Album.init (Data.Url.Url rootUrl))
-
             Just Route.Root ->
-                model => Route.modifyUrl Route.Home
+                model => Route.modifyUrl (Route.Album rootUrl)
 
+            -- transition (AlbumLoaded (Data.Url.Url rootUrl)) (Album.init (Data.Url.Url rootUrl))
             Just (Route.Album url) ->
                 transition (AlbumLoaded (Data.Url.Url url)) (Album.init (Data.Url.Url url))
 
@@ -254,15 +241,6 @@ updatePage page msg model =
         case ( msg, page ) of
             ( SetRoute route, _ ) ->
                 setRoute route model
-
-            ( HomeLoaded (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Home subModel) } => Cmd.none
-
-            ( HomeLoaded (Err error), _ ) ->
-                { model | pageState = Loaded (Errored error) } => Cmd.none
-
-            ( HomeMsg subMsg, Home subModel ) ->
-                toPage (Album (Data.Url.Url rootUrl)) AlbumMsg (Album.update) subMsg subModel
 
             ( AlbumLoaded url (Ok subModel), _ ) ->
                 { model | pageState = Loaded (Album url subModel) } => (Album.initMap subModel)
