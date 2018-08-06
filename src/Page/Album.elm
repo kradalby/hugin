@@ -67,7 +67,10 @@ view model =
                 model.errors
             , div
                 [ class "container-fluid" ]
-                [ div [ class "row bg-darklight" ] [ viewPath album.parents album.name, viewDownloadButton ]
+                [ div [ class "row bg-darklight" ]
+                    [ viewPath album.parents album.name
+                    , viewIf (album.photos /= []) viewDownloadButton
+                    ]
                 , viewIf model.showDownloadModal (viewDownloadModal model)
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewNestedAlbums album.albums ]
