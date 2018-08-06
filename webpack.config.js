@@ -56,13 +56,13 @@ module.exports = {
 
   plugins: process.env.NODE_ENV === 'development' ? [] : [
     new CopyWebpackPlugin([
-        { from: 'assets/images', to: 'assets/images' }
-    ]),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
+      { from: 'assets/images', to: 'assets/images' }
+    ])
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false
+    //   }
+    // })
   ],
 
   devServer: {

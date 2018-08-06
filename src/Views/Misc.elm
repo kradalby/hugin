@@ -26,7 +26,7 @@ viewKeywords name keywords =
                             [ class "", Route.href (Route.Keyword (Url.urlToString keyword.url)) ]
                             [ text keyword.name ]
                     )
-                    (List.sortBy .name keywords)
+                    keywords
     in
         div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
             [ div [ class "mt-3 mb-3" ] <|

@@ -105,19 +105,28 @@ initMap name coordinates =
 
 fuzzyKeywordReduce : String -> List Data.Misc.KeywordPointer -> List Data.Misc.KeywordPointer
 fuzzyKeywordReduce searchString keywordPointers =
-    let
-        test =
-            Debug.log "searchString: " searchString
+    case searchString of
+        "" ->
+            List.sortBy .name keywordPointers
 
-        keywords =
-            Debug.log "Keywords: " <|
-                List.map .name keywordPointers
+        _ ->
+            let
+                isValid kwp =
+                    (match << keyword) kwp < 2000
 
-        match input =
-            Fuzzy.match [] [] searchString input |> .score
+                keyword kwp =
+                    kwp.name
 
-        results =
-            Debug.log "Results: " <|
-                List.map match keywords
-    in
-        []
+                match input =
+                    Fuzzy.match []
+                        []
+                        (String.toLower searchString)
+                        (String.toLower input)
+                        |> .score
+
+                filteredPointers =
+                    List.filter
+                        isValid
+                        keywordPointers
+            in
+                List.sortBy (match << keyword) filteredPointers

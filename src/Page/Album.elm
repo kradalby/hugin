@@ -61,9 +61,6 @@ view model =
     let
         album =
             model.album
-
-        test =
-            Util.fuzzyKeywordReduce model.keywordFilter album.keywords
     in
         div [ class "album-page" ]
             [ Errors.view DismissErrors
@@ -79,10 +76,12 @@ view model =
                 , div [ class "row" ]
                     [ Html.Lazy.lazy2 viewKeywords
                         "People"
-                        album.people
+                      <|
+                        Util.fuzzyKeywordReduce model.keywordFilter album.people
                     , Html.Lazy.lazy2 viewKeywords
                         "Tags"
-                        album.keywords
+                      <|
+                        Util.fuzzyKeywordReduce model.keywordFilter album.keywords
                     ]
                 , div [ class "row" ] [ viewMap model.album.name ]
                 ]
@@ -222,11 +221,7 @@ update msg model =
                 model => Cmd.none
 
             UpdateKeywordFilter value ->
-                let
-                    test =
-                        Debug.log "update value: " value
-                in
-                    { model | keywordFilter = value } => Cmd.none
+                { model | keywordFilter = value } => Cmd.none
 
 
 onDownloadProgressUpdate : Sub (Maybe Float)
