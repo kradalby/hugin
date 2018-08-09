@@ -56,7 +56,7 @@ view model =
             model.errors
         , div
             [ class "container-fluid" ]
-            [ div [ class "row" ] [ viewMap "locations" ]
+            [ div [ class "row" ] [ viewMap "locations" 12 ]
             ]
         ]
 

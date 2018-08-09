@@ -69,7 +69,7 @@ view model =
                     ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewInformation photo
-                    , viewMap model.photo.name
+                    , viewMap model.photo.name 6
                     ]
                 ]
             ]

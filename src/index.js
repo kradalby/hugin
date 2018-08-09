@@ -44,6 +44,11 @@ app.ports.initMap.subscribe((data) => {
 })
 // coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]] : List ( Float, Float ) ]
 function initMap (data) {
+  // Ugly hack to remove not garbage collected rouge maps
+  document.querySelectorAll('[class^=mapboxgl]').forEach(
+    (element) => {
+      element.parentNode.removeChild(element)
+    })
   console.log('initMap called with: ', data)
   // Try to force some garbage collection
   if (map) {
