@@ -44,9 +44,9 @@ init url =
             Request.Album.get url
                 |> Http.toTask
 
-        handleLoadError _ =
+        handleLoadError err =
             "Album is currently unavailable."
-                |> pageLoadError (Page.Album url)
+                |> pageLoadError (Page.Album url) err
     in
         Task.map (Model [] False 0.0 "") loadAlbum
             |> Task.mapError handleLoadError

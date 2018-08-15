@@ -11,7 +11,7 @@ import Views.Assets as Assets
 view : Html msg
 view =
     main_ [ id "content", class "container", tabindex -1 ]
-        [ h1 [] [ text "Not Found" ]
+        [ h1 [ class "text-center pt-2 pb-3" ] [ text "Page not found :(" ]
         , div [ class "row" ]
-            [ img [ Assets.src Assets.error, alt "giant laser walrus wreaking havoc" ] [] ]
+            [ img [ class "rounded mx-auto d-block mb-3", Assets.src Assets.notFound, alt "Christina cannot find your page :(" ] [] ]
         ]

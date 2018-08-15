@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Html exposing (..)
+import Http exposing (Error)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
 import Page.Errored as Errored exposing (PageLoadError)
@@ -90,9 +91,21 @@ viewPage isLoading page =
                 Html.text ""
                     |> frame Page.Other
 
-            Errored subModel ->
-                Errored.view subModel
-                    |> frame Page.Other
+            Errored (Errored.PageLoadError model) ->
+                case model.errorType of
+                    Http.BadStatus resp ->
+                        case resp.status.code of
+                            404 ->
+                                NotFound.view
+                                    |> frame Page.Other
+
+                            _ ->
+                                Errored.view (Errored.PageLoadError model)
+                                    |> frame Page.Other
+
+                    _ ->
+                        Errored.view (Errored.PageLoadError model)
+                            |> frame Page.Other
 
             Album url subModel ->
                 Album.view subModel
@@ -186,9 +199,6 @@ setRoute maybeRoute model =
         transition toMsg task =
             { model | pageState = TransitioningFrom (getPage model.pageState) }
                 => Task.attempt toMsg task
-
-        errored =
-            pageErrored model
     in
         case maybeRoute of
             Nothing ->
@@ -211,15 +221,6 @@ setRoute maybeRoute model =
                 transition (LocationsLoaded (Data.Url.Url url)) (Locations.init (Data.Url.Url url))
 
 
-pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
-pageErrored model activePage errorMessage =
-    let
-        error =
-            Errored.pageLoadError activePage errorMessage
-    in
-        { model | pageState = Loaded (Errored error) } => Cmd.none
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     updatePage (getPage model.pageState) msg model
@@ -234,9 +235,6 @@ updatePage page msg model =
                     subUpdate subMsg subModel
             in
                 ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
-
-        errored =
-            pageErrored model
     in
         case ( msg, page ) of
             ( SetRoute route, _ ) ->

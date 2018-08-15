@@ -1,4 +1,4 @@
-module Page.Errored exposing (PageLoadError, pageLoadError, view)
+module Page.Errored exposing (PageLoadError(..), pageLoadError, view)
 
 {-| The page that renders when there was an error trying to load another page,
 for example a Page Not Found error.
@@ -11,6 +11,7 @@ of a giant walrus exploding the golden gate bridge with laser beams. Pew pew!
 import Html exposing (Html, div, h1, img, main_, p, text)
 import Html.Attributes exposing (alt, class, id, tabindex)
 import Views.Page exposing (ActivePage)
+import Http
 
 
 -- MODEL --
@@ -22,13 +23,18 @@ type PageLoadError
 
 type alias Model =
     { activePage : ActivePage
+    , errorType : Http.Error
     , errorMessage : String
     }
 
 
-pageLoadError : ActivePage -> String -> PageLoadError
-pageLoadError activePage errorMessage =
-    PageLoadError { activePage = activePage, errorMessage = errorMessage }
+pageLoadError : ActivePage -> Http.Error -> String -> PageLoadError
+pageLoadError activePage errorType errorMessage =
+    PageLoadError
+        { activePage = activePage
+        , errorType = errorType
+        , errorMessage = errorMessage
+        }
 
 
 
@@ -38,7 +44,7 @@ pageLoadError activePage errorMessage =
 view : PageLoadError -> Html msg
 view (PageLoadError model) =
     main_ [ id "content", class "container", tabindex -1 ]
-        [ h1 [] [ text "Error Loading Page" ]
-        , div [ class "row" ]
-            [ p [] [ text model.errorMessage ] ]
+        [ h1 [ class "text-center pt-2 pb-3" ] [ text "Could not load page" ]
+        , div [ class "row" ] [ text model.errorMessage ]
+        , div [ class "row" ] [ text "Please send the url that produced this page to kradalby@kradalby.no" ]
         ]

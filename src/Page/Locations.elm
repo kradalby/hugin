@@ -37,9 +37,9 @@ init url =
             Request.Locations.get url
                 |> Http.toTask
 
-        handleLoadError _ =
+        handleLoadError err =
             "Locations is currently unavailable."
-                |> pageLoadError (Page.Locations url)
+                |> pageLoadError (Page.Locations url) err
     in
         Task.map (Model []) loadLocations
             |> Task.mapError handleLoadError

@@ -61,7 +61,8 @@ traceDecoder message decoder =
             (\value ->
                 case Decode.decodeValue decoder value of
                     Ok decoded ->
-                        Decode.succeed <| Debug.log ("Success: " ++ message) <| decoded
+                        -- Decode.succeed <| Debug.log ("Success: " ++ message) <| decoded
+                        Decode.succeed decoded
 
                     Err err ->
                         Decode.fail <| Debug.log ("Fail: " ++ message) <| err

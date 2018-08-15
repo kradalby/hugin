@@ -34,9 +34,9 @@ init url =
             Request.Keyword.get url
                 |> Http.toTask
 
-        handleLoadError _ =
+        handleLoadError err =
             "Keyword is currently unavailable."
-                |> pageLoadError (Page.Keyword url)
+                |> pageLoadError (Page.Keyword url) err
     in
         Task.map (Model []) loadKeyword
             |> Task.mapError handleLoadError

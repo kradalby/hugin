@@ -37,9 +37,13 @@ init url =
             Request.Photo.get url
                 |> Http.toTask
 
-        handleLoadError _ =
-            "Photo is currently unavailable."
-                |> pageLoadError (Page.Photo url)
+        handleLoadError err =
+            let
+                _ =
+                    Debug.log "err: " err
+            in
+                "Photo is currently unavailable."
+                    |> pageLoadError (Page.Photo url) err
     in
         Task.map (Model []) loadPhoto
             |> Task.mapError handleLoadError
