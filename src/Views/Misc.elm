@@ -1,4 +1,4 @@
-module Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap)
+module Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, scaledImg, scaledImgCount)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -57,6 +57,47 @@ viewPath parents current =
                     )
 
 
+scaledImgCount : List Data.Misc.ScaledPhoto -> Int -> Html msg
+scaledImgCount scaledPhotos count =
+    let
+        sp =
+            List.sortBy .maxResolution scaledPhotos |> List.take count
+
+        srcset =
+            List.map
+                (\scaledPhoto ->
+                    scaledPhoto.url ++ " " ++ (toString scaledPhoto.maxResolution) ++ "w"
+                )
+                sp
+                |> String.join ", "
+
+        sizes =
+            List.map
+                (\scaledPhoto ->
+                    "(max-width: "
+                        ++ (toString scaledPhoto.maxResolution)
+                        ++ "px)"
+                        ++ " "
+                        ++ (toString scaledPhoto.maxResolution)
+                        ++ "px"
+                )
+                sp
+                |> String.join ", "
+    in
+        img
+            [ class "mx-auto d-block img-fluid"
+            , attribute "sizes" sizes
+            , attribute "srcset" srcset
+            , src <| Photo.biggest sp
+            ]
+            []
+
+
+scaledImg : List Data.Misc.ScaledPhoto -> Html msg
+scaledImg scaledPhotos =
+    scaledImgCount scaledPhotos (List.length scaledPhotos)
+
+
 viewPhotos : List PhotoInAlbum -> Html msg
 viewPhotos photos =
     div [ class "flexbin" ] <| List.map viewPhoto (List.sortBy (\photo -> Url.urlToString photo.url) photos)
@@ -65,7 +106,7 @@ viewPhotos photos =
 viewPhoto : PhotoInAlbum -> Html msg
 viewPhoto photo =
     a [ Route.href (Route.Photo (Url.urlToString photo.url)) ]
-        [ img [ src (Photo.thumbnail photo.scaledPhotos) ] [] ]
+        [ scaledImgCount photo.scaledPhotos 3 ]
 
 
 viewMap : String -> Int -> Html msg

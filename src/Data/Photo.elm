@@ -78,19 +78,27 @@ decoder =
 
 thumbnail : List ScaledPhoto -> String
 thumbnail scaledPhotos =
-    case (List.Extra.last scaledPhotos) of
-        Nothing ->
-            ""
+    let
+        sp =
+            List.sortBy .maxResolution scaledPhotos
+    in
+        case (List.head sp) of
+            Nothing ->
+                ""
 
-        Just thumb ->
-            thumb.url
+            Just photo ->
+                photo.url
 
 
 biggest : List ScaledPhoto -> String
 biggest scaledPhotos =
-    case (List.head scaledPhotos) of
-        Nothing ->
-            ""
+    let
+        sp =
+            List.sortBy .maxResolution scaledPhotos |> List.reverse
+    in
+        case (List.head sp) of
+            Nothing ->
+                ""
 
-        Just photo ->
-            photo.url
+            Just photo ->
+                photo.url
