@@ -4,7 +4,7 @@ module Views.Errors exposing (view)
 -}
 
 import Html exposing (..)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (class, style, attribute)
 import Html.Events exposing (onClick)
 import Util exposing ((=>))
 
@@ -14,17 +14,12 @@ view dismissErrors errors =
     if List.isEmpty errors then
         Html.text ""
     else
-        div [ class "error-messages", styles ] <|
-            List.map (\error -> p [] [ text error ]) errors
-                ++ [ button [ onClick dismissErrors ] [ text "Ok" ] ]
-
-
-styles : Attribute msg
-styles =
-    style
-        [ "position" => "fixed"
-        , "top" => "0"
-        , "background" => "rgb(250, 250, 250)"
-        , "padding" => "20px"
-        , "border" => "1px solid"
-        ]
+        div [ class "row" ]
+            [ div [ class "col-12 p-0" ]
+                [ div [ onClick dismissErrors, class "alert alert-primary mb-0 rounded-0", attribute "role" "alert" ] <|
+                    List.intersperse (hr [] []) <|
+                        List.map
+                            (\error -> p [ class "mb-0" ] [ text error ])
+                            errors
+                ]
+            ]

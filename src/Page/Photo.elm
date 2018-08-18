@@ -7,6 +7,7 @@ import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Html.Lazy
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
@@ -60,12 +61,12 @@ view model =
             model.photo
     in
         div [ class "photo-page" ]
-            [ Errors.view DismissErrors model.errors
-            , div [ class "container-fluid" ]
+            [ div [ class "container-fluid" ]
                 [ div [ class "row bg-darklight" ]
                     [ viewPath photo.parents photo.name
                     , viewDownloadButton photo
                     ]
+                , Errors.view DismissErrors model.errors
                 , div [ class "row" ] [ viewImage photo ]
                 , div [ class "row" ]
                     [ viewKeywords "People" photo.people
@@ -81,7 +82,7 @@ view model =
 
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
-    div [ class "ml-auto mr-2" ] [ a [ href photo.originalImageURL, downloadAs photo.name ] [ i [ class "fas fa-download text-white" ] [] ] ]
+    div [ class "ml-auto mr-2" ] [ a [ onClick CopyRightNotice, href photo.originalImageURL, downloadAs photo.name ] [ i [ class "fas fa-download text-white" ] [] ] ]
 
 
 viewImage : Photo -> Html Msg
@@ -172,6 +173,7 @@ viewInformation photo =
 
 type Msg
     = DismissErrors
+    | CopyRightNotice
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -183,6 +185,9 @@ update msg model =
         case msg of
             DismissErrors ->
                 { model | errors = [] } => Cmd.none
+
+            CopyRightNotice ->
+                { model | errors = [ "Remember to ask and credit the photographer before using the image!" ] } => Cmd.none
 
 
 initMap : Model -> Cmd msg

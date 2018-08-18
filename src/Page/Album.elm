@@ -110,7 +110,10 @@ viewDownloadModal model =
                         ]
                     ]
                 , div [ class "modal-body" ]
-                    [ text "This feature is experimental, and will probably at best crash your browser."
+                    [ div [ class "alert alert-danger", attribute "role" "alert" ]
+                        [ text "This feature is experimental, and will probably only work in Chrome-based browsers." ]
+                    , hr [] []
+                    , p [ class "ml-2 mr-2" ] [ text "If you want to republish or use the photos you download, please ask the photographer and remember to credit." ]
                     , hr [] []
                     , div
                         [ class "progress" ]
