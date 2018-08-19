@@ -10,7 +10,12 @@ require('./index.html')
 
 require('bootstrap/js/dist/modal')
 
-let saveAs = require('./FileSaver.js')
+// let saveAs = require('./FileSaver.js')
+require('web-streams-polyfill')
+let StreamSaver = require('StreamSaver')
+console.log(StreamSaver.mitm)
+StreamSaver.mitm = 'https://jimmywarting.github.io/StreamSaver.js/mitm.html?version=' +
+    StreamSaver.version.full
 
 require('mapbox-gl/dist/mapbox-gl.css')
 let mapboxgl = require('mapbox-gl')
@@ -120,23 +125,43 @@ function urlToPromise (url) {
 function downloadImages (urls) {
   console.log('Download images is called with: ', urls)
   let zip = new JSZip()
+  const fileStream = StreamSaver.createWriteStream('download.zip')
+  const writer = fileStream.getWriter()
 
   urls.forEach((url) => {
     let filename = url.replace(/.*\//g, '')
     zip.file(filename, urlToPromise(url), {binary: true})
   })
 
-  // when everything has been downloaded, we can trigger the dl
-  zip.generateAsync({type: 'blob'}, function updateCallback (metadata) {
-    // Inform elm app
-    app.ports.downloadProgress.send(metadata.percent.toFixed(2) | 0)
-  })
-    .then(function callback (blob) {
-      // see FileSaver.js
-      saveAs(blob, 'download.zip')
-    }, function (e) {
-      console.err(e)
+  // // when everything has been downloaded, we can trigger the dl
+  // zip.generateAsync({type: 'blob', streamFiles: true}, function updateCallback (metadata) {
+  //   // Inform elm app
+  //   app.ports.downloadProgress.send(metadata.percent.toFixed(2) | 0)
+  // })
+  //   .then(function callback (blob) {
+  //     // see FileSaver.js
+  //     saveAs(blob, 'download.zip')
+  //   }, function (e) {
+  //     console.err(e)
+  //   })
+  // zip.generateInternalStream({type: 'blob', streamFiles: true}, function updateCallback (metadata) {
+  // // Inform elm app
+  //   app.ports.downloadProgress.send(metadata.percent.toFixed(2) | 0)
+  // })
+  zip.generateInternalStream({type: 'uint8array', streamFiles: true})
+    .on('data', data => {
+      console.log('Received data')
+      writer.write(new Blob([data])
+      )
     })
+    .on('end', error => {
+      console.log('Reached end of zip stream')
+      writer.close()
+    })
+    .on('error', error => {
+      console.err(error)
+      writer.abort(error)
+    }).resume()
 
   return false
 }
