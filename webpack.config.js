@@ -47,12 +47,12 @@ module.exports = {
     noParse: /\.elm$/
   },
 
-  resolve: {
-    plugins: [new BowerResolvePlugin()],
-    modules: ['bower_components', 'node_modules'],
-    descriptionFiles: ['bower.json', 'package.json'],
-    mainFields: ['browser', 'main']
-  },
+  // resolve: {
+  //  plugins: [new BowerResolvePlugin()],
+  //  modules: ['bower_components', 'node_modules'],
+  //  descriptionFiles: ['bower.json', 'package.json'],
+  //  mainFields: ['browser', 'main']
+  // },
 
   plugins: process.env.NODE_ENV === 'development' ? [] : [
     new CopyWebpackPlugin([

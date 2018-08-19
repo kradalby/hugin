@@ -74,15 +74,21 @@ decoder =
 
 
 -- HELPERS --
+-- Return image closest to width
 
 
-thumbnail : List ScaledPhoto -> String
-thumbnail scaledPhotos =
+thumbnail : List ScaledPhoto -> Int -> String
+thumbnail scaledPhotos width =
     let
-        sp =
-            List.sortBy .maxResolution scaledPhotos
+        distances =
+            List.map (\elem -> abs (elem.maxResolution - width)) scaledPhotos
+
+        closest =
+            List.minimum distances
+                |> Maybe.andThen (\elem -> List.Extra.elemIndex elem distances)
+                |> Maybe.andThen (\index -> List.Extra.getAt index scaledPhotos)
     in
-        case (List.head sp) of
+        case closest of
             Nothing ->
                 ""
 

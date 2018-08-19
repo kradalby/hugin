@@ -164,8 +164,8 @@ pageSubscriptions page =
         NotFound ->
             Sub.none
 
-        Album _ subModel ->
-            Sub.map AlbumMsg (Album.subscriptions subModel)
+        Album _ _ ->
+            Sub.none
 
         Photo _ _ ->
             Sub.none

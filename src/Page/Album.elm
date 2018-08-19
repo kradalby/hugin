@@ -1,4 +1,4 @@
-module Page.Album exposing (Model, Msg(..), init, update, view, subscriptions, initMap)
+module Page.Album exposing (Model, Msg(..), init, update, view, initMap)
 
 {-| Viewing a user's album.
 -}
@@ -22,7 +22,6 @@ import Views.Page as Page
 import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap)
 import Route exposing (Route)
 import Ports
-import Json.Decode as Decode
 
 
 -- MODEL --
@@ -31,7 +30,6 @@ import Json.Decode as Decode
 type alias Model =
     { errors : List String
     , showDownloadModal : Bool
-    , downloadProgress : Float
     , keywordFilter : String
     , album : Album
     }
@@ -48,7 +46,7 @@ init url =
             "Album is currently unavailable."
                 |> pageLoadError (Page.Album url) err
     in
-        Task.map (Model [] False 0.0 "") loadAlbum
+        Task.map (Model [] False "") loadAlbum
             |> Task.mapError handleLoadError
 
 
@@ -114,23 +112,6 @@ viewDownloadModal model =
                         [ text "This feature is experimental, and will probably only work in Chrome-based browsers." ]
                     , hr [] []
                     , p [ class "ml-2 mr-2" ] [ text "If you want to republish or use the photos you download, please ask the photographer and remember to credit." ]
-                    , hr [] []
-                    , div
-                        [ class "progress" ]
-                        [ div
-                            [ attribute "aria-valuemax" "100"
-                            , attribute "aria-valuemin" "0"
-                            , attribute "aria-valuenow" (toString model.downloadProgress)
-                            , class "progress-bar"
-                            , attribute "role" "progressbar"
-                            , attribute "style"
-                                ("width:"
-                                    ++ (toString model.downloadProgress)
-                                    ++ "%;"
-                                )
-                            ]
-                            [ text <| (toString model.downloadProgress) ++ "%" ]
-                        ]
                     ]
                 , div [ class "modal-footer" ]
                     [ button [ onClick ToggleDownloadModal, class "btn btn-secondary", attribute "data-dismiss" "modal", type_ "button" ]
@@ -166,7 +147,7 @@ viewNestedAlbum album =
                         img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300 ] []
 
                     _ ->
-                        img [ src (Photo.thumbnail album.scaledPhotos) ] []
+                        img [ src (Photo.thumbnail album.scaledPhotos 300) ] []
                   )
                 , h4 [] [ text album.name ]
                 ]
@@ -190,7 +171,6 @@ type Msg
     = DismissErrors
     | ToggleDownloadModal
     | Download
-    | OnDownloadProgressUpdate (Maybe Float)
     | UpdateKeywordFilter String
 
 
@@ -207,7 +187,6 @@ update msg model =
             ToggleDownloadModal ->
                 { model
                     | showDownloadModal = not model.showDownloadModal
-                    , downloadProgress = 0.0
                 }
                     => Cmd.none
 
@@ -218,26 +197,10 @@ update msg model =
                             .originalImageURL
                             album.photos
                 in
-                    { model | downloadProgress = 0.0 } => Ports.downloadImages urls
-
-            OnDownloadProgressUpdate (Just progress) ->
-                { model | downloadProgress = progress } => Cmd.none
-
-            OnDownloadProgressUpdate Nothing ->
-                model => Cmd.none
+                    model => Ports.downloadImages urls
 
             UpdateKeywordFilter value ->
                 { model | keywordFilter = value } => Cmd.none
-
-
-onDownloadProgressUpdate : Sub (Maybe Float)
-onDownloadProgressUpdate =
-    Ports.downloadProgress (Decode.decodeValue Decode.float >> Result.toMaybe)
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.map OnDownloadProgressUpdate onDownloadProgressUpdate
 
 
 initMap : Model -> Cmd msg

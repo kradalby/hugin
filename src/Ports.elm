@@ -1,4 +1,4 @@
-port module Ports exposing (downloadImages, downloadProgress, initMap)
+port module Ports exposing (downloadImages, initMap)
 
 import Json.Encode exposing (Value)
 
@@ -10,9 +10,6 @@ port onSessionChange : (Value -> msg) -> Sub msg
 
 
 port downloadImages : List String -> Cmd msg
-
-
-port downloadProgress : (Value -> msg) -> Sub msg
 
 
 port initMap : ( String, List ( Float, Float ) ) -> Cmd msg

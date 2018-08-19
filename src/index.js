@@ -14,8 +14,6 @@ require('bootstrap/js/dist/modal')
 require('web-streams-polyfill')
 let StreamSaver = require('StreamSaver')
 console.log(StreamSaver.mitm)
-StreamSaver.mitm = 'https://jimmywarting.github.io/StreamSaver.js/mitm.html?version=' +
-    StreamSaver.version.full
 
 require('mapbox-gl/dist/mapbox-gl.css')
 let mapboxgl = require('mapbox-gl')
@@ -47,6 +45,7 @@ function checkElementById (selector) {
 app.ports.initMap.subscribe((data) => {
   initMap(data)
 })
+
 // coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]] : List ( Float, Float ) ]
 function initMap (data) {
   // Ugly hack to remove not garbage collected rouge maps
@@ -109,19 +108,6 @@ function urlToPromise (url) {
   })
 }
 
-// function urlToPromise (url) {
-//   fetch(url) // 1) fetch the url
-//     .then(function (response) { // 2) filter on 200 OK
-//       console.log(response)
-//       console.log(response.status)
-//       if (response.status === 200 || response.status === 0) {
-//         return Promise.resolve(response.blob())
-//       } else {
-//         return Promise.reject(new Error(response.statusText))
-//       }
-//     })
-// }
-
 function downloadImages (urls) {
   console.log('Download images is called with: ', urls)
   let zip = new JSZip()
@@ -133,28 +119,12 @@ function downloadImages (urls) {
     zip.file(filename, urlToPromise(url), {binary: true})
   })
 
-  // // when everything has been downloaded, we can trigger the dl
-  // zip.generateAsync({type: 'blob', streamFiles: true}, function updateCallback (metadata) {
-  //   // Inform elm app
-  //   app.ports.downloadProgress.send(metadata.percent.toFixed(2) | 0)
-  // })
-  //   .then(function callback (blob) {
-  //     // see FileSaver.js
-  //     saveAs(blob, 'download.zip')
-  //   }, function (e) {
-  //     console.err(e)
-  //   })
-  // zip.generateInternalStream({type: 'blob', streamFiles: true}, function updateCallback (metadata) {
-  // // Inform elm app
-  //   app.ports.downloadProgress.send(metadata.percent.toFixed(2) | 0)
-  // })
   zip.generateInternalStream({type: 'uint8array', streamFiles: true})
     .on('data', data => {
-      console.log('Received data')
-      writer.write(new Blob([data])
-      )
+      writer.write(data)
+      // writer.write(new Blob([data]))
     })
-    .on('end', error => {
+    .on('end', () => {
       console.log('Reached end of zip stream')
       writer.close()
     })
