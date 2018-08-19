@@ -1,9 +1,20 @@
 const path = require('path')
-const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const BowerResolvePlugin = require('bower-resolve-webpack-plugin')
+const MinifyPlugin = require('babel-minify-webpack-plugin')
 
-const elmLoader = process.env.NODE_ENV === 'development' ? 'elm-hot-loader!elm-webpack-loader?verbose=true&warn=true&debug=true' : 'elm-webpack-loader'
+const elmLoaders = process.env.NODE_ENV === 'development' ? [
+  { loader: 'elm-hot-loader' },
+  {
+    loader: 'elm-webpack-loader',
+    options: {
+      debug: true,
+      verbose: true,
+      warn: true
+    }
+  }
+] : [
+  { loader: 'elm-webpack-loader' }
+]
 
 module.exports = {
   entry: {
@@ -33,7 +44,7 @@ module.exports = {
       {
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loader: elmLoader
+        use: elmLoaders
       },
       {
         test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
@@ -47,22 +58,11 @@ module.exports = {
     noParse: /\.elm$/
   },
 
-  // resolve: {
-  //  plugins: [new BowerResolvePlugin()],
-  //  modules: ['bower_components', 'node_modules'],
-  //  descriptionFiles: ['bower.json', 'package.json'],
-  //  mainFields: ['browser', 'main']
-  // },
-
   plugins: process.env.NODE_ENV === 'development' ? [] : [
     new CopyWebpackPlugin([
       { from: 'assets/images', to: 'assets/images' }
-    ])
-    // new webpack.optimize.UglifyJsPlugin({
-    //   compress: {
-    //     warnings: false
-    //   }
-    // })
+    ]),
+    new MinifyPlugin({}, {})
   ],
 
   devServer: {
