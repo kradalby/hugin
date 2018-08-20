@@ -113,7 +113,7 @@ if (mode === 'development') {
     serve: {
       inline: true,
       stats: 'errors-only',
-      content: [path.join(__dirname, 'assets')],
+      content: [path.join(__dirname, '')],
       add: (app, middleware, options) => {
         // routes /xyz -> /index.html
         app.use(history())
