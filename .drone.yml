@@ -1,0 +1,6 @@
+pipeline:
+  build:
+    image: plugins/docker
+    repo: kradalby/hugin
+    tags: latest
+    secrets: [ docker_username, docker_password ]
