@@ -9,14 +9,13 @@ require('../assets/css/flexbin.scss')
 
 require('bootstrap/js/dist/modal')
 
-// let saveAs = require('./FileSaver.js')
-require('web-streams-polyfill')
-let StreamSaver = require('StreamSaver')
-console.log(StreamSaver.mitm)
-
 require('mapbox-gl/dist/mapbox-gl.css')
 let mapboxgl = require('mapbox-gl')
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9.ziohBVzNJe3_miSeuFFp5g'
+
+// let saveAs = require('./FileSaver.js')
+require('web-streams-polyfill')
+let StreamSaver = require('streamsaver')
 
 let JSZip = require('jszip')
 let JSZipUtils = require('jszip-utils')
