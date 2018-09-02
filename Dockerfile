@@ -13,6 +13,5 @@ ADD . .
 RUN npm run prod
 
 
-
-FROM nginx:alpine 
+FROM kradalby/nginx-ldap-auth:1.15.3 as production 
 COPY --from=builder /app/dist /usr/share/nginx/html
