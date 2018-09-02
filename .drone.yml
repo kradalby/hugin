@@ -1,6 +1,7 @@
 pipeline:
   build:
     image: plugins/docker
+    registry: registry.docker.io
     repo: kradalby/hugin
     auto_tag: true
     secrets: [ docker_username, docker_password ]
