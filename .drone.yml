@@ -4,6 +4,19 @@ pipeline:
     repo: kradalby/hugin
     auto_tag: true
     secrets: [ docker_username, docker_password ]
+    tags:
+        - latest
+        - ${DRONE_COMMIT_SHA:0:8}
+
+  deploy:
+    image: quay.io/honestbee/drone-kubernetes
+    deployment: hugin-deployment
+    repo: kradalby/hugin
+    container: hugin
+    namespace: hugin
+    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
+    tag:
+      - ${DRONE_COMMIT_SHA:0:8}
 
   notify:
     image: drillster/drone-email
