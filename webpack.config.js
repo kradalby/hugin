@@ -12,6 +12,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const SizePlugin = require('size-plugin')
 // const CompressionPlugin = require('compression-webpack-plugin')
 
 const mode = process.env.NODE_ENV || 'development'
@@ -27,6 +28,7 @@ var common = {
     filename: filename
   },
   plugins: [
+    new SizePlugin(),
     new HTMLWebpackPlugin({
       // Use this template to get basic responsive meta tags
       template: 'src/index.html',
