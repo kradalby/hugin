@@ -1,4 +1,4 @@
-port module Ports exposing (downloadImages, initMap)
+port module Ports exposing (downloadImages, initMap, analytics)
 
 import Json.Encode exposing (Value)
 
@@ -13,3 +13,6 @@ port downloadImages : List String -> Cmd msg
 
 
 port initMap : ( String, List ( Float, Float ) ) -> Cmd msg
+
+
+port analytics : String -> Cmd msg

@@ -16,6 +16,7 @@ import Util exposing ((=>), initMap)
 import Views.Page as Page exposing (ActivePage)
 import Data.Url
 import Request.Helpers exposing (rootUrl)
+import Ports
 
 
 -- WARNING: Based on discussions around how asset management features
@@ -238,7 +239,19 @@ updatePage page msg model =
     in
         case ( msg, page ) of
             ( SetRoute route, _ ) ->
-                setRoute route model
+                let
+                    ( m, c ) =
+                        setRoute route model
+
+                    url =
+                        case route of
+                            Nothing ->
+                                ""
+
+                            Just r ->
+                                Route.routeToString r
+                in
+                    ( m, Cmd.batch [ c, Ports.analytics url ] )
 
             ( AlbumLoaded url (Ok subModel), _ ) ->
                 { model | pageState = Loaded (Album url subModel) } => (Album.initMap subModel)

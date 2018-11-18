@@ -1,31 +1,21 @@
+let Elm = require('./Main.elm')
+let app = Elm.Main.fullscreen()
+
 // require('./styles/reset.css');
 // require('materialize-css/sass/materialize.scss')
-//
+
+// FONT AWESOME
 require('@fortawesome/fontawesome')
 require('@fortawesome/fontawesome-free-solid')
 
+// SCSS
 require('../assets/css/custom.scss')
 require('../assets/css/flexbin.scss')
 
+// BOOTSTRAP
 require('bootstrap/js/dist/modal')
 
-require('mapbox-gl/dist/mapbox-gl.css')
-let mapboxgl = require('mapbox-gl')
-mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9.ziohBVzNJe3_miSeuFFp5g'
-
-// let saveAs = require('./FileSaver.js')
-require('web-streams-polyfill')
-let StreamSaver = require('streamsaver')
-
-let JSZip = require('jszip')
-let JSZipUtils = require('jszip-utils')
-
-let Elm = require('./Main.elm')
-
-let app = Elm.Main.fullscreen()
-
-var map = null
-
+// Helper functions
 function rafAsync () {
   return new Promise(resolve => {
     requestAnimationFrame(resolve) // faster than set time out
@@ -39,6 +29,18 @@ function checkElementById (selector) {
     return Promise.resolve(document.getElementById(selector))
   }
 }
+
+// Google Analytics
+app.ports.analytics.subscribe((url) => {
+  gtag('config', 'UA-18856525-25', {'page_path': '/' + url})
+})
+
+// MAPBOX
+require('mapbox-gl/dist/mapbox-gl.css')
+let mapboxgl = require('mapbox-gl')
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9.ziohBVzNJe3_miSeuFFp5g'
+
+var map = null
 
 app.ports.initMap.subscribe((data) => {
   initMap(data)
@@ -88,6 +90,15 @@ function initMap (data) {
     })
   })
 }
+
+// FILE DOWNLOAD
+
+// let saveAs = require('./FileSaver.js')
+require('web-streams-polyfill')
+let StreamSaver = require('streamsaver')
+
+let JSZip = require('jszip')
+let JSZipUtils = require('jszip-utils')
 
 // Download albums
 app.ports.downloadImages.subscribe((urls) => {
