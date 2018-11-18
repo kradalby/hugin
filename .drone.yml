@@ -4,6 +4,8 @@ pipeline:
     repo: kradalby/hugin
     # auto_tag: true
     secrets: [ docker_username, docker_password ]
+    environment:
+        - MAPBOX_ACCESS_TOKEN: $$mapbox_token 
     tags:
         - ${DRONE_COMMIT_SHA:0:8}
         - latest
