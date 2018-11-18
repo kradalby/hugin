@@ -41,6 +41,30 @@ $theme-colors: (
   opacity: 0;
 }
 
+.previous-image-help-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 50%;
+  opacity: 0.5;
+  background-color: #222;
+}
+
+.next-image-help-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 0;
+  height: 100%;
+  width: 50%;
+  opacity: 0.5;
+  background-color: #000;
+}
+
 .image-album-container {
   display: inline-block;
   position: relative;

@@ -168,8 +168,8 @@ pageSubscriptions page =
         Album _ _ ->
             Sub.none
 
-        Photo _ _ ->
-            Sub.none
+        Photo _ subModel ->
+            Sub.map PhotoMsg (Photo.subscriptions subModel)
 
         Keyword _ _ ->
             Sub.none

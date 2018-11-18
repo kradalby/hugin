@@ -32,6 +32,7 @@ function checkElementById (selector) {
 
 // Google Analytics
 app.ports.analytics.subscribe((url) => {
+  // console.log('DEBUG - gtag called with: ', url)
   gtag('config', 'UA-18856525-25', {'page_path': '/' + url})
 })
 

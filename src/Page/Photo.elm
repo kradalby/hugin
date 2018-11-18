@@ -1,4 +1,4 @@
-module Page.Photo exposing (Model, Msg, init, update, view, initMap)
+module Page.Photo exposing (Model, Msg, init, update, view, subscriptions, initMap)
 
 {-| Viewing a user's photo.
 -}
@@ -20,6 +20,7 @@ import Views.Misc exposing (viewKeywords, viewPath, viewMap, scaledImg)
 import Maybe.Extra
 import Route exposing (Route)
 import Date.Format
+import Keyboard exposing (KeyCode)
 
 
 -- MODEL --
@@ -27,6 +28,7 @@ import Date.Format
 
 type alias Model =
     { errors : List String
+    , showHelpModal : Bool
     , photo : Photo
     }
 
@@ -46,7 +48,7 @@ init url =
                 "Photo is currently unavailable."
                     |> pageLoadError (Page.Photo url) err
     in
-        Task.map (Model []) loadPhoto
+        Task.map (Model [] False) loadPhoto
             |> Task.mapError handleLoadError
 
 
@@ -65,8 +67,10 @@ view model =
                 [ div [ class "row bg-darklight" ]
                     [ viewPath photo.parents photo.name
                     , viewDownloadButton photo
+                    , viewHelpButton
                     ]
                 , Errors.view DismissErrors model.errors
+                , viewIf model.showHelpModal (viewHelpModal model)
                 , div [ class "row" ] [ viewImage photo ]
                 , div [ class "row" ]
                     [ viewKeywords "People" photo.people
@@ -82,45 +86,63 @@ view model =
 
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
-    div [ class "ml-auto mr-2" ] [ a [ onClick CopyRightNotice, href photo.originalImageURL, downloadAs photo.name ] [ i [ class "fas fa-download text-white" ] [] ] ]
+    div [ class "col-1 ml-auto mr-2" ]
+        [ a [ onClick CopyRightNotice, href photo.originalImageURL, downloadAs photo.name ]
+            [ i [ class "fas fa-download text-white" ] []
+            ]
+        ]
+
+
+viewHelpButton : Html Msg
+viewHelpButton =
+    div [ class "col-1 ml-auto mr-2" ]
+        [ a [ onClick ToggleHelpModal ]
+            [ i [ class "fas fa-info-circle text-white" ] []
+            ]
+        ]
+
+
+previousHref : Photo -> Attribute msg
+previousHref photo =
+    Maybe.map Url.urlToString photo.previous
+        |> Maybe.map (\url -> Route.href (Route.Photo url))
+        |> Maybe.withDefault (href "")
+
+
+nextHref : Photo -> Attribute msg
+nextHref photo =
+    Maybe.map Url.urlToString photo.next
+        |> Maybe.map (\url -> Route.href (Route.Photo url))
+        |> Maybe.withDefault (href "")
 
 
 viewImage : Photo -> Html Msg
 viewImage photo =
     let
         imageTag =
-            case photo.scaledPhotos of
-                [] ->
-                    img [ src <| Photo.biggest photo.scaledPhotos, class "mx-auto d-block img-fluid" ] []
-
-                scaledPhotos ->
-                    scaledImg scaledPhotos
+            viewImageTag photo
     in
         div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 m-0 p-0" ]
             [ div [ class "mx-auto" ]
                 [ div []
                     [ imageTag
-                    , a
-                        (case photo.previous of
-                            Nothing ->
-                                []
-
-                            Just url ->
-                                [ Route.href (Route.Photo (Url.urlToString url)) ]
-                        )
+                    , a [ previousHref photo ]
                         [ div [ class "previous-image-overlay" ] [] ]
-                    , a
-                        (case photo.next of
-                            Nothing ->
-                                []
-
-                            Just url ->
-                                [ Route.href (Route.Photo (Url.urlToString url)) ]
-                        )
+                    , a [ nextHref photo ]
                         [ div [ class "next-image-overlay" ] [] ]
                     ]
                 ]
             ]
+
+
+viewImageTag : Photo -> Html Msg
+viewImageTag photo =
+    case photo.scaledPhotos of
+        [] ->
+            img [ src <| Photo.biggest photo.scaledPhotos, class "mx-auto d-block img-fluid" ] []
+
+        scaledPhotos ->
+            scaledImg scaledPhotos
 
 
 viewInformation : Photo -> Html Msg
@@ -171,9 +193,64 @@ viewInformation photo =
             ]
 
 
+viewHelpModal : Model -> Html Msg
+viewHelpModal model =
+    div [ style [ ( "display", "block" ) ], attribute "aria-hidden" "false", attribute "aria-labelledby" "helpModal", class "modal", id "helpModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
+        [ div [ class "modal-dialog modal-dialog-centered", attribute "role" "document" ]
+            [ div [ class "modal-content" ]
+                [ div [ class "modal-header" ]
+                    [ h5 [ class "modal-title", id "helpModalTitle" ]
+                        [ text "Help" ]
+                    , button [ onClick ToggleHelpModal, attribute "aria-label" "Close", class "close", attribute "data-dismiss" "modal", type_ "button" ]
+                        [ span [ attribute "aria-hidden" "true" ]
+                            [ text "×" ]
+                        ]
+                    ]
+                , div [ class "modal-body" ]
+                    [ p [ class "mx-2" ]
+                        [ text "Download a high quality version of the image by clicking "
+                        , i [ class "fas fa-download" ] []
+                        ]
+                    , hr [] []
+                    , div [ class "mx-2" ]
+                        [ p [] [ text "Navigate to the previous or next image by clicking on the left or right side of the current image:" ]
+                        , div [ style [ ( "position", "relative" ) ] ]
+                            [ viewImageTag model.photo
+                            , div
+                                [ class "previous-image-help-overlay" ]
+                                [ i [ class "fas fa-chevron-left fa-3x text-white mx-auto d-block" ]
+                                    []
+                                ]
+                            , div
+                                [ class "next-image-help-overlay" ]
+                                [ i [ class "fas fa-chevron-right fa-3x text-white mx-auto d-block" ]
+                                    []
+                                ]
+                            ]
+                        ]
+                    , hr [] []
+                    , p [ class "mx-2" ]
+                        [ text "On desktop, navigate through images by pressing "
+                        , i [ class "fas fa-caret-square-left" ] []
+                        , text " to navigate to the previous image and "
+                        , i [ class "fas fa-caret-square-right" ] []
+                        , text " to navigate to the next image"
+                        ]
+                    ]
+                , div [ class "modal-footer" ]
+                    [ button [ onClick ToggleHelpModal, class "btn btn-secondary", attribute "data-dismiss" "modal", type_ "button" ]
+                        [ text "Close" ]
+                    ]
+                ]
+            ]
+        ]
+
+
 type Msg
     = DismissErrors
+    | ToggleHelpModal
     | CopyRightNotice
+    | KeyMsg KeyCode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -186,8 +263,42 @@ update msg model =
             DismissErrors ->
                 { model | errors = [] } => Cmd.none
 
+            ToggleHelpModal ->
+                { model
+                    | showHelpModal = not model.showHelpModal
+                }
+                    => Cmd.none
+
             CopyRightNotice ->
                 { model | errors = [ "Remember to ask and credit the photographer before using the image!" ] } => Cmd.none
+
+            KeyMsg code ->
+                case code of
+                    37 ->
+                        case photo.previous of
+                            Nothing ->
+                                ( model, Cmd.none )
+
+                            Just url ->
+                                ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
+
+                    39 ->
+                        case photo.next of
+                            Nothing ->
+                                ( model, Cmd.none )
+
+                            Just url ->
+                                ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
+
+                    _ ->
+                        ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Keyboard.downs KeyMsg
+        ]
 
 
 initMap : Model -> Cmd msg
