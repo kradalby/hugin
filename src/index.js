@@ -38,7 +38,8 @@ app.ports.analytics.subscribe((url) => {
 // MAPBOX
 require('mapbox-gl/dist/mapbox-gl.css')
 let mapboxgl = require('mapbox-gl')
-mapboxgl.accessToken = 'pk.eyJ1Ijoia3JhZGFsYnkiLCJhIjoiY2prZ3huOHE3MDFhYjNrcXF6cHo0d2p4eSJ9.ziohBVzNJe3_miSeuFFp5g'
+mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
+console.log(mapboxgl.accessToken)
 
 var map = null
 

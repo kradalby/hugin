@@ -28,6 +28,9 @@ var common = {
     filename: filename
   },
   plugins: [
+    new webpack.DefinePlugin({
+      MAPBOX_ACCESS_TOKEN: JSON.stringify(process.env.MAPBOX_ACCESS_TOKEN)
+    }),
     new SizePlugin(),
     new HTMLWebpackPlugin({
       // Use this template to get basic responsive meta tags
