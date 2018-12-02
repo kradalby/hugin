@@ -84,7 +84,7 @@ view model =
                       <|
                         Util.fuzzyKeywordReduce model.keywordFilter album.keywords
                     ]
-                , div [ class "row" ] [ viewMap model.album.name 12 ]
+                , div [ class "row" ] [ viewMap model.album.name 12 12 12 12 12 ]
                 ]
             ]
 

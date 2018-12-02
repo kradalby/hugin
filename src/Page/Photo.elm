@@ -66,8 +66,10 @@ view model =
             [ div [ class "container-fluid" ]
                 [ div [ class "row bg-darklight" ]
                     [ viewPath photo.parents photo.name
-                    , viewDownloadButton photo
-                    , viewHelpButton
+                    , div [ class "col-1 px-0 text-right" ]
+                        [ viewHelpButton
+                        , viewDownloadButton photo
+                        ]
                     ]
                 , Errors.view DismissErrors model.errors
                 , viewIf model.showHelpModal (viewHelpModal model)
@@ -78,7 +80,7 @@ view model =
                     ]
                 , div [ class "row" ]
                     [ Html.Lazy.lazy viewInformation photo
-                    , viewMap model.photo.name 6
+                    , viewMap model.photo.name 12 12 6 6 6
                     ]
                 ]
             ]
@@ -86,7 +88,7 @@ view model =
 
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
-    div [ class "col-1 ml-auto mr-2" ]
+    span [ class "pr-2" ]
         [ a [ onClick CopyRightNotice, href photo.originalImageURL, downloadAs photo.name ]
             [ i [ class "fas fa-download text-white" ] []
             ]
@@ -95,7 +97,7 @@ viewDownloadButton photo =
 
 viewHelpButton : Html Msg
 viewHelpButton =
-    div [ class "col-1 ml-auto mr-2" ]
+    span [ class "pr-2" ]
         [ a [ onClick ToggleHelpModal ]
             [ i [ class "fas fa-info-circle text-white" ] []
             ]

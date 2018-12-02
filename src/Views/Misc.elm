@@ -109,11 +109,19 @@ viewPhoto photo =
         [ scaledImgCount photo.scaledPhotos 3 ]
 
 
-viewMap : String -> Int -> Html msg
-viewMap name size =
+viewMap : String -> Int -> Int -> Int -> Int -> Int -> Html msg
+viewMap name col sm md lg xl =
     let
         cls =
-            String.join " " <| List.map (\col -> col ++ (toString size)) [ "col-", "col-sm-", "col-md-", "col-lg-", "col-xl-" ]
+            String.join " "
+                [ "col-" ++ (toString col)
+                , "col-sm-" ++ (toString sm)
+                , "col-md-" ++ (toString md)
+                , "col-lg-" ++ (toString lg)
+                , "col-xl-" ++ (toString xl)
+                ]
+
+        -- String.join " " <| List.map (\col -> col ++ (toString size)) [ "col-", "col-sm-", "col-md-", "col-lg-", "col-xl-" ]
     in
         div [ class <| "p-0 " ++ cls ]
             [ div [ id <| "map-" ++ name, class "map" ] []
