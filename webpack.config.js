@@ -44,7 +44,6 @@ var common = {
     extensions: ['.js', '.elm', '.scss', '.png']
   },
   module: {
-    noParse: /(mapbox-gl)\.js$/,
     rules: [
       {
         test: /\.js$/,
@@ -78,7 +77,7 @@ var common = {
       chunks: 'all'
     },
     minimizer: [
-      new MinifyPlugin({}, {}),
+      new MinifyPlugin({ builtIns: false }, {}), // Option so MapBox minify will work
       new OptimizeCssAssetsPlugin({})
       // new CompressionPlugin({})
     ]
