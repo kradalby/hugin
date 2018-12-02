@@ -18,7 +18,6 @@ const SizePlugin = require('size-plugin')
 const mode = process.env.NODE_ENV || 'development'
 const filename = mode === 'production' ? '[name]-[hash].js' : 'index.js'
 console.log(mode)
-console.log(process.env.MAPBOX_ACCESS_TOKEN)
 
 var common = {
   mode: mode,
