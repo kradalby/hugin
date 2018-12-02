@@ -32,7 +32,7 @@ function checkElementById (selector) {
 
 // Google Analytics
 app.ports.analytics.subscribe((url) => {
-  // console.log('DEBUG - gtag called with: ', url)
+  console.log('DEBUG: gtag called with: ', url)
   gtag('config', 'UA-18856525-25', {'page_path': '/' + url})
 })
 
@@ -54,7 +54,7 @@ function initMap (data) {
     (element) => {
       element.parentNode.removeChild(element)
     })
-  console.log('initMap called with: ', data)
+  console.log('DEBUG: initMap called with: ', data)
   // Try to force some garbage collection
   if (map) {
     map = null
