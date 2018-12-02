@@ -44,6 +44,7 @@ var common = {
     extensions: ['.js', '.elm', '.scss', '.png']
   },
   module: {
+    noParse: /(mapbox-gl)\.js$/,
     rules: [
       {
         test: /\.js$/,
