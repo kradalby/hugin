@@ -10,7 +10,8 @@ RUN elm package install -y
 
 ENV NODE_ENV "production"
 ADD . .
-RUN npm run prod
+RUN env
+# RUN npm run prod
 
 
 FROM kradalby/nginx-ldap-auth:1.15.3 as production 
