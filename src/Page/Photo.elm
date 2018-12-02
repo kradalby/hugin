@@ -220,12 +220,12 @@ viewHelpModal model =
                             [ viewImageTag model.photo
                             , div
                                 [ class "previous-image-help-overlay" ]
-                                [ i [ class "fas fa-chevron-left fa-3x text-white mx-auto d-block" ]
+                                [ i [ class "fas fa-chevron-left fa-3x text-white center-image-on-help-overlay" ]
                                     []
                                 ]
                             , div
                                 [ class "next-image-help-overlay" ]
-                                [ i [ class "fas fa-chevron-right fa-3x text-white mx-auto d-block" ]
+                                [ i [ class "fas fa-chevron-right fa-3x text-white center-image-on-help-overlay" ]
                                     []
                                 ]
                             ]
