@@ -1,6 +1,8 @@
 FROM node:10 as builder
 WORKDIR /app
 
+ARG MAPBOX_ACCESS_TOKEN
+
 RUN yarn global add elm@0.18.0
 
 ADD package.json .
@@ -10,8 +12,7 @@ RUN elm package install -y
 
 ENV NODE_ENV "production"
 ADD . .
-RUN env
-# RUN npm run prod
+RUN npm run prod
 
 
 FROM kradalby/nginx-ldap-auth:1.15.3 as production 
