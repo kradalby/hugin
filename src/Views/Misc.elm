@@ -43,7 +43,7 @@ viewPath parents current =
             text ""
 
         _ ->
-            div [ class "col-11 pl-2" ] <|
+            div [ class "col-10 pl-2" ] <|
                 List.intersperse
                     --(i [ class "fas fa-angle-right text-white ml-2 mr-2" ] [])
                     (span [ class "text-light ml-2 mr-2" ] [ text ">" ])

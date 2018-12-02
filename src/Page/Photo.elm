@@ -66,7 +66,7 @@ view model =
             [ div [ class "container-fluid" ]
                 [ div [ class "row bg-darklight" ]
                     [ viewPath photo.parents photo.name
-                    , div [ class "col-1 px-0 text-right" ]
+                    , div [ class "col-2 pr-2 text-right" ]
                         [ viewHelpButton
                         , viewDownloadButton photo
                         ]
@@ -88,7 +88,7 @@ view model =
 
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
-    span [ class "pr-2" ]
+    span [ class "" ]
         [ a [ onClick CopyRightNotice, href photo.originalImageURL, downloadAs photo.name ]
             [ i [ class "fas fa-download text-white" ] []
             ]
