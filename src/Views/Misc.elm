@@ -1,4 +1,4 @@
-module Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap, scaledImg, scaledImgCount)
+module Views.Misc exposing (scaledImg, scaledImgCount, viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -7,11 +7,11 @@ all of them. One source of truth!
 
 -}
 
+import Data.Misc exposing (..)
+import Data.Photo as Photo exposing (Photo)
+import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Data.Misc exposing (..)
-import Data.Url as Url exposing (Url)
-import Data.Photo as Photo exposing (Photo)
 import Route exposing (Route)
 
 
@@ -28,12 +28,12 @@ viewKeywords name keywords =
                     )
                     keywords
     in
-        div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
-            [ div [ class "mt-3 mb-3" ] <|
-                [ h5 [] [ text name ]
-                ]
-                    ++ links
+    div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
+        [ div [ class "mt-3 mb-3" ] <|
+            [ h5 [] [ text name ]
             ]
+                ++ links
+        ]
 
 
 viewPath : List Parent -> String -> Html msg
@@ -47,18 +47,17 @@ viewPath parents current =
                 List.intersperse
                     --(i [ class "fas fa-angle-right text-white ml-2 mr-2" ] [])
                     (span [ class "text-light ml-2 mr-2" ] [ text ">" ])
-                    ((List.map
+                    (List.map
                         (\parent ->
                             a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
                         )
                         parents
-                     )
                         ++ [ span [ class "text-secondary" ] [ text current ] ]
                     )
 
 
-scaledImgCount : List Data.Misc.ScaledPhoto -> Int -> Html msg
-scaledImgCount scaledPhotos count =
+scaledImgCount : Int -> List Data.Misc.ScaledPhoto -> Int -> Html msg
+scaledImgCount widthFactor scaledPhotos count =
     let
         sp =
             List.sortBy .maxResolution scaledPhotos |> List.take count
@@ -66,7 +65,7 @@ scaledImgCount scaledPhotos count =
         srcset =
             List.map
                 (\scaledPhoto ->
-                    scaledPhoto.url ++ " " ++ (toString scaledPhoto.maxResolution) ++ "w"
+                    scaledPhoto.url ++ " " ++ toString (scaledPhoto.maxResolution * widthFactor) ++ "w"
                 )
                 sp
                 |> String.join ", "
@@ -75,27 +74,27 @@ scaledImgCount scaledPhotos count =
             List.map
                 (\scaledPhoto ->
                     "(max-width: "
-                        ++ (toString scaledPhoto.maxResolution)
+                        ++ toString (scaledPhoto.maxResolution * widthFactor)
                         ++ "px)"
                         ++ " "
-                        ++ (toString scaledPhoto.maxResolution)
+                        ++ toString scaledPhoto.maxResolution
                         ++ "px"
                 )
                 sp
                 |> String.join ", "
     in
-        img
-            [ class "mx-auto d-block img-fluid"
-            , attribute "sizes" sizes
-            , attribute "srcset" srcset
-            , src <| Photo.biggest sp
-            ]
-            []
+    img
+        [ class "mx-auto d-block img-fluid"
+        , attribute "sizes" sizes
+        , attribute "srcset" srcset
+        , src <| Photo.biggest sp
+        ]
+        []
 
 
 scaledImg : List Data.Misc.ScaledPhoto -> Html msg
 scaledImg scaledPhotos =
-    scaledImgCount scaledPhotos (List.length scaledPhotos)
+    scaledImgCount 1 scaledPhotos (List.length scaledPhotos)
 
 
 viewPhotos : List PhotoInAlbum -> Html msg
@@ -106,7 +105,7 @@ viewPhotos photos =
 viewPhoto : PhotoInAlbum -> Html msg
 viewPhoto photo =
     a [ Route.href (Route.Photo (Url.urlToString photo.url)) ]
-        [ scaledImgCount photo.scaledPhotos 3 ]
+        [ scaledImgCount 2 photo.scaledPhotos 3 ]
 
 
 viewMap : String -> Int -> Int -> Int -> Int -> Int -> Html msg
@@ -114,15 +113,15 @@ viewMap name col sm md lg xl =
     let
         cls =
             String.join " "
-                [ "col-" ++ (toString col)
-                , "col-sm-" ++ (toString sm)
-                , "col-md-" ++ (toString md)
-                , "col-lg-" ++ (toString lg)
-                , "col-xl-" ++ (toString xl)
+                [ "col-" ++ toString col
+                , "col-sm-" ++ toString sm
+                , "col-md-" ++ toString md
+                , "col-lg-" ++ toString lg
+                , "col-xl-" ++ toString xl
                 ]
 
         -- String.join " " <| List.map (\col -> col ++ (toString size)) [ "col-", "col-sm-", "col-md-", "col-lg-", "col-xl-" ]
     in
-        div [ class <| "p-0 " ++ cls ]
-            [ div [ id <| "map-" ++ name, class "map" ] []
-            ]
+    div [ class <| "p-0 " ++ cls ]
+        [ div [ id <| "map-" ++ name, class "map" ] []
+        ]
