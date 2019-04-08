@@ -1,9 +1,9 @@
 module Data.Keyword exposing (Keyword, decoder)
 
-import Data.Url as Url exposing (Url)
 import Data.Misc exposing (..)
+import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode.Pipeline exposing (decode, optional, required)
 
 
 type alias Keyword =

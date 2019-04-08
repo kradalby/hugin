@@ -1,12 +1,12 @@
-module Data.Photo exposing (Photo, thumbnail, biggest, decoder)
+module Data.Photo exposing (Photo, biggest, decoder, thumbnail)
 
-import Data.Url as Url exposing (Url)
 import Data.Misc as Misc exposing (..)
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required, optional)
-import Json.Decode.Extra
-import List.Extra
+import Data.Url as Url exposing (Url)
 import Date exposing (Date)
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Extra
+import Json.Decode.Pipeline exposing (decode, optional, required)
+import List.Extra
 
 
 type alias Photo =
@@ -88,12 +88,12 @@ thumbnail scaledPhotos width =
                 |> Maybe.andThen (\elem -> List.Extra.elemIndex elem distances)
                 |> Maybe.andThen (\index -> List.Extra.getAt index scaledPhotos)
     in
-        case closest of
-            Nothing ->
-                ""
+    case closest of
+        Nothing ->
+            ""
 
-            Just photo ->
-                photo.url
+        Just photo ->
+            photo.url
 
 
 biggest : List ScaledPhoto -> String
@@ -102,9 +102,9 @@ biggest scaledPhotos =
         sp =
             List.sortBy .maxResolution scaledPhotos |> List.reverse
     in
-        case (List.head sp) of
-            Nothing ->
-                ""
+    case List.head sp of
+        Nothing ->
+            ""
 
-            Just photo ->
-                photo.url
+        Just photo ->
+            photo.url

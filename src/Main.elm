@@ -1,22 +1,23 @@
 module Main exposing (main)
 
+import Data.Url
 import Html exposing (..)
 import Http exposing (Error)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
-import Page.Errored as Errored exposing (PageLoadError)
 import Page.Album as Album
-import Page.Photo as Photo
+import Page.Errored as Errored exposing (PageLoadError)
 import Page.Keyword as Keyword
 import Page.Locations as Locations
 import Page.NotFound as NotFound
+import Page.Photo as Photo
+import Ports
+import Request.Helpers exposing (rootUrl)
 import Route exposing (Route)
 import Task
 import Util exposing ((=>), initMap)
 import Views.Page as Page exposing (ActivePage)
-import Data.Url
-import Request.Helpers exposing (rootUrl)
-import Ports
+
 
 
 -- WARNING: Based on discussions around how asset management features
@@ -81,52 +82,52 @@ viewPage isLoading page =
         frame =
             Page.frame isLoading
     in
-        case page of
-            NotFound ->
-                NotFound.view
-                    |> frame Page.Other
+    case page of
+        NotFound ->
+            NotFound.view
+                |> frame Page.Other
 
-            Blank ->
-                -- This is for the very initial page load, while we are loading
-                -- data via HTTP. We could also render a spinner here.
-                Html.text ""
-                    |> frame Page.Other
+        Blank ->
+            -- This is for the very initial page load, while we are loading
+            -- data via HTTP. We could also render a spinner here.
+            Html.text ""
+                |> frame Page.Other
 
-            Errored (Errored.PageLoadError model) ->
-                case model.errorType of
-                    Http.BadStatus resp ->
-                        case resp.status.code of
-                            404 ->
-                                NotFound.view
-                                    |> frame Page.Other
+        Errored (Errored.PageLoadError model) ->
+            case model.errorType of
+                Http.BadStatus resp ->
+                    case resp.status.code of
+                        404 ->
+                            NotFound.view
+                                |> frame Page.Other
 
-                            _ ->
-                                Errored.view (Errored.PageLoadError model)
-                                    |> frame Page.Other
+                        _ ->
+                            Errored.view (Errored.PageLoadError model)
+                                |> frame Page.Other
 
-                    _ ->
-                        Errored.view (Errored.PageLoadError model)
-                            |> frame Page.Other
+                _ ->
+                    Errored.view (Errored.PageLoadError model)
+                        |> frame Page.Other
 
-            Album url subModel ->
-                Album.view subModel
-                    |> frame (Page.Album url)
-                    |> Html.map AlbumMsg
+        Album url subModel ->
+            Album.view subModel
+                |> frame (Page.Album url)
+                |> Html.map AlbumMsg
 
-            Photo url subModel ->
-                Photo.view subModel
-                    |> frame (Page.Photo url)
-                    |> Html.map PhotoMsg
+        Photo url subModel ->
+            Photo.view subModel
+                |> frame (Page.Photo url)
+                |> Html.map PhotoMsg
 
-            Keyword url subModel ->
-                Keyword.view subModel
-                    |> frame (Page.Keyword url)
-                    |> Html.map KeywordMsg
+        Keyword url subModel ->
+            Keyword.view subModel
+                |> frame (Page.Keyword url)
+                |> Html.map KeywordMsg
 
-            Locations url subModel ->
-                Locations.view subModel
-                    |> frame (Page.Locations url)
-                    |> Html.map LocationsMsg
+        Locations url subModel ->
+            Locations.view subModel
+                |> frame (Page.Locations url)
+                |> Html.map LocationsMsg
 
 
 
@@ -201,25 +202,25 @@ setRoute maybeRoute model =
             { model | pageState = TransitioningFrom (getPage model.pageState) }
                 => Task.attempt toMsg task
     in
-        case maybeRoute of
-            Nothing ->
-                { model | pageState = Loaded NotFound } => Cmd.none
+    case maybeRoute of
+        Nothing ->
+            { model | pageState = Loaded NotFound } => Cmd.none
 
-            Just Route.Root ->
-                model => Route.modifyUrl (Route.Album rootUrl)
+        Just Route.Root ->
+            model => Route.modifyUrl (Route.Album rootUrl)
 
-            -- transition (AlbumLoaded (Data.Url.Url rootUrl)) (Album.init (Data.Url.Url rootUrl))
-            Just (Route.Album url) ->
-                transition (AlbumLoaded (Data.Url.Url url)) (Album.init (Data.Url.Url url))
+        -- transition (AlbumLoaded (Data.Url.Url rootUrl)) (Album.init (Data.Url.Url rootUrl))
+        Just (Route.Album url) ->
+            transition (AlbumLoaded (Data.Url.Url url)) (Album.init (Data.Url.Url url))
 
-            Just (Route.Photo url) ->
-                transition (PhotoLoaded (Data.Url.Url url)) (Photo.init (Data.Url.Url url))
+        Just (Route.Photo url) ->
+            transition (PhotoLoaded (Data.Url.Url url)) (Photo.init (Data.Url.Url url))
 
-            Just (Route.Keyword url) ->
-                transition (KeywordLoaded (Data.Url.Url url)) (Keyword.init (Data.Url.Url url))
+        Just (Route.Keyword url) ->
+            transition (KeywordLoaded (Data.Url.Url url)) (Keyword.init (Data.Url.Url url))
 
-            Just (Route.Locations url) ->
-                transition (LocationsLoaded (Data.Url.Url url)) (Locations.init (Data.Url.Url url))
+        Just (Route.Locations url) ->
+            transition (LocationsLoaded (Data.Url.Url url)) (Locations.init (Data.Url.Url url))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -235,68 +236,68 @@ updatePage page msg model =
                 ( newModel, newCmd ) =
                     subUpdate subMsg subModel
             in
-                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
+            ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
     in
-        case ( msg, page ) of
-            ( SetRoute route, _ ) ->
-                let
-                    ( m, c ) =
-                        setRoute route model
+    case ( msg, page ) of
+        ( SetRoute route, _ ) ->
+            let
+                ( m, c ) =
+                    setRoute route model
 
-                    url =
-                        case route of
-                            Nothing ->
-                                ""
+                url =
+                    case route of
+                        Nothing ->
+                            ""
 
-                            Just r ->
-                                Route.routeToString r
-                in
-                    ( m, Cmd.batch [ c, Ports.analytics url ] )
+                        Just r ->
+                            Route.routeToString r
+            in
+            ( m, Cmd.batch [ c, Ports.analytics url ] )
 
-            ( AlbumLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Album url subModel) } => (Album.initMap subModel)
+        ( AlbumLoaded url (Ok subModel), _ ) ->
+            { model | pageState = Loaded (Album url subModel) } => Album.initMap subModel
 
-            ( AlbumLoaded url (Err error), _ ) ->
-                { model | pageState = Loaded (Errored error) } => Cmd.none
+        ( AlbumLoaded url (Err error), _ ) ->
+            { model | pageState = Loaded (Errored error) } => Cmd.none
 
-            ( AlbumMsg subMsg, Album url subModel ) ->
-                toPage (Album url) AlbumMsg (Album.update) subMsg subModel
+        ( AlbumMsg subMsg, Album url subModel ) ->
+            toPage (Album url) AlbumMsg Album.update subMsg subModel
 
-            ( PhotoLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Photo url subModel) } => (Photo.initMap subModel)
+        ( PhotoLoaded url (Ok subModel), _ ) ->
+            { model | pageState = Loaded (Photo url subModel) } => Photo.initMap subModel
 
-            ( PhotoLoaded url (Err error), _ ) ->
-                { model | pageState = Loaded (Errored error) } => Cmd.none
+        ( PhotoLoaded url (Err error), _ ) ->
+            { model | pageState = Loaded (Errored error) } => Cmd.none
 
-            ( PhotoMsg subMsg, Photo url subModel ) ->
-                toPage (Photo url) PhotoMsg (Photo.update) subMsg subModel
+        ( PhotoMsg subMsg, Photo url subModel ) ->
+            toPage (Photo url) PhotoMsg Photo.update subMsg subModel
 
-            ( KeywordLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Keyword url subModel) } => (Keyword.initMap subModel)
+        ( KeywordLoaded url (Ok subModel), _ ) ->
+            { model | pageState = Loaded (Keyword url subModel) } => Keyword.initMap subModel
 
-            ( KeywordLoaded url (Err error), _ ) ->
-                { model | pageState = Loaded (Errored error) } => Cmd.none
+        ( KeywordLoaded url (Err error), _ ) ->
+            { model | pageState = Loaded (Errored error) } => Cmd.none
 
-            ( KeywordMsg subMsg, Keyword url subModel ) ->
-                toPage (Keyword url) KeywordMsg (Keyword.update) subMsg subModel
+        ( KeywordMsg subMsg, Keyword url subModel ) ->
+            toPage (Keyword url) KeywordMsg Keyword.update subMsg subModel
 
-            ( LocationsLoaded url (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Locations url subModel) } => Cmd.none
+        ( LocationsLoaded url (Ok subModel), _ ) ->
+            { model | pageState = Loaded (Locations url subModel) } => Cmd.none
 
-            ( LocationsLoaded url (Err error), _ ) ->
-                { model | pageState = Loaded (Errored error) } => Cmd.none
+        ( LocationsLoaded url (Err error), _ ) ->
+            { model | pageState = Loaded (Errored error) } => Cmd.none
 
-            ( LocationsMsg subMsg, Locations url subModel ) ->
-                toPage (Locations url) LocationsMsg (Locations.update) subMsg subModel
+        ( LocationsMsg subMsg, Locations url subModel ) ->
+            toPage (Locations url) LocationsMsg Locations.update subMsg subModel
 
-            ( _, NotFound ) ->
-                -- Disregard incoming messages when we're on the
-                -- NotFound page.
-                model => Cmd.none
+        ( _, NotFound ) ->
+            -- Disregard incoming messages when we're on the
+            -- NotFound page.
+            model => Cmd.none
 
-            ( _, _ ) ->
-                -- Disregard incoming messages that arrived for the wrong page
-                model => Cmd.none
+        ( _, _ ) ->
+            -- Disregard incoming messages that arrived for the wrong page
+            model => Cmd.none
 
 
 

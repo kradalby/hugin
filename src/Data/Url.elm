@@ -1,9 +1,9 @@
-module Data.Url exposing (Url(..), urlToString, rest, urlDecoder, encodeUrl, urlToHtml)
+module Data.Url exposing (Url(..), encodeUrl, rest, urlDecoder, urlToHtml, urlToString)
 
+import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import UrlParser exposing ((</>))
-import Html exposing (Html)
 
 
 type Url
@@ -39,6 +39,7 @@ restHelp : Int -> UrlParser.Parser (List String -> a) a
 restHelp maxDepth =
     if maxDepth < 1 then
         UrlParser.map [] UrlParser.top
+
     else
         UrlParser.oneOf
             [ UrlParser.map [] UrlParser.top

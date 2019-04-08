@@ -1,4 +1,4 @@
-port module Ports exposing (downloadImages, initMap, analytics)
+port module Ports exposing (analytics, downloadImages, initMap)
 
 import Json.Encode exposing (Value)
 

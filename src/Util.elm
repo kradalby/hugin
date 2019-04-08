@@ -1,22 +1,24 @@
-module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf, traceDecoder, formatExposureTime, cleanOwnerToName, initMap, fuzzyKeywordReduce)
+module Util exposing ((=>), appendErrors, cleanOwnerToName, formatExposureTime, fuzzyKeywordReduce, initMap, onClickStopPropagation, pair, traceDecoder, viewIf)
 
+import Data.Misc
+import Fuzzy
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
 import Json.Decode as Decode
-import String.Extra
-import Data.Misc
 import Ports
-import Fuzzy
+import String.Extra
 
 
 (=>) : a -> b -> ( a, b )
 (=>) =
-    (,)
+    \a b -> ( a, b )
 
 
 {-| infixl 0 means the (=>) operator has the same precedence as (<|) and (|>),
 meaning you can use it at the end of a pipeline and have the precedence work out.
 -}
+
+
 infixl 0 =>
 
 
@@ -38,6 +40,7 @@ viewIf : Bool -> Html msg -> Html msg
 viewIf condition content =
     if condition then
         content
+
     else
         Html.text ""
 
@@ -75,7 +78,7 @@ formatExposureTime exposure =
         denominator =
             1 / exposure
     in
-        "1/" ++ (toString denominator)
+    "1/" ++ toString denominator
 
 
 cleanOwnerToName : String -> String
@@ -84,7 +87,7 @@ cleanOwnerToName owner =
         keywords =
             [ "Copyright: ", "copyright: ", "Photograph: ", "photograph: ", "Copyright", "copyright", "Photograph", "photograph" ]
     in
-        List.foldl (\word acc -> String.Extra.replace word "" acc) owner keywords
+    List.foldl (\word acc -> String.Extra.replace word "" acc) owner keywords
 
 
 initMap : String -> List Data.Misc.GPS -> Cmd msg
@@ -96,12 +99,12 @@ initMap name coordinates =
         longLats =
             List.map gpsToLongLat coordinates
     in
-        case longLats of
-            [] ->
-                Cmd.none
+    case longLats of
+        [] ->
+            Cmd.none
 
-            _ ->
-                Ports.initMap ( name, longLats )
+        _ ->
+            Ports.initMap ( name, longLats )
 
 
 fuzzyKeywordReduce : String -> List Data.Misc.KeywordPointer -> List Data.Misc.KeywordPointer
@@ -130,4 +133,4 @@ fuzzyKeywordReduce searchString keywordPointers =
                         isValid
                         keywordPointers
             in
-                List.sortBy (match << keyword) filteredPointers
+            List.sortBy (match << keyword) filteredPointers

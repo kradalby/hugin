@@ -1,26 +1,27 @@
-module Page.Photo exposing (Model, Msg, init, update, view, subscriptions, initMap)
+module Page.Photo exposing (Model, Msg, init, initMap, subscriptions, update, view)
 
 {-| Viewing a user's photo.
 -}
 
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
+import Date.Format
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy
 import Http
+import Keyboard exposing (KeyCode)
+import Maybe.Extra
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Photo
-import Task exposing (Task)
-import Util exposing ((=>), pair, viewIf, formatExposureTime, cleanOwnerToName)
-import Views.Errors as Errors
-import Views.Page as Page
-import Views.Misc exposing (viewKeywords, viewPath, viewMap, scaledImg)
-import Maybe.Extra
 import Route exposing (Route)
-import Date.Format
-import Keyboard exposing (KeyCode)
+import Task exposing (Task)
+import Util exposing ((=>), cleanOwnerToName, formatExposureTime, pair, viewIf)
+import Views.Errors as Errors
+import Views.Misc exposing (scaledImg, viewKeywords, viewMap, viewPath)
+import Views.Page as Page
+
 
 
 -- MODEL --
@@ -45,11 +46,11 @@ init url =
                 _ =
                     Debug.log "err: " err
             in
-                "Photo is currently unavailable."
-                    |> pageLoadError (Page.Photo url) err
+            "Photo is currently unavailable."
+                |> pageLoadError (Page.Photo url) err
     in
-        Task.map (Model [] False) loadPhoto
-            |> Task.mapError handleLoadError
+    Task.map (Model [] False) loadPhoto
+        |> Task.mapError handleLoadError
 
 
 
@@ -62,28 +63,28 @@ view model =
         photo =
             model.photo
     in
-        div [ class "photo-page" ]
-            [ div [ class "container-fluid" ]
-                [ div [ class "row bg-darklight" ]
-                    [ viewPath photo.parents photo.name
-                    , div [ class "col-2 pr-2 text-right" ]
-                        [ viewHelpButton
-                        , viewDownloadButton photo
-                        ]
-                    ]
-                , Errors.view DismissErrors model.errors
-                , viewIf model.showHelpModal (viewHelpModal model)
-                , div [ class "row" ] [ viewImage photo ]
-                , div [ class "row" ]
-                    [ viewKeywords "People" photo.people
-                    , viewKeywords "Tags" photo.keywords
-                    ]
-                , div [ class "row" ]
-                    [ Html.Lazy.lazy viewInformation photo
-                    , viewMap model.photo.name 12 12 6 6 6
+    div [ class "photo-page" ]
+        [ div [ class "container-fluid" ]
+            [ div [ class "row bg-darklight" ]
+                [ viewPath photo.parents photo.name
+                , div [ class "col-2 pr-2 text-right" ]
+                    [ viewHelpButton
+                    , viewDownloadButton photo
                     ]
                 ]
+            , Errors.view DismissErrors model.errors
+            , viewIf model.showHelpModal (viewHelpModal model)
+            , div [ class "row" ] [ viewImage photo ]
+            , div [ class "row" ]
+                [ viewKeywords "People" photo.people
+                , viewKeywords "Tags" photo.keywords
+                ]
+            , div [ class "row" ]
+                [ Html.Lazy.lazy viewInformation photo
+                , viewMap model.photo.name 12 12 6 6 6
+                ]
             ]
+        ]
 
 
 viewDownloadButton : Photo -> Html Msg
@@ -124,17 +125,17 @@ viewImage photo =
         imageTag =
             viewImageTag photo
     in
-        div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 m-0 p-0" ]
-            [ div [ class "mx-auto" ]
-                [ div []
-                    [ imageTag
-                    , a [ previousHref photo ]
-                        [ div [ class "previous-image-overlay" ] [] ]
-                    , a [ nextHref photo ]
-                        [ div [ class "next-image-overlay" ] [] ]
-                    ]
+    div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 m-0 p-0" ]
+        [ div [ class "mx-auto" ]
+            [ div []
+                [ imageTag
+                , a [ previousHref photo ]
+                    [ div [ class "previous-image-overlay" ] [] ]
+                , a [ nextHref photo ]
+                    [ div [ class "next-image-overlay" ] [] ]
                 ]
             ]
+        ]
 
 
 viewImageTag : Photo -> Html Msg
@@ -179,25 +180,25 @@ viewInformation photo =
             , photo.focalLength |> Maybe.map (rowWithToString "Focal length")
             , photo.fNumber |> Maybe.map (rowWithToString "f/")
             , photo.exposureTime |> Maybe.map (formatExposureTime >> row "Shutter speed")
-            , (List.head photo.isoSpeed) |> Maybe.map (rowWithToString "ISO")
+            , List.head photo.isoSpeed |> Maybe.map (rowWithToString "ISO")
             , Just original
             ]
     in
-        div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
-            [ div [ class "mt-3" ]
-                [ table [ class "table" ]
-                    [ tbody []
-                        (Maybe.Extra.values
-                            rows
-                        )
-                    ]
+    div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
+        [ div [ class "mt-3" ]
+            [ table [ class "table" ]
+                [ tbody []
+                    (Maybe.Extra.values
+                        rows
+                    )
                 ]
             ]
+        ]
 
 
 viewHelpModal : Model -> Html Msg
 viewHelpModal model =
-    div [ style [ ( "display", "block" ) ], attribute "aria-hidden" "false", attribute "aria-labelledby" "helpModal", class "modal", id "helpModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
+    div [ style "display" "block", attribute "aria-hidden" "false", attribute "aria-labelledby" "helpModal", class "modal", id "helpModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
         [ div [ class "modal-dialog modal-dialog-centered", attribute "role" "document" ]
             [ div [ class "modal-content" ]
                 [ div [ class "modal-header" ]
@@ -216,7 +217,7 @@ viewHelpModal model =
                     , hr [] []
                     , div [ class "mx-2" ]
                         [ p [] [ text "Navigate to the previous or next image by clicking on the left or right side of the current image:" ]
-                        , div [ style [ ( "position", "relative" ) ] ]
+                        , div [ style "position" "relative" ]
                             [ viewImageTag model.photo
                             , div
                                 [ class "previous-image-help-overlay" ]
@@ -261,39 +262,39 @@ update msg model =
         photo =
             model.photo
     in
-        case msg of
-            DismissErrors ->
-                { model | errors = [] } => Cmd.none
+    case msg of
+        DismissErrors ->
+            { model | errors = [] } => Cmd.none
 
-            ToggleHelpModal ->
-                { model
-                    | showHelpModal = not model.showHelpModal
-                }
-                    => Cmd.none
+        ToggleHelpModal ->
+            { model
+                | showHelpModal = not model.showHelpModal
+            }
+                => Cmd.none
 
-            CopyRightNotice ->
-                { model | errors = [ "Remember to ask and credit the photographer before using the image!" ] } => Cmd.none
+        CopyRightNotice ->
+            { model | errors = [ "Remember to ask and credit the photographer before using the image!" ] } => Cmd.none
 
-            KeyMsg code ->
-                case code of
-                    37 ->
-                        case photo.previous of
-                            Nothing ->
-                                ( model, Cmd.none )
+        KeyMsg code ->
+            case code of
+                37 ->
+                    case photo.previous of
+                        Nothing ->
+                            ( model, Cmd.none )
 
-                            Just url ->
-                                ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
+                        Just url ->
+                            ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
 
-                    39 ->
-                        case photo.next of
-                            Nothing ->
-                                ( model, Cmd.none )
+                39 ->
+                    case photo.next of
+                        Nothing ->
+                            ( model, Cmd.none )
 
-                            Just url ->
-                                ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
+                        Just url ->
+                            ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
 
-                    _ ->
-                        ( model, Cmd.none )
+                _ ->
+                    ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

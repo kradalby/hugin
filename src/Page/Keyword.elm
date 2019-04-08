@@ -1,4 +1,4 @@
-module Page.Keyword exposing (Model, Msg(..), init, update, view, initMap)
+module Page.Keyword exposing (Model, Msg(..), init, initMap, update, view)
 
 {-| Viewing a user's album.
 -}
@@ -14,8 +14,9 @@ import Request.Keyword
 import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf)
 import Views.Errors as Errors
+import Views.Misc exposing (viewMap, viewPhoto, viewPhotos)
 import Views.Page as Page
-import Views.Misc exposing (viewPhotos, viewPhoto, viewMap)
+
 
 
 -- MODEL --
@@ -38,8 +39,8 @@ init url =
             "Keyword is currently unavailable."
                 |> pageLoadError (Page.Keyword url) err
     in
-        Task.map (Model []) loadKeyword
-            |> Task.mapError handleLoadError
+    Task.map (Model []) loadKeyword
+        |> Task.mapError handleLoadError
 
 
 

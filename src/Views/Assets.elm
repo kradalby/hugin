@@ -1,4 +1,4 @@
-module Views.Assets exposing (error, placeholder, src, notFound)
+module Views.Assets exposing (error, notFound, placeholder, src)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 

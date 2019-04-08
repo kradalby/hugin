@@ -3,13 +3,13 @@ module Views.Page exposing (ActivePage(..), bodyId, frame)
 {-| The frame around a typical page - that is, the header and footer.
 -}
 
+import Data.Url
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
 import Route exposing (Route)
 import Util exposing ((=>))
 import Views.Spinner exposing (spinner)
-import Data.Url
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -90,10 +90,10 @@ isActive : ActivePage -> Route -> Bool
 isActive page route =
     case ( page, route ) of
         ( Album pageUrl, Route.Album routeUrl ) ->
-            (Data.Url.urlToString pageUrl) == routeUrl
+            Data.Url.urlToString pageUrl == routeUrl
 
         ( Photo pageUrl, Route.Photo routeUrl ) ->
-            (Data.Url.urlToString pageUrl) == routeUrl
+            Data.Url.urlToString pageUrl == routeUrl
 
         _ ->
             False

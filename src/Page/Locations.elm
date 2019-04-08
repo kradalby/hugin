@@ -12,13 +12,14 @@ import Html.Lazy
 import Http
 import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Locations
+import Route exposing (Route)
 import Task exposing (Task)
 import Util exposing ((=>), pair, viewIf)
-import Views.Errors as Errors
 import Views.Assets as Assets
+import Views.Errors as Errors
+import Views.Misc exposing (viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
 import Views.Page as Page
-import Views.Misc exposing (viewKeywords, viewPath, viewPhotos, viewPhoto, viewMap)
-import Route exposing (Route)
+
 
 
 -- MODEL --
@@ -41,8 +42,8 @@ init url =
             "Locations is currently unavailable."
                 |> pageLoadError (Page.Locations url) err
     in
-        Task.map (Model []) loadLocations
-            |> Task.mapError handleLoadError
+    Task.map (Model []) loadLocations
+        |> Task.mapError handleLoadError
 
 
 

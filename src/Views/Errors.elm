@@ -4,7 +4,7 @@ module Views.Errors exposing (view)
 -}
 
 import Html exposing (..)
-import Html.Attributes exposing (class, style, attribute)
+import Html.Attributes exposing (attribute, class, style)
 import Html.Events exposing (onClick)
 import Util exposing ((=>))
 
@@ -13,6 +13,7 @@ view : msg -> List String -> Html msg
 view dismissErrors errors =
     if List.isEmpty errors then
         Html.text ""
+
     else
         div [ class "row" ]
             [ div [ class "col-12 p-0" ]

@@ -1,10 +1,11 @@
 module Route exposing (Route(..), fromLocation, href, modifyUrl, routeToString)
 
+import Data.Url as Url exposing (Url)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Navigation exposing (Location)
 import UrlParser exposing ((</>), Parser, oneOf, parseHash, s, string)
-import Data.Url as Url exposing (Url)
+
 
 
 -- ROUTING --
@@ -53,7 +54,7 @@ routeToString page =
                 Locations url ->
                     [ "locations", url ]
     in
-        "#/" ++ String.join "/" pieces
+    "#/" ++ String.join "/" pieces
 
 
 
@@ -74,5 +75,6 @@ fromLocation : Location -> Maybe Route
 fromLocation location =
     if String.isEmpty location.hash then
         Just Root
+
     else
         parseHash route location
