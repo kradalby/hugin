@@ -115,26 +115,37 @@ if (mode === 'development') {
         }
       ]
     },
-    serve: {
+    devServer: {
+      proxy: {
+        '/content': {
+          target: 'http://localhost:3000',
+          pathRewrite: {'^/content': ''}
+        }
+      },
       inline: true,
-      stats: 'errors-only',
-      content: [path.join(__dirname, '')],
-      add: (app, middleware, options) => {
-        // routes /xyz -> /index.html
-        app.use(history())
-        app.use(
-          convert(
-            proxy(
-              '/content',
-              {
-                target: 'http://localhost:3000',
-                pathRewrite: {'^/content': ''}
-              }
-            )
-          )
-        )
-      }
+      stats: { colors: true },
+      disableHostCheck: true
     }
+      // serve: {
+      //   inline: true,
+      //   stats: 'errors-only',
+      //   content: [path.join(__dirname, '')],
+      //   add: (app, middleware, options) => {
+      //     // routes /xyz -> /index.html
+      //     app.use(history())
+      //     app.use(
+      //       convert(
+      //         proxy(
+      //           '/content',
+      //           {
+      //             target: 'http://localhost:3000',
+      //             pathRewrite: {'^/content': ''}
+      //           }
+      //         )
+      //       )
+      //     )
+      //   }
+      // }
   })
 }
 
@@ -143,7 +154,7 @@ if (mode === 'production') {
   module.exports = merge(common, {
     plugins: [
       // Delete everything from output directory and report to user
-      new CleanWebpackPlugin(['dist'], {
+      new CleanWebpackPlugin({
         root: __dirname,
         exclude: [],
         verbose: true,
@@ -153,8 +164,8 @@ if (mode === 'production') {
         {
           from: 'assets/images',
           to: 'assets/images'
-        }
-      ]),
+        }]
+      ),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional

@@ -5,8 +5,14 @@ let app = Elm.Main.fullscreen()
 // require('materialize-css/sass/materialize.scss')
 
 // FONT AWESOME
-require('@fortawesome/fontawesome')
-require('@fortawesome/fontawesome-free-solid')
+import { library, dom } from '@fortawesome/fontawesome-svg-core'
+import { faDownload, faInfoCircle, faChevronLeft, faChevronRight, faCaretSquareLeft, faCaretSquareRight, faSpinner, faAngleRight} from '@fortawesome/free-solid-svg-icons'
+
+
+library.add(faDownload, faInfoCircle, faChevronLeft, faChevronRight, faCaretSquareLeft, faCaretSquareRight, faSpinner, faAngleRight
+)
+
+dom.watch()
 
 // SCSS
 require('../assets/css/custom.scss')
