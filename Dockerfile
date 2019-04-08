@@ -6,7 +6,8 @@ ARG MAPBOX_ACCESS_TOKEN
 RUN yarn global add elm@0.18.0
 
 ADD package.json .
-RUN npm install --silent
+ADD yarn.lock .
+RUN yarn install --silent
 ADD elm-package.json .
 RUN elm package install -y
 
@@ -15,5 +16,5 @@ ADD . .
 RUN npm run prod
 
 
-FROM kradalby/nginx-ldap-auth:1.15.3 as production 
+FROM kradalby/nginx-ldap-auth:1.15.3 as production
 COPY --from=builder /app/dist /usr/share/nginx/html
