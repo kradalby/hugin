@@ -3,7 +3,7 @@ module Data.Album exposing (Album, decoder)
 import Data.Misc as Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias Album =
@@ -23,7 +23,7 @@ type alias Album =
 
 decoder : Decoder Album
 decoder =
-    decode Album
+    Decode.succeed Album
         |> required "url" Url.urlDecoder
         |> required "photos" (Decode.list photoInAlbumDecoder)
         |> required "albums" (Decode.list albumInAlbumDecoder)

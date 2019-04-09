@@ -65,7 +65,7 @@ scaledImgCount widthFactor scaledPhotos count =
         srcset =
             List.map
                 (\scaledPhoto ->
-                    scaledPhoto.url ++ " " ++ toString (scaledPhoto.maxResolution * widthFactor) ++ "w"
+                    scaledPhoto.url ++ " " ++ String.fromInt (scaledPhoto.maxResolution * widthFactor) ++ "w"
                 )
                 sp
                 |> String.join ", "
@@ -74,10 +74,10 @@ scaledImgCount widthFactor scaledPhotos count =
             List.map
                 (\scaledPhoto ->
                     "(max-width: "
-                        ++ toString (scaledPhoto.maxResolution * widthFactor)
+                        ++ String.fromInt (scaledPhoto.maxResolution * widthFactor)
                         ++ "px)"
                         ++ " "
-                        ++ toString scaledPhoto.maxResolution
+                        ++ String.fromInt scaledPhoto.maxResolution
                         ++ "px"
                 )
                 sp
@@ -113,14 +113,14 @@ viewMap name col sm md lg xl =
     let
         cls =
             String.join " "
-                [ "col-" ++ toString col
-                , "col-sm-" ++ toString sm
-                , "col-md-" ++ toString md
-                , "col-lg-" ++ toString lg
-                , "col-xl-" ++ toString xl
+                [ "col-" ++ String.fromInt col
+                , "col-sm-" ++ String.fromInt sm
+                , "col-md-" ++ String.fromInt md
+                , "col-lg-" ++ String.fromInt lg
+                , "col-xl-" ++ String.fromInt xl
                 ]
 
-        -- String.join " " <| List.map (\col -> col ++ (toString size)) [ "col-", "col-sm-", "col-md-", "col-lg-", "col-xl-" ]
+        -- String.join " " <| List.map (\col -> col ++ (String.fromInt size)) [ "col-", "col-sm-", "col-md-", "col-lg-", "col-xl-" ]
     in
     div [ class <| "p-0 " ++ cls ]
         [ div [ id <| "map-" ++ name, class "map" ] []

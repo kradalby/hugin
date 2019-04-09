@@ -16,5 +16,5 @@ get : Url -> Http.Request Photo
 get url =
     apiUrl (Url.urlToString url)
         |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson (traceDecoder "photo" Photo.decoder))
+        |> HttpBuilder.withExpect (Http.expectJson Photo.decoder)
         |> HttpBuilder.toRequest

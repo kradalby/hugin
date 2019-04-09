@@ -1,4 +1,4 @@
-module Page.Album exposing (Model, Msg(..), init, initMap, update, view)
+module Page.Album exposing (Model, Msg(..), init, initMap, subscriptions, toSession, update, view)
 
 {-| Viewing a user's album.
 -}
@@ -12,16 +12,17 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy
 import Http
-import Page.Errored exposing (PageLoadError, pageLoadError)
+import Loading
+import Log
 import Ports
 import Request.Album
 import Route exposing (Route)
+import Session exposing (Session)
 import Task exposing (Task)
-import Util exposing ((=>), fuzzyKeywordReduce, pair, viewIf)
+import Util exposing (Status(..), fuzzyKeywordReduce, viewIf)
 import Views.Assets as Assets
 import Views.Errors as Errors
 import Views.Misc exposing (viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
-import Views.Page as Page
 
 
 
@@ -29,65 +30,83 @@ import Views.Page as Page
 
 
 type alias Model =
-    { errors : List String
+    { session : Session
+    , errors : List String
     , showDownloadModal : Bool
     , keywordFilter : String
-    , album : Album
+    , album : Status Album
     }
 
 
-init : Url -> Task PageLoadError Model
-init url =
-    let
-        loadAlbum =
-            Request.Album.get url
-                |> Http.toTask
-
-        handleLoadError err =
-            "Album is currently unavailable."
-                |> pageLoadError (Page.Album url) err
-    in
-    Task.map (Model [] False "") loadAlbum
-        |> Task.mapError handleLoadError
+init : Session -> Url -> ( Model, Cmd Msg )
+init session url =
+    ( { session = session
+      , errors = []
+      , showDownloadModal = False
+      , keywordFilter = ""
+      , album = Loading
+      }
+    , Cmd.batch
+        [ Request.Album.get url
+            |> Http.toTask
+            |> Task.attempt CompletedAlbumLoad
+        , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
+        ]
+    )
 
 
 
 -- VIEW --
 
 
-view : Model -> Html Msg
+view : Model -> { title : String, content : Html Msg }
 view model =
-    let
-        album =
-            model.album
-    in
-    div [ class "album-page" ]
-        [ Errors.view DismissErrors
-            model.errors
-        , div
-            [ class "container-fluid" ]
-            [ div [ class "row bg-darklight" ]
-                [ viewPath album.parents album.name
-                , viewIf (album.photos /= []) viewDownloadButton
-                ]
-            , viewIf model.showDownloadModal (viewDownloadModal model)
-            , div [ class "row" ]
-                [ Html.Lazy.lazy viewNestedAlbums album.albums ]
-            , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
-            , div [ class "row" ] [ viewKeywordFilter model.keywordFilter ]
-            , div [ class "row" ]
-                [ Html.Lazy.lazy2 viewKeywords
-                    "People"
-                  <|
-                    Util.fuzzyKeywordReduce model.keywordFilter album.people
-                , Html.Lazy.lazy2 viewKeywords
-                    "Tags"
-                  <|
-                    Util.fuzzyKeywordReduce model.keywordFilter album.keywords
-                ]
-            , div [ class "row" ] [ viewMap model.album.name 12 12 12 12 12 ]
-            ]
-        ]
+    { title =
+        Util.statusToMaybe model.album
+            |> Maybe.map .name
+            |> Maybe.withDefault "Album"
+    , content =
+        case model.album of
+            Loading ->
+                -- Todo: Nice loading
+                text ""
+
+            LoadingSlowly ->
+                -- Todo: Nice loading
+                Loading.icon
+
+            Loaded album ->
+                div [ class "album-page" ]
+                    [ Errors.view DismissErrors
+                        model.errors
+                    , div
+                        [ class "container-fluid" ]
+                        [ div [ class "row bg-darklight" ]
+                            [ viewPath album.parents album.name
+                            , viewIf (album.photos /= []) viewDownloadButton
+                            ]
+                        , viewIf model.showDownloadModal (viewDownloadModal model)
+                        , div [ class "row" ]
+                            [ Html.Lazy.lazy viewNestedAlbums album.albums ]
+                        , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
+                        , div [ class "row" ] [ viewKeywordFilter model.keywordFilter ]
+                        , div [ class "row" ]
+                            [ Html.Lazy.lazy2 viewKeywords
+                                "People"
+                              <|
+                                Util.fuzzyKeywordReduce model.keywordFilter album.people
+                            , Html.Lazy.lazy2 viewKeywords
+                                "Tags"
+                              <|
+                                Util.fuzzyKeywordReduce model.keywordFilter album.keywords
+                            ]
+                        , div [ class "row" ] [ viewMap album.name 12 12 12 12 12 ]
+                        ]
+                    ]
+
+            Failed ->
+                Loading.error "album"
+    }
 
 
 viewDownloadButton : Html Msg
@@ -172,37 +191,67 @@ type Msg
     | ToggleDownloadModal
     | Download
     | UpdateKeywordFilter String
+    | CompletedAlbumLoad (Result Http.Error Album)
+    | PassedSlowLoadThreshold
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        album =
-            model.album
-    in
     case msg of
         DismissErrors ->
-            { model | errors = [] } => Cmd.none
+            ( { model | errors = [] }, Cmd.none )
 
         ToggleDownloadModal ->
-            { model
+            ( { model
                 | showDownloadModal = not model.showDownloadModal
-            }
-                => Cmd.none
+              }
+            , Cmd.none
+            )
 
         Download ->
             let
                 urls =
-                    List.map
-                        .originalImageURL
-                        album.photos
+                    case model.album of
+                        Loaded album ->
+                            List.map
+                                .originalImageURL
+                                album.photos
+
+                        _ ->
+                            []
             in
-            model => Ports.downloadImages urls
+            ( model, Ports.downloadImages urls )
 
         UpdateKeywordFilter value ->
-            { model | keywordFilter = value } => Cmd.none
+            ( { model | keywordFilter = value }, Cmd.none )
+
+        CompletedAlbumLoad (Ok album) ->
+            ( { model | album = Loaded album }, Cmd.none )
+
+        CompletedAlbumLoad (Err err) ->
+            ( { model | album = Failed }
+            , Log.error
+            )
+
+        PassedSlowLoadThreshold ->
+            ( model, Cmd.none )
 
 
 initMap : Model -> Cmd msg
 initMap model =
-    Util.initMap model.album.name <| List.filterMap .gps model.album.photos
+    case model.album of
+        Loaded album ->
+            Util.initMap album.name <| List.filterMap .gps album.photos
+
+        _ ->
+            Cmd.none
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+toSession : Model -> Session
+toSession model =
+    model.session

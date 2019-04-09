@@ -8,7 +8,7 @@ const proxy = require('http-proxy-middleware')
 
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MinifyPlugin = require('babel-minify-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
@@ -100,15 +100,14 @@ if (mode === 'development') {
           exclude: [/elm-stuff/, /node_modules/],
           use: [
             {
-              loader: 'elm-hot-loader'
+              loader: 'elm-hot-webpack-loader'
             },
             {
               loader: 'elm-webpack-loader',
               // add Elm's debug overlay to output
               options: {
                 debug: true,
-                verbose: true,
-                warn: true
+                verbose: true
               }
             }
           ]
@@ -154,12 +153,12 @@ if (mode === 'production') {
   module.exports = merge(common, {
     plugins: [
       // Delete everything from output directory and report to user
-      new CleanWebpackPlugin({
-        root: __dirname,
-        exclude: [],
-        verbose: true,
-        dry: false
-      }),
+        // new CleanWebpackPlugin({
+        //   root: __dirname,
+        //   exclude: [],
+        //   verbose: true,
+        //   dry: false
+        // }),
       new CopyWebpackPlugin([
         {
           from: 'assets/images',

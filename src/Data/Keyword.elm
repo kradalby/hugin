@@ -3,7 +3,7 @@ module Data.Keyword exposing (Keyword, decoder)
 import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias Keyword =
@@ -15,7 +15,7 @@ type alias Keyword =
 
 decoder : Decoder Keyword
 decoder =
-    decode Keyword
+    Decode.succeed Keyword
         |> required "url" Url.urlDecoder
         |> required "photos" (Decode.list photoInAlbumDecoder)
         |> required "name" Decode.string

@@ -16,5 +16,5 @@ get : Url -> Http.Request Locations
 get url =
     apiUrl (Url.urlToString url)
         |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson (traceDecoder "locations" Location.decoderLocations))
+        |> HttpBuilder.withExpect (Http.expectJson Location.decoderLocations)
         |> HttpBuilder.toRequest

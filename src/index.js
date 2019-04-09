@@ -1,5 +1,9 @@
-let Elm = require('./Main.elm')
-let app = Elm.Main.fullscreen()
+const {Elm} = require('./Main')
+
+let app = Elm.Main.init({
+  node: document.getElementById('root')
+})
+
 
 // require('./styles/reset.css');
 // require('materialize-css/sass/materialize.scss')

@@ -1,10 +1,11 @@
-module Route exposing (Route(..), fromLocation, href, modifyUrl, routeToString)
+module Route exposing (Route(..), fromUrl, href, parser, pushUrl, replaceUrl)
 
-import Data.Url as Url exposing (Url)
+import Browser.Navigation as Nav
+import Data.Url as HuginUrl
 import Html exposing (Attribute)
 import Html.Attributes as Attr
-import Navigation exposing (Location)
-import UrlParser exposing ((</>), Parser, oneOf, parseHash, s, string)
+import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
 
 
 
@@ -19,14 +20,14 @@ type Route
     | Locations String
 
 
-route : Parser (Route -> a) a
-route =
+parser : Parser (Route -> a) a
+parser =
     oneOf
-        [ UrlParser.map Root (s "")
-        , UrlParser.map (Album << String.join "/") (s "album" </> Url.rest)
-        , UrlParser.map (Photo << String.join "/") (s "photo" </> Url.rest)
-        , UrlParser.map (Keyword << String.join "/") (s "keyword" </> Url.rest)
-        , UrlParser.map (Locations << String.join "/") (s "locations" </> Url.rest)
+        [ Parser.map Root (s "")
+        , Parser.map (Album << String.join "/") (s "album" </> HuginUrl.rest)
+        , Parser.map (Photo << String.join "/") (s "photo" </> HuginUrl.rest)
+        , Parser.map (Keyword << String.join "/") (s "keyword" </> HuginUrl.rest)
+        , Parser.map (Locations << String.join "/") (s "locations" </> HuginUrl.rest)
         ]
 
 
@@ -62,19 +63,31 @@ routeToString page =
 
 
 href : Route -> Attribute msg
-href route =
-    Attr.href (routeToString route)
+href targetRoute =
+    Attr.href (routeToString targetRoute)
 
 
-modifyUrl : Route -> Cmd msg
-modifyUrl =
-    routeToString >> Navigation.modifyUrl
+pushUrl : Nav.Key -> Route -> Cmd msg
+pushUrl key route =
+    Nav.pushUrl key (routeToString route)
 
 
-fromLocation : Location -> Maybe Route
-fromLocation location =
-    if String.isEmpty location.hash then
-        Just Root
+replaceUrl : Nav.Key -> Route -> Cmd msg
+replaceUrl key route =
+    Nav.replaceUrl key (routeToString route)
 
-    else
-        parseHash route location
+
+fromUrl : Url -> Maybe Route
+fromUrl url =
+    { url | path = Maybe.withDefault "" url.fragment, fragment = Nothing }
+        |> Parser.parse parser
+
+
+
+--fromLocation : Location -> Maybe Route
+--fromLocation location =
+--    if String.isEmpty location.hash then
+--        Just Root
+--
+--    else
+--        parseHash route location

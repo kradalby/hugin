@@ -1,26 +1,31 @@
-module Page.Photo exposing (Model, Msg, init, initMap, subscriptions, update, view)
+module Page.Photo exposing (Model, Msg, init, initMap, subscriptions, toSession, update, view)
 
 {-| Viewing a user's photo.
 -}
 
+--import Date.Format
+--import Keyboard exposing (KeyCode)
+
+import Browser.Events
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
-import Date.Format
+import File.Download as Download
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Lazy
 import Http
-import Keyboard exposing (KeyCode)
+import Json.Decode as Decode
+import Loading
+import Log
 import Maybe.Extra
-import Page.Errored exposing (PageLoadError, pageLoadError)
 import Request.Photo
 import Route exposing (Route)
+import Session exposing (Session)
 import Task exposing (Task)
-import Util exposing ((=>), cleanOwnerToName, formatExposureTime, pair, viewIf)
+import Util exposing (Status(..), cleanOwnerToName, formatExposureTime, viewIf)
 import Views.Errors as Errors
 import Views.Misc exposing (scaledImg, viewKeywords, viewMap, viewPath)
-import Views.Page as Page
 
 
 
@@ -28,69 +33,82 @@ import Views.Page as Page
 
 
 type alias Model =
-    { errors : List String
+    { session : Session
+    , errors : List String
     , showHelpModal : Bool
-    , photo : Photo
+    , photo : Status Photo
     }
 
 
-init : Url -> Task PageLoadError Model
-init url =
-    let
-        loadPhoto =
-            Request.Photo.get url
-                |> Http.toTask
-
-        handleLoadError err =
-            let
-                _ =
-                    Debug.log "err: " err
-            in
-            "Photo is currently unavailable."
-                |> pageLoadError (Page.Photo url) err
-    in
-    Task.map (Model [] False) loadPhoto
-        |> Task.mapError handleLoadError
+init : Session -> Url -> ( Model, Cmd Msg )
+init session url =
+    ( { session = session
+      , errors = []
+      , showHelpModal = False
+      , photo = Loading
+      }
+    , Cmd.batch
+        [ Request.Photo.get url
+            |> Http.toTask
+            |> Task.attempt CompletedPhotoLoad
+        , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
+        ]
+    )
 
 
 
 -- VIEW --
 
 
-view : Model -> Html Msg
+view : Model -> { title : String, content : Html Msg }
 view model =
-    let
-        photo =
-            model.photo
-    in
-    div [ class "photo-page" ]
-        [ div [ class "container-fluid" ]
-            [ div [ class "row bg-darklight" ]
-                [ viewPath photo.parents photo.name
-                , div [ class "col-2 pr-2 text-right" ]
-                    [ viewHelpButton
-                    , viewDownloadButton photo
+    { title =
+        Util.statusToMaybe model.photo
+            |> Maybe.map .name
+            |> Maybe.withDefault "Photo"
+    , content =
+        case model.photo of
+            Loading ->
+                -- Todo: Nice loading
+                text ""
+
+            LoadingSlowly ->
+                -- Todo: Nice loading
+                Loading.icon
+
+            Loaded photo ->
+                div [ class "photo-page" ]
+                    [ div [ class "container-fluid" ]
+                        [ div [ class "row bg-darklight" ]
+                            [ viewPath photo.parents photo.name
+                            , div [ class "col-2 pr-2 text-right" ]
+                                [ viewHelpButton
+                                , viewDownloadButton photo
+                                ]
+                            ]
+                        , Errors.view DismissErrors model.errors
+                        , viewIf model.showHelpModal (viewHelpModal photo)
+                        , div [ class "row" ] [ viewImage photo ]
+                        , div [ class "row" ]
+                            [ viewKeywords "People" photo.people
+                            , viewKeywords "Tags" photo.keywords
+                            ]
+                        , div [ class "row" ]
+                            [ Html.Lazy.lazy viewInformation photo
+                            , viewMap photo.name 12 12 6 6 6
+                            ]
+                        ]
                     ]
-                ]
-            , Errors.view DismissErrors model.errors
-            , viewIf model.showHelpModal (viewHelpModal model)
-            , div [ class "row" ] [ viewImage photo ]
-            , div [ class "row" ]
-                [ viewKeywords "People" photo.people
-                , viewKeywords "Tags" photo.keywords
-                ]
-            , div [ class "row" ]
-                [ Html.Lazy.lazy viewInformation photo
-                , viewMap model.photo.name 12 12 6 6 6
-                ]
-            ]
-        ]
+
+            Failed ->
+                Loading.error "photo"
+    }
 
 
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
     span [ class "" ]
-        [ a [ onClick CopyRightNotice, href photo.originalImageURL, downloadAs photo.name ]
+        [ a [ onClick CopyRightNotice, href photo.originalImageURL ]
             [ i [ class "fas fa-download text-white" ] []
             ]
         ]
@@ -168,19 +186,25 @@ viewInformation photo =
                 , td [] [ a [ href photo.originalImageURL ] [ text "Link" ] ]
                 ]
 
-        rowWithToString name value =
-            row name (toString value)
-
         rows =
+            -- TODO: Add some nice font awesome icons
             [ photo.copyright |> Maybe.map (cleanOwnerToName >> row "Photographer")
-            , photo.dateTime |> Maybe.map (Date.Format.format "%A %d %B %Y %H:%M:%S" >> row "Date")
+
+            -- TODO: Fix date formatting
+            , photo.dateTime |> Maybe.map (Util.formatPhotoDate >> row "Date")
             , photo.cameraMake |> Maybe.map (row "Camera")
             , photo.cameraModel |> Maybe.map (row "Model")
             , photo.lensModel |> Maybe.map (row "Lens")
-            , photo.focalLength |> Maybe.map (rowWithToString "Focal length")
-            , photo.fNumber |> Maybe.map (rowWithToString "f/")
-            , photo.exposureTime |> Maybe.map (formatExposureTime >> row "Shutter speed")
-            , List.head photo.isoSpeed |> Maybe.map (rowWithToString "ISO")
+            , photo.focalLength
+                |> Maybe.map String.fromFloat
+                |> Maybe.map (row "Focal length")
+            , photo.fNumber
+                |> Maybe.map String.fromFloat
+                |> Maybe.map (row "f/")
+            , photo.exposureTime |> Maybe.map (Util.formatExposureTime >> row "Shutter speed")
+            , List.head photo.isoSpeed
+                |> Maybe.map String.fromInt
+                |> Maybe.map (row "ISO")
             , Just original
             ]
     in
@@ -196,8 +220,8 @@ viewInformation photo =
         ]
 
 
-viewHelpModal : Model -> Html Msg
-viewHelpModal model =
+viewHelpModal : Photo -> Html Msg
+viewHelpModal photo =
     div [ style "display" "block", attribute "aria-hidden" "false", attribute "aria-labelledby" "helpModal", class "modal", id "helpModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
         [ div [ class "modal-dialog modal-dialog-centered", attribute "role" "document" ]
             [ div [ class "modal-content" ]
@@ -218,7 +242,7 @@ viewHelpModal model =
                     , div [ class "mx-2" ]
                         [ p [] [ text "Navigate to the previous or next image by clicking on the left or right side of the current image:" ]
                         , div [ style "position" "relative" ]
-                            [ viewImageTag model.photo
+                            [ viewImageTag photo
                             , div
                                 [ class "previous-image-help-overlay" ]
                                 [ i [ class "fas fa-chevron-left fa-3x text-white center-image-on-help-overlay" ]
@@ -253,62 +277,108 @@ type Msg
     = DismissErrors
     | ToggleHelpModal
     | CopyRightNotice
-    | KeyMsg KeyCode
+    | KeyMsg String
+    | CompletedPhotoLoad (Result Http.Error Photo)
+    | PassedSlowLoadThreshold
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        photo =
-            model.photo
-    in
     case msg of
         DismissErrors ->
-            { model | errors = [] } => Cmd.none
+            ( { model | errors = [] }, Cmd.none )
 
         ToggleHelpModal ->
-            { model
+            ( { model
                 | showHelpModal = not model.showHelpModal
-            }
-                => Cmd.none
+              }
+            , Cmd.none
+            )
 
         CopyRightNotice ->
-            { model | errors = [ "Remember to ask and credit the photographer before using the image!" ] } => Cmd.none
-
-        KeyMsg code ->
-            case code of
-                37 ->
-                    case photo.previous of
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                        Just url ->
-                            ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
-
-                39 ->
-                    case photo.next of
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                        Just url ->
-                            ( model, Route.modifyUrl (Route.Photo (Url.urlToString url)) )
+            case model.photo of
+                Loaded photo ->
+                    -- TODO: Test download
+                    ( { model
+                        | errors =
+                            [ "Remember to ask and credit the photographer before using the image!"
+                            ]
+                      }
+                    , Download.url photo.originalImageURL
+                    )
 
                 _ ->
                     ( model, Cmd.none )
+
+        KeyMsg code ->
+            -- TODO: Test keys
+            case model.photo of
+                Loaded photo ->
+                    case code of
+                        "37" ->
+                            case photo.previous of
+                                Nothing ->
+                                    ( model, Cmd.none )
+
+                                Just url ->
+                                    ( model
+                                    , Route.pushUrl
+                                        (Session.navKey model.session)
+                                        (Route.Photo (Url.urlToString url))
+                                    )
+
+                        "39" ->
+                            case photo.next of
+                                Nothing ->
+                                    ( model, Cmd.none )
+
+                                Just url ->
+                                    ( model
+                                    , Route.pushUrl
+                                        (Session.navKey model.session)
+                                        (Route.Photo (Url.urlToString url))
+                                    )
+
+                        _ ->
+                            ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        CompletedPhotoLoad (Ok photo) ->
+            ( { model | photo = Loaded photo }, Cmd.none )
+
+        CompletedPhotoLoad (Err err) ->
+            ( { model | photo = Failed }
+            , Log.error
+            )
+
+        PassedSlowLoadThreshold ->
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Keyboard.downs KeyMsg
+        [ Browser.Events.onKeyDown <| Decode.map KeyMsg (Decode.field "key" Decode.string)
         ]
 
 
 initMap : Model -> Cmd msg
 initMap model =
-    case model.photo.gps of
-        Nothing ->
-            Util.initMap model.photo.name []
+    case model.photo of
+        Loaded photo ->
+            case photo.gps of
+                Nothing ->
+                    Util.initMap photo.name []
 
-        Just gps ->
-            Util.initMap model.photo.name [ gps ]
+                Just gps ->
+                    Util.initMap photo.name [ gps ]
+
+        _ ->
+            Cmd.none
+
+
+toSession : Model -> Session
+toSession model =
+    model.session

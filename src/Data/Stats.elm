@@ -3,7 +3,7 @@ module Data.Stats exposing (Stats, Statss, decoder)
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias Stats =
@@ -25,7 +25,7 @@ type alias Statss =
 
 decoder : Decoder Stats
 decoder =
-    decode Stats
+    Decode.succeed Stats
         |> required "writtenPhotos" Decode.int
         |> required "albums" Decode.int
         |> required "originalPhotos" Decode.int

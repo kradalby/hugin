@@ -1,9 +1,7 @@
-module Data.Url exposing (Url(..), encodeUrl, rest, urlDecoder, urlToHtml, urlToString)
+module Data.Url exposing (Url(..), fromString, rest, urlDecoder, urlToString)
 
-import Html exposing (Html)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Encode as Encode exposing (Value)
-import UrlParser exposing ((</>))
+import Url.Parser as Parser exposing ((</>))
 
 
 type Url
@@ -15,35 +13,30 @@ urlToString (Url url) =
     url
 
 
-
--- urlParser : UrlParser.Parser (Url -> a) a
--- urlParser =
---     UrlParser.custom "URL" <|
---         \segment ->
---             let
---                 derp =
---                     Debug.log "segment" segment
---             in
---                 if String.endsWith ".json" segment then
---                     Ok (Url segment)
---                 else
---                     Err "Does not end with .json"
+fromString : String -> Url
+fromString str =
+    Url str
 
 
-rest : UrlParser.Parser (List String -> a) a
+
+-- This works, but I must admit that its a bit over my head...
+
+
+rest : Parser.Parser (List String -> a) a
 rest =
     restHelp 10
 
 
-restHelp : Int -> UrlParser.Parser (List String -> a) a
+restHelp : Int -> Parser.Parser (List String -> a) a
 restHelp maxDepth =
     if maxDepth < 1 then
-        UrlParser.map [] UrlParser.top
+        Parser.map [] Parser.top
 
     else
-        UrlParser.oneOf
-            [ UrlParser.map [] UrlParser.top
-            , UrlParser.map (::) (UrlParser.string </> restHelp (maxDepth - 1))
+        Parser.oneOf
+            [ Parser.map [] Parser.top
+
+            --            , Parser.map (::) (Parser.string </> restHelp (maxDepth - 1))
             ]
 
 
@@ -52,11 +45,13 @@ urlDecoder =
     Decode.map Url Decode.string
 
 
-encodeUrl : Url -> Value
-encodeUrl (Url url) =
-    Encode.string url
 
-
-urlToHtml : Url -> Html msg
-urlToHtml (Url url) =
-    Html.text url
+--
+--encodeUrl : Url -> Value
+--encodeUrl (Url url) =
+--    Encode.string url
+--
+--
+--urlToHtml : Url -> Html msg
+--urlToHtml (Url url) =
+--    Html.text url

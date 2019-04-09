@@ -16,5 +16,5 @@ get : Url -> Http.Request Album
 get url =
     apiUrl (Url.urlToString url)
         |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson (Util.traceDecoder "Album: " Album.decoder))
+        |> HttpBuilder.withExpect (Http.expectJson Album.decoder)
         |> HttpBuilder.toRequest

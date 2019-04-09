@@ -2,7 +2,7 @@ module Data.Misc exposing (AlbumInAlbum, GPS, KeywordPointer, LocationData, Pare
 
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Json.Decode.Pipeline exposing (optional, required)
 
 
 type alias PhotoInAlbum =
@@ -59,7 +59,7 @@ type alias KeywordPointer =
 
 photoInAlbumDecoder : Decoder PhotoInAlbum
 photoInAlbumDecoder =
-    decode PhotoInAlbum
+    Decode.succeed PhotoInAlbum
         |> required "url" Url.urlDecoder
         |> required "originalImageURL" Decode.string
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
@@ -68,7 +68,7 @@ photoInAlbumDecoder =
 
 albumInAlbumDecoder : Decoder AlbumInAlbum
 albumInAlbumDecoder =
-    decode AlbumInAlbum
+    Decode.succeed AlbumInAlbum
         |> required "url" Url.urlDecoder
         |> required "name" Decode.string
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
@@ -76,14 +76,14 @@ albumInAlbumDecoder =
 
 scaledPhotoDecoder : Decoder ScaledPhoto
 scaledPhotoDecoder =
-    decode ScaledPhoto
+    Decode.succeed ScaledPhoto
         |> required "url" Decode.string
         |> required "maxResolution" Decode.int
 
 
 gpsDecoder : Decoder GPS
 gpsDecoder =
-    decode GPS
+    Decode.succeed GPS
         |> required "latitude" Decode.float
         |> required "longitude" Decode.float
         |> required "altitude" Decode.float
@@ -91,7 +91,7 @@ gpsDecoder =
 
 locationDataDecoder : Decoder LocationData
 locationDataDecoder =
-    decode LocationData
+    Decode.succeed LocationData
         |> required "city" Decode.string
         |> required "state" Decode.string
         |> required "locationCode" Decode.string
@@ -100,14 +100,14 @@ locationDataDecoder =
 
 parentDecoder : Decoder Parent
 parentDecoder =
-    decode Parent
+    Decode.succeed Parent
         |> required "url" Url.urlDecoder
         |> required "name" Decode.string
 
 
 keywordPointerDecoder : Decoder KeywordPointer
 keywordPointerDecoder =
-    decode KeywordPointer
+    Decode.succeed KeywordPointer
         |> required "url" Url.urlDecoder
         |> required "name" Decode.string
 

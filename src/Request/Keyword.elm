@@ -16,5 +16,5 @@ get : Url -> Http.Request Keyword
 get url =
     apiUrl (Url.urlToString url)
         |> HttpBuilder.get
-        |> HttpBuilder.withExpect (Http.expectJson (Util.traceDecoder "Keyword: " Keyword.decoder))
+        |> HttpBuilder.withExpect (Http.expectJson Keyword.decoder)
         |> HttpBuilder.toRequest

@@ -30,12 +30,10 @@
     "babel-loader": "^8.0.5",
     "babel-minify-webpack-plugin": "^0.3.1",
     "bootstrap": "^4.3.1",
-    "clean-webpack-plugin": "^2.0.1",
     "compression-webpack-plugin": "^2.0.0",
     "copy-webpack-plugin": "^5.0.2",
     "cross-env": "^5.2.0",
     "css-loader": "^2.1.1",
-    "elm-hot-loader": "^0.5.4",
     "elm-webpack-loader": "5.0.0",
     "file-loader": "^3.0.1",
     "flexbin": "^0.2.0",
@@ -65,6 +63,7 @@
   "dependencies": {
     "elm": "^0.19.0-bugfix6",
     "elm-format": "^0.8.1",
+    "elm-hot-webpack-loader": "^1.0.2",
     "elm-upgrade": "^0.19.6"
   }
 }

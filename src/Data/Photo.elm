@@ -1,12 +1,15 @@
 module Data.Photo exposing (Photo, biggest, decoder, thumbnail)
 
+--import Date exposing (Date)
+--import Json.Decode.Extra
+
 import Data.Misc as Misc exposing (..)
 import Data.Url as Url exposing (Url)
-import Date exposing (Date)
+import Iso8601
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Extra
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Json.Decode.Pipeline exposing (optional, required)
 import List.Extra
+import Time
 
 
 type alias Photo =
@@ -18,7 +21,7 @@ type alias Photo =
     , meteringMode : Maybe Int
     , cameraMake : Maybe String
     , isoSpeed : List Int
-    , dateTime : Maybe Date
+    , dateTime : Maybe Time.Posix
     , name : String
     , keywords : List KeywordPointer
     , originalImageURL : String
@@ -42,7 +45,7 @@ type alias Photo =
 
 decoder : Decoder Photo
 decoder =
-    decode Photo
+    Decode.succeed Photo
         |> optional "shutterSpeed" (Decode.nullable Decode.float) Nothing
         |> optional "lensModel" (Decode.nullable Decode.string) Nothing
         |> required "people" (Decode.list keywordPointerDecoder)
@@ -51,7 +54,7 @@ decoder =
         |> optional "meteringMode" (Decode.nullable Decode.int) Nothing
         |> optional "cameraMake" (Decode.nullable Decode.string) Nothing
         |> required "isoSpeed" (Decode.list Decode.int)
-        |> optional "dateTime" (Decode.nullable Json.Decode.Extra.date) Nothing
+        |> optional "dateTime" (Decode.nullable Iso8601.decoder) Nothing
         |> required "name" Decode.string
         |> required "keywords" (Decode.list keywordPointerDecoder)
         |> required "originalImageURL" Decode.string
