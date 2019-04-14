@@ -3,17 +3,14 @@ WORKDIR /app
 
 ARG MAPBOX_ACCESS_TOKEN
 
-RUN yarn global add elm@0.18.0
-
-ADD package.json .
-ADD yarn.lock .
+COPY package.json .
+COPY yarn.lock .
 RUN yarn install --silent
-ADD elm-package.json .
-RUN elm package install -y
+COPY elm.json .
 
 ENV NODE_ENV "production"
-ADD . .
-RUN npm run prod
+COPY . .
+RUN yarn run prod
 
 
 FROM kradalby/nginx-ldap-auth:1.15.3 as production
