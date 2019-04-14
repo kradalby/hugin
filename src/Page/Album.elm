@@ -68,11 +68,9 @@ view model =
     , content =
         case model.album of
             Loading ->
-                -- Todo: Nice loading
-                text ""
+                Loading.icon
 
             LoadingSlowly ->
-                -- Todo: Nice loading
                 Loading.icon
 
             Loaded album ->

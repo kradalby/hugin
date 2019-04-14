@@ -3,16 +3,15 @@ module Loading exposing (error, icon, slowThreshold)
 {-| A loading spinner icon.
 -}
 
-import Html exposing (Attribute, Html, text)
-import Html.Attributes exposing (alt, height, src, width)
+import Html exposing (Attribute, Html, i, text)
+import Html.Attributes exposing (alt, class, height, src, width)
 import Process
 import Task exposing (Task)
 
 
 icon : Html msg
 icon =
-    -- TODO: Use font awesome
-    text ""
+    i [ class "fas fa-2x fa-spinner fa-spin text-black" ] []
 
 
 error : String -> Html msg
