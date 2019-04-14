@@ -58,8 +58,6 @@ view model =
         NotFound _ ->
             viewPage Page.Other (\_ -> Ignored) NotFound.view
 
-        --        Settings settings ->
-        --            viewPage Page.Other GotSettingsMsg (Settings.view settings)
         Album url m ->
             viewPage (Page.Album url) GotAlbumMsg (Album.view m)
 
@@ -75,10 +73,6 @@ view model =
 
 
 -- SUBSCRIPTIONS --
--- Note: we aren't currently doing any page subscriptions, but I thought it would
--- be a good idea to put this in here as an example. If I were actually
--- maintaining this in production, I wouldn't bother until I needed this!
--- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
@@ -118,35 +112,6 @@ type Msg
     | GotPhotoMsg Photo.Msg
     | GotKeywordMsg Keyword.Msg
     | GotLocationsMsg Locations.Msg
-
-
-
---setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
---setRoute maybeRoute model =
---    let
---        transition toMsg task =
---            { model | pageState = TransitioningFrom (getPage model.pageState) }
---                => Task.attempt toMsg task
---    in
---    case maybeRoute of
---        Nothing ->
---            { model | pageState = Loaded NotFound } => Cmd.none
---
---        Just Route.Root ->
---            model => Route.modifyUrl (Route.Album rootUrl)
---
---        -- transition (AlbumLoaded (Data.Url.Url rootUrl)) (Album.init (Data.Url.Url rootUrl))
---        Just (Route.Album url) ->
---            transition (AlbumLoaded (Data.Url.Url url)) (Album.init (Data.Url.Url url))
---
---        Just (Route.Photo url) ->
---            transition (PhotoLoaded (Data.Url.Url url)) (Photo.init (Data.Url.Url url))
---
---        Just (Route.Keyword url) ->
---            transition (KeywordLoaded (Data.Url.Url url)) (Keyword.init (Data.Url.Url url))
---
---        Just (Route.Locations url) ->
---            transition (LocationsLoaded (Data.Url.Url url)) (Locations.init (Data.Url.Url url))
 
 
 toSession : Model -> Session
@@ -278,113 +243,6 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
     )
 
 
-
---update : Msg -> Model -> ( Model, Cmd Msg )
---update msg model =
---    updatePage (getPage model.pageState) msg model
---
---
---updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
---updatePage page msg model =
---    let
---        toPage toModel toMsg subUpdate subMsg subModel =
---            let
---                ( newModel, newCmd ) =
---                    subUpdate subMsg subModel
---            in
---            ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
---    in
---    case ( msg, page ) of
---        ( SetRoute route, _ ) ->
---            let
---                ( m, c ) =
---                    setRoute route model
---
---                url =
---                    case route of
---                        Nothing ->
---                            ""
---
---                        Just r ->
---                            Route.routeToString r
---            in
---            ( m, Cmd.batch [ c, Ports.analytics url ] )
---
---        ( ClickedLink urlRequest, _ ) ->
---            case urlRequest of
---                Browser.Internal url ->
---                    case url.fragment of
---                        Nothing ->
---                            -- If we got a link that didn't include a fragment,
---                            -- it's from one of those (href "") attributes that
---                            -- we have to include to make the RealWorld CSS work.
---                            --
---                            -- In an application doing path routing instead of
---                            -- fragment-based routing, this entire
---                            -- `case url.fragment of` expression this comment
---                            -- is inside would be unnecessary.
---                            ( model, Cmd.none )
---
---                        Just _ ->
---                            ( model
---                            , Nav.pushUrl (Session.navKey (toSession model)) (Url.toString url)
---                            )
---
---                Browser.External href ->
---                    ( model
---                    , Nav.load href
---                    )
---
---        ( ChangedUrl url, _ ) ->
---            changeRouteTo (Route.fromUrl url) model
---
---        ( AlbumLoaded url (Ok subModel), _ ) ->
---            { model | pageState = Loaded (Album url subModel) } => Album.initMap subModel
---
---        ( AlbumLoaded url (Err error), _ ) ->
---            { model | pageState = Loaded (Errored error) } => Cmd.none
---
---        ( AlbumMsg subMsg, Album url subModel ) ->
---            toPage (Album url) AlbumMsg Album.update subMsg subModel
---
---        ( PhotoLoaded url (Ok subModel), _ ) ->
---            { model | pageState = Loaded (Photo url subModel) } => Photo.initMap subModel
---
---        ( PhotoLoaded url (Err error), _ ) ->
---            { model | pageState = Loaded (Errored error) } => Cmd.none
---
---        ( PhotoMsg subMsg, Photo url subModel ) ->
---            toPage (Photo url) PhotoMsg Photo.update subMsg subModel
---
---        ( KeywordLoaded url (Ok subModel), _ ) ->
---            { model | pageState = Loaded (Keyword url subModel) } => Keyword.initMap subModel
---
---        ( KeywordLoaded url (Err error), _ ) ->
---            { model | pageState = Loaded (Errored error) } => Cmd.none
---
---        ( KeywordMsg subMsg, Keyword url subModel ) ->
---            toPage (Keyword url) KeywordMsg Keyword.update subMsg subModel
---
---        ( LocationsLoaded url (Ok subModel), _ ) ->
---            { model | pageState = Loaded (Locations url subModel) } => Cmd.none
---
---        ( LocationsLoaded url (Err error), _ ) ->
---            { model | pageState = Loaded (Errored error) } => Cmd.none
---
---        ( LocationsMsg subMsg, Locations url subModel ) ->
---            toPage (Locations url) LocationsMsg Locations.update subMsg subModel
---
---        ( _, NotFound ) ->
---            -- Disregard incoming messages when we're on the
---            -- NotFound page.
---            model => Cmd.none
---
---        ( _, _ ) ->
---            -- Disregard incoming messages that arrived for the wrong page
---            model => Cmd.none
--- MAIN --
-
-
 main : Program Value Model Msg
 main =
     Browser.application
@@ -395,12 +253,3 @@ main =
         , onUrlChange = ChangedUrl
         , onUrlRequest = ClickedLink
         }
-
-
-
---    Navigation.programWithFlags (Route.fromLocation >> SetRoute)
---        { init = init
---        , view = view
---        , update = update
---        , subscriptions = subscriptions
---        }
