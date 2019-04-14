@@ -1,4 +1,4 @@
-module Views.Assets exposing (error, loading, notFound, placeholder, src)
+module Views.Assets exposing (loading, notFound, placeholder, src)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -17,26 +17,24 @@ type Image
 
 
 -- IMAGES --
-
-
-error : Image
-error =
-    Image "/images/error.jpg"
+-- error : Image
+-- error =
+--     Image "/error.jpg"
 
 
 placeholder : Image
 placeholder =
-    Image "/images/placeholder.png"
+    Image "/placeholder.png"
 
 
 notFound : Image
 notFound =
-    Image "/images/404.jpg"
+    Image "/404.jpg"
 
 
 loading : Image
 loading =
-    Image "/images/loading.svg"
+    Image "/loading.svg"
 
 
 

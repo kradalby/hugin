@@ -30,6 +30,10 @@ dom.watch();
 // SCSS
 require("./styles.scss");
 
+require("./images/placeholder.png");
+require("./images/loading.svg");
+require("./images/404.jpg");
+
 // BOOTSTRAP
 // require("bootstrap/js/dist/modal");
 
