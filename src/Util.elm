@@ -136,7 +136,7 @@ formatPhotoDate date =
 
         day =
             Time.toDay Time.utc date
-                |> String.fromInt
+                |> addOrdinalSuffix
 
         weekday =
             Time.toWeekday Time.utc date
@@ -157,7 +157,7 @@ formatPhotoDate date =
     weekday
         ++ " "
         ++ day
-        ++ ". of "
+        ++ " of "
         ++ month
         ++ " "
         ++ year
@@ -249,3 +249,25 @@ statusToMaybe status =
 
         _ ->
             Nothing
+
+
+addOrdinalSuffix : Int -> String
+addOrdinalSuffix number =
+    let
+        j =
+            modBy number 10
+
+        k =
+            modBy number 100
+    in
+    if j == 1 && k /= 11 then
+        String.fromInt number ++ "st"
+
+    else if j == 2 && k /= 12 then
+        String.fromInt number ++ "nd"
+
+    else if j == 3 && k /= 13 then
+        String.fromInt number ++ "rd"
+
+    else
+        String.fromInt number ++ "th"

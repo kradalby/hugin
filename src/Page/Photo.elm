@@ -1,4 +1,4 @@
-module Page.Photo exposing (Model, Msg, init, initMap, subscriptions, toSession, update, view)
+module Page.Photo exposing (Model, Msg, init, subscriptions, toSession, update, view)
 
 {-| Viewing a user's photo.
 -}
@@ -189,8 +189,6 @@ viewInformation photo =
         rows =
             -- TODO: Add some nice font awesome icons
             [ photo.copyright |> Maybe.map (cleanOwnerToName >> row "Photographer")
-
-            -- TODO: Fix date formatting
             , photo.dateTime |> Maybe.map (Util.formatPhotoDate >> row "Date")
             , photo.cameraMake |> Maybe.map (row "Camera")
             , photo.cameraModel |> Maybe.map (row "Model")
@@ -298,7 +296,6 @@ update msg model =
         CopyRightNotice ->
             case model.photo of
                 Loaded photo ->
-                    -- TODO: Test download
                     ( { model
                         | errors =
                             [ "Remember to ask and credit the photographer before using the image!"
@@ -311,11 +308,10 @@ update msg model =
                     ( model, Cmd.none )
 
         KeyMsg code ->
-            -- TODO: Test keys
             case model.photo of
                 Loaded photo ->
                     case code of
-                        "37" ->
+                        "ArrowLeft" ->
                             case photo.previous of
                                 Nothing ->
                                     ( model, Cmd.none )
@@ -327,7 +323,7 @@ update msg model =
                                         (Route.Photo (Url.urlToString url))
                                     )
 
-                        "39" ->
+                        "ArrowRight" ->
                             case photo.next of
                                 Nothing ->
                                     ( model, Cmd.none )
@@ -364,19 +360,20 @@ subscriptions model =
         ]
 
 
-initMap : Model -> Cmd msg
-initMap model =
-    case model.photo of
-        Loaded photo ->
-            case photo.gps of
-                Nothing ->
-                    Util.initMap photo.name []
 
-                Just gps ->
-                    Util.initMap photo.name [ gps ]
-
-        _ ->
-            Cmd.none
+--initMap : Model -> Cmd msg
+--initMap model =
+--    case model.photo of
+--        Loaded photo ->
+--            case photo.gps of
+--                Nothing ->
+--                    Util.initMap photo.name []
+--
+--                Just gps ->
+--                    Util.initMap photo.name [ gps ]
+--
+--        _ ->
+--            Cmd.none
 
 
 toSession : Model -> Session
