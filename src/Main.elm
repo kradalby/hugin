@@ -14,6 +14,7 @@ import Page.Keyword as Keyword
 import Page.Locations as Locations
 import Page.NotFound as NotFound
 import Page.Photo as Photo
+import Ports
 import Request.Helpers exposing (rootUrl)
 import Route exposing (Route)
 import Session exposing (Session)
@@ -136,54 +137,61 @@ toSession page =
             session
 
 
-
--- TODO: Remember analytics!
-
-
 changeRouteTo : Maybe Route -> Model -> ( Model, Cmd Msg )
 changeRouteTo maybeRoute model =
     let
         session =
             toSession model
+
+        analyticsUrl =
+            case maybeRoute of
+                Nothing ->
+                    ""
+
+                Just route ->
+                    Route.routeToString route
+
+        ( m, c ) =
+            case maybeRoute of
+                Nothing ->
+                    ( NotFound session, Cmd.none )
+
+                Just Route.Root ->
+                    ( model, Route.replaceUrl (Session.navKey session) (Route.Album rootUrl) )
+
+                Just (Route.Album urlString) ->
+                    let
+                        url =
+                            Data.Url.fromString urlString
+                    in
+                    Album.init session url
+                        |> updateWith (Album url) GotAlbumMsg model
+
+                Just (Route.Photo urlString) ->
+                    let
+                        url =
+                            Data.Url.fromString urlString
+                    in
+                    Photo.init session url
+                        |> updateWith (Photo url) GotPhotoMsg model
+
+                Just (Route.Keyword urlString) ->
+                    let
+                        url =
+                            Data.Url.fromString urlString
+                    in
+                    Keyword.init session url
+                        |> updateWith (Keyword url) GotKeywordMsg model
+
+                Just (Route.Locations urlString) ->
+                    let
+                        url =
+                            Data.Url.fromString urlString
+                    in
+                    Locations.init session url
+                        |> updateWith (Locations url) GotLocationsMsg model
     in
-    case maybeRoute of
-        Nothing ->
-            ( NotFound session, Cmd.none )
-
-        Just Route.Root ->
-            ( model, Route.replaceUrl (Session.navKey session) (Route.Album rootUrl) )
-
-        Just (Route.Album urlString) ->
-            let
-                url =
-                    Data.Url.fromString urlString
-            in
-            Album.init session url
-                |> updateWith (Album url) GotAlbumMsg model
-
-        Just (Route.Photo urlString) ->
-            let
-                url =
-                    Data.Url.fromString urlString
-            in
-            Photo.init session url
-                |> updateWith (Photo url) GotPhotoMsg model
-
-        Just (Route.Keyword urlString) ->
-            let
-                url =
-                    Data.Url.fromString urlString
-            in
-            Keyword.init session url
-                |> updateWith (Keyword url) GotKeywordMsg model
-
-        Just (Route.Locations urlString) ->
-            let
-                url =
-                    Data.Url.fromString urlString
-            in
-            Locations.init session url
-                |> updateWith (Locations url) GotLocationsMsg model
+    ( m, Cmd.batch [ c, Ports.analytics analyticsUrl ] )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

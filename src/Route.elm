@@ -1,4 +1,4 @@
-module Route exposing (Route(..), fromUrl, href, parser, pushUrl, replaceUrl)
+module Route exposing (Route(..), fromUrl, href, parser, pushUrl, replaceUrl, routeToString)
 
 import Browser.Navigation as Nav
 import Data.Url as HuginUrl
