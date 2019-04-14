@@ -11,7 +11,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
 import Util
-import Views.Spinner exposing (spinner)
 
 
 {-| Determines which navbar link (if any) will be rendered as active.

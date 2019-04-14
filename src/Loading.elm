@@ -3,15 +3,16 @@ module Loading exposing (error, icon, slowThreshold)
 {-| A loading spinner icon.
 -}
 
-import Html exposing (Attribute, Html, i, text)
+import Html exposing (Attribute, Html, img, text)
 import Html.Attributes exposing (alt, class, height, src, width)
 import Process
 import Task exposing (Task)
+import Views.Assets as Assets
 
 
 icon : Html msg
 icon =
-    i [ class "fas fa-2x fa-spinner fa-spin text-black" ] []
+    img [ class "rounded mx-auto d-block mb-3", Assets.src Assets.notFound, alt "Loading..." ] []
 
 
 error : String -> Html msg

@@ -1,9 +1,3 @@
-let { Elm } = require("./Main");
-
-let app = Elm.Main.init({
-  node: document.getElementById("root")
-});
-
 // require('./styles/reset.css');
 // require('materialize-css/sass/materialize.scss')
 
@@ -34,11 +28,17 @@ library.add(
 dom.watch();
 
 // SCSS
-require("../assets/css/custom.scss");
-require("../assets/css/flexbin.scss");
+require("./styles.scss");
 
 // BOOTSTRAP
-require("bootstrap/js/dist/modal");
+// require("bootstrap/js/dist/modal");
+
+// ELM
+const { Elm } = require("./Main.elm");
+
+let app = Elm.Main.init({
+  node: document.getElementById("root")
+});
 
 // Helper functions
 function rafAsync() {
