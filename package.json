@@ -7,7 +7,8 @@
     "prod": "webpack -p",
     "build": "webpack --mode=development",
     "dev": "webpack-dev-server --hot --colors --port 8000",
-    "analyse": "webpack --profile --json"
+    "analyse": "webpack --profile --json",
+    "analyse": "elm-analyse -s -p 3001 -o"
   },
   "repository": {
     "type": "git",
@@ -52,6 +53,7 @@
   },
   "dependencies": {
     "elm": "^0.19.0-bugfix6",
+    "elm-analyse": "^0.16.3",
     "elm-format": "^0.8.1",
     "elm-hot-webpack-loader": "^1.0.2",
     "optimize-css-assets-webpack-plugin": "^5.0.1"
