@@ -49,7 +49,8 @@ module.exports = {
             loader: "elm-webpack-loader",
             options: {
               debug: !production,
-              verbose: !production
+              verbose: !production,
+              optimize: production
             }
           }
         ]
