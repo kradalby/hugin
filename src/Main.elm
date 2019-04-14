@@ -232,9 +232,17 @@ update msg model =
                 Browser.Internal url ->
                     case url.fragment of
                         Nothing ->
+                            let
+                                derp =
+                                    Debug.log "url nothing" url
+                            in
                             ( model, Cmd.none )
 
                         Just _ ->
+                            let
+                                derp =
+                                    Debug.log "url just" url
+                            in
                             ( model
                             , Nav.pushUrl (Session.navKey (toSession model)) (Url.toString url)
                             )

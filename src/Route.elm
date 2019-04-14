@@ -23,7 +23,7 @@ type Route
 parser : Parser (Route -> a) a
 parser =
     oneOf
-        [ Parser.map Root (s "")
+        [ Parser.map Root Parser.top
         , Parser.map (Album << String.join "/") (s "album" </> HuginUrl.rest)
         , Parser.map (Photo << String.join "/") (s "photo" </> HuginUrl.rest)
         , Parser.map (Keyword << String.join "/") (s "keyword" </> HuginUrl.rest)
