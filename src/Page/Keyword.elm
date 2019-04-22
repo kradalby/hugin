@@ -3,8 +3,8 @@ module Page.Keyword exposing (Model, Msg(..), init, initMap, subscriptions, toSe
 {-| Viewing a user's album.
 -}
 
-import Data.Keyword as Keyword exposing (Keyword)
-import Data.Url as Url exposing (Url)
+import Data.Keyword exposing (Keyword)
+import Data.Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy
@@ -13,7 +13,7 @@ import Loading
 import Log
 import Request.Keyword
 import Session exposing (Session)
-import Task exposing (Task)
+import Task
 import Util exposing (Status(..))
 import Views.Errors as Errors
 import Views.Misc exposing (viewMap, viewPhotos)
@@ -93,7 +93,7 @@ update msg model =
         CompletedKeywordLoad (Ok keyword) ->
             ( { model | keyword = Loaded keyword }, initMap keyword )
 
-        CompletedKeywordLoad (Err err) ->
+        CompletedKeywordLoad (Err _) ->
             ( { model | keyword = Failed }
             , Log.error
             )
@@ -108,7 +108,7 @@ initMap keyword =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 

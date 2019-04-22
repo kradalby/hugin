@@ -47,7 +47,7 @@ view page { title, content } =
 
 
 viewHeader : Page -> Html msg
-viewHeader page =
+viewHeader _ =
     nav [ class "navbar navbar-expand-md navbar-dark bg-dark pl-1" ]
         [ a [ class "navbar-brand flexiday-logo", href "#" ]
             [ text "" ]

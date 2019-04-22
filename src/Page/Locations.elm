@@ -3,8 +3,8 @@ module Page.Locations exposing (Model, Msg(..), init, subscriptions, toSession, 
 {-| Viewing a user's album.
 -}
 
-import Data.Location as Location exposing (Locations)
-import Data.Url as Url exposing (Url)
+import Data.Location exposing (Locations)
+import Data.Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
@@ -12,7 +12,7 @@ import Loading
 import Log
 import Request.Locations
 import Session exposing (Session)
-import Task exposing (Task)
+import Task
 import Util exposing (Status(..))
 import Views.Errors as Errors
 import Views.Misc exposing (viewMap)
@@ -76,7 +76,7 @@ update msg model =
         CompletedLocationsLoad (Ok locations) ->
             ( { model | locations = Loaded locations }, Cmd.none )
 
-        CompletedLocationsLoad (Err err) ->
+        CompletedLocationsLoad (Err _) ->
             ( { model | locations = Failed }
             , Log.error
             )
@@ -86,7 +86,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 

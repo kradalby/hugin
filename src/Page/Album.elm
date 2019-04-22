@@ -3,9 +3,9 @@ module Page.Album exposing (Model, Msg(..), init, initMap, subscriptions, toSess
 {-| Viewing a user's album.
 -}
 
-import Data.Album as Album exposing (Album)
+import Data.Album exposing (Album)
 import Data.Misc exposing (..)
-import Data.Photo as Photo exposing (Photo)
+import Data.Photo as Photo
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -16,9 +16,9 @@ import Loading
 import Log
 import Ports
 import Request.Album
-import Route exposing (Route)
+import Route
 import Session exposing (Session)
-import Task exposing (Task)
+import Task
 import Util exposing (Status(..), viewIf)
 import Views.Assets as Assets
 import Views.Errors as Errors
@@ -111,7 +111,7 @@ viewDownloadButton =
 
 
 viewDownloadModal : Model -> Html Msg
-viewDownloadModal model =
+viewDownloadModal _ =
     div [ style "display" "block", attribute "aria-hidden" "false", attribute "aria-labelledby" "downloadModal", class "modal", id "downloadModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
         [ div [ class "modal-dialog modal-dialog-centered", attribute "role" "document" ]
             [ div [ class "modal-content" ]
@@ -224,7 +224,7 @@ update msg model =
         CompletedAlbumLoad (Ok album) ->
             ( { model | album = Loaded album }, initMap album )
 
-        CompletedAlbumLoad (Err err) ->
+        CompletedAlbumLoad (Err _) ->
             ( { model | album = Failed }
             , Log.error
             )
@@ -239,7 +239,7 @@ initMap album =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 

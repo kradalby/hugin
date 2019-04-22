@@ -9,10 +9,10 @@ all of them. One source of truth!
 
 import Data.Misc exposing (..)
 import Data.Photo as Photo exposing (Photo)
-import Data.Url as Url exposing (Url)
+import Data.Url as Url
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Route exposing (Route)
+import Route
 
 
 viewKeywords : String -> List KeywordPointer -> Html msg
