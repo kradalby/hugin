@@ -36,9 +36,7 @@ init session url =
       , locations = Loading
       }
     , Cmd.batch
-        [ Request.Locations.get url
-            |> Http.toTask
-            |> Task.attempt CompletedLocationsLoad
+        [ Request.Locations.get url CompletedLocationsLoad
         , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
         ]
     )
