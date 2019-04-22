@@ -12,7 +12,7 @@ module Util exposing
 
 import Data.Misc
 import Fuzzy
-import Html exposing (Attribute, Html)
+import Html exposing (Html)
 import Ports
 import Time exposing (..)
 
@@ -32,14 +32,9 @@ viewIf condition content =
 --    onWithOptions "click"
 --        { defaultOptions | stopPropagation = True }
 --        (Decode.succeed msg)
-
-
-appendErrors : { model | errors : List error } -> List error -> { model | errors : List error }
-appendErrors model errors =
-    { model | errors = model.errors ++ errors }
-
-
-
+--appendErrors : { model | errors : List error } -> List error -> { model | errors : List error }
+--appendErrors model errors =
+--    { model | errors = model.errors ++ errors }
 --traceDecoder : String -> Decode.Decoder msg -> Decode.Decoder msg
 --traceDecoder message decoder =
 --    Decode.value

@@ -20,9 +20,9 @@ import Loading
 import Log
 import Maybe.Extra
 import Request.Photo
-import Route exposing (Route)
+import Route
 import Session exposing (Session)
-import Task exposing (Task)
+import Task
 import Util exposing (Status(..), cleanOwnerToName, viewIf)
 import Views.Errors as Errors
 import Views.Misc exposing (scaledImg, viewKeywords, viewMap, viewPath)
@@ -340,7 +340,7 @@ update msg model =
         CompletedPhotoLoad (Ok photo) ->
             ( { model | photo = Loaded photo }, initMap photo )
 
-        CompletedPhotoLoad (Err err) ->
+        CompletedPhotoLoad (Err _) ->
             ( { model | photo = Failed }
             , Log.error
             )
@@ -350,7 +350,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Browser.Events.onKeyDown <| Decode.map KeyMsg (Decode.field "key" Decode.string)
         ]
