@@ -38,7 +38,11 @@ in the header. (This comes up during slow page transitions.)
 view : Page -> { title : String, content : Html msg } -> Document msg
 view page { title, content } =
     { title = title ++ " - Hugin"
-    , body = viewHeader page :: content :: [ viewFooter ]
+    , body =
+        [ viewHeader page
+        , content
+        , viewFooter
+        ]
     }
 
 
