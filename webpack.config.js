@@ -13,10 +13,14 @@ console.log(mode);
 
 module.exports = {
   mode: mode,
-  entry: "./src/index.js",
+  entry: "./src/index.ts",
   output: {
     path: path.join(__dirname, "dist"),
     filename: production ? "[name]-[hash].js" : "index.js"
+  },
+  resolve: {
+    modules: [path.join(__dirname, "src"), "node_modules"],
+    extensions: [".js", ".elm", ".scss", ".ts"]
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -32,10 +36,6 @@ module.exports = {
       chunkFileName: "[id].[hash].css"
     })
   ],
-  resolve: {
-    modules: [path.join(__dirname, "src"), "node_modules"],
-    extensions: [".js", ".elm", ".scss", ".png"]
-  },
   module: {
     rules: [
       {
@@ -62,6 +62,7 @@ module.exports = {
           loader: "babel-loader"
         }
       },
+      { test: /\.ts$/, loader: "ts-loader" },
       {
         test: /\.scss$/,
         loaders: [

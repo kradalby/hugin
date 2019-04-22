@@ -38,10 +38,28 @@ require("./images/404.jpg");
 // require("bootstrap/js/dist/modal");
 
 // ELM
-const { Elm } = require("./Main.elm");
+import { Elm } from "./Main";
 
-let app = Elm.Main.init({
-  node: document.getElementById("root")
+document.addEventListener("DOMContentLoaded", function() {
+  let app = Elm.Main.init({
+    node: document.getElementById("root"),
+    flags: null
+  });
+
+  // Download albums
+  app.ports.downloadImages.subscribe(urls => {
+    downloadImages(urls);
+  });
+  // Google Analytics
+  app.ports.analytics.subscribe(url => {
+    console.log("DEBUG: gtag called with: ", url);
+    gtag("config", "UA-18856525-25", { page_path: "/" + url });
+  });
+
+  app.ports.initMap.subscribe(data => {
+    console.log("DEBUG: Elm Port initMap called");
+    initMap(data);
+  });
 });
 
 // Helper functions
@@ -51,7 +69,7 @@ function rafAsync() {
   });
 }
 
-function checkElementById(selector) {
+function checkElementById(selector: string): Promise<HTMLElement | null> {
   if (document.getElementById(selector) === null) {
     return rafAsync().then(() => checkElementById(selector));
   } else {
@@ -59,25 +77,15 @@ function checkElementById(selector) {
   }
 }
 
-// Google Analytics
-app.ports.analytics.subscribe(url => {
-  console.log("DEBUG: gtag called with: ", url);
-  gtag("config", "UA-18856525-25", { page_path: "/" + url });
-});
-
 // MAPBOX
 require("mapbox-gl/dist/mapbox-gl.css");
 let mapboxgl = require("mapbox-gl");
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
-var map = null;
-
-app.ports.initMap.subscribe(data => {
-  initMap(data);
-});
+var map: mapboxgl.Map | null = null;
 
 // coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]] : List ( Float, Float ) ]
-function initMap(data) {
+function initMap(data: [string, [number, number][]]) {
   console.log("DEBUG: initMap called with: ", data);
 
   // ----------------------------------------------
@@ -92,7 +100,9 @@ function initMap(data) {
 
   // Ugly hack to remove not garbage collected rouge maps
   document.querySelectorAll("[class^=mapboxgl]").forEach(element => {
-    element.parentNode.removeChild(element);
+    if (element.parentNode !== null) {
+      element.parentNode.removeChild(element);
+    }
   });
 
   // ----------------------------------------------
@@ -119,11 +129,13 @@ function initMap(data) {
 
       bounds.extend(coordinate);
     });
-    map.fitBounds(bounds, {
-      padding: { top: 65, bottom: 50, left: 50, right: 50 },
-      linear: false,
-      maxZoom: 10
-    });
+    if (map) {
+      map.fitBounds(bounds, {
+        padding: { top: 65, bottom: 50, left: 50, right: 50 },
+        linear: false,
+        maxZoom: 10
+      });
+    }
   });
 }
 
@@ -136,14 +148,9 @@ let StreamSaver = require("streamsaver");
 let JSZip = require("jszip");
 let JSZipUtils = require("jszip-utils");
 
-// Download albums
-app.ports.downloadImages.subscribe(urls => {
-  downloadImages(urls);
-});
-
-function urlToPromise(url) {
+function urlToPromise(url: string) {
   return new Promise(function(resolve, reject) {
-    JSZipUtils.getBinaryContent(url, function(err, data) {
+    JSZipUtils.getBinaryContent(url, function(err: Error, data: Uint8Array) {
       if (err) {
         reject(err);
       } else {
@@ -153,7 +160,7 @@ function urlToPromise(url) {
   });
 }
 
-function downloadImages(urls) {
+function downloadImages(urls: string[]) {
   console.log("Download images is called with: ", urls);
   let zip = new JSZip();
   const fileStream = StreamSaver.createWriteStream("download.zip");
@@ -166,7 +173,7 @@ function downloadImages(urls) {
 
   zip
     .generateInternalStream({ type: "uint8array", streamFiles: true })
-    .on("data", data => {
+    .on("data", (data: Uint8Array) => {
       writer.write(data);
       // writer.write(new Blob([data]))
     })
@@ -174,8 +181,8 @@ function downloadImages(urls) {
       console.log("Reached end of zip stream");
       writer.close();
     })
-    .on("error", error => {
-      console.err(error);
+    .on("error", (error: Error) => {
+      console.log(error);
       writer.abort(error);
     })
     .resume();

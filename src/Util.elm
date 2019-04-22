@@ -10,12 +10,9 @@ module Util exposing
     , viewIf
     )
 
---import Html.Events exposing (defaultOptions, onWithOptions)
-
 import Data.Misc
 import Fuzzy
 import Html exposing (Attribute, Html)
-import Json.Decode as Decode
 import Ports
 import Time exposing (..)
 

@@ -93,7 +93,7 @@ update msg model =
             ( { model | errors = [] }, Cmd.none )
 
         CompletedKeywordLoad (Ok keyword) ->
-            ( { model | keyword = Loaded keyword }, Cmd.none )
+            ( { model | keyword = Loaded keyword }, initMap keyword )
 
         CompletedKeywordLoad (Err err) ->
             ( { model | keyword = Failed }
@@ -104,14 +104,9 @@ update msg model =
             ( model, Cmd.none )
 
 
-initMap : Model -> Cmd msg
-initMap model =
-    case model.keyword of
-        Loaded keyword ->
-            Util.initMap keyword.name <| List.filterMap .gps keyword.photos
-
-        _ ->
-            Cmd.none
+initMap : Keyword -> Cmd msg
+initMap keyword =
+    Util.initMap keyword.name <| List.filterMap .gps keyword.photos
 
 
 subscriptions : Model -> Sub Msg

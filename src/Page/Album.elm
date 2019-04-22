@@ -224,7 +224,7 @@ update msg model =
             ( { model | keywordFilter = value }, Cmd.none )
 
         CompletedAlbumLoad (Ok album) ->
-            ( { model | album = Loaded album }, Cmd.none )
+            ( { model | album = Loaded album }, initMap album )
 
         CompletedAlbumLoad (Err err) ->
             ( { model | album = Failed }
@@ -235,14 +235,9 @@ update msg model =
             ( model, Cmd.none )
 
 
-initMap : Model -> Cmd msg
-initMap model =
-    case model.album of
-        Loaded album ->
-            Util.initMap album.name <| List.filterMap .gps album.photos
-
-        _ ->
-            Cmd.none
+initMap : Album -> Cmd msg
+initMap album =
+    Util.initMap album.name <| List.filterMap .gps album.photos
 
 
 subscriptions : Model -> Sub Msg

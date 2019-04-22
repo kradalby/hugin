@@ -251,7 +251,7 @@ updateWith toModel toMsg model ( subModel, subCmd ) =
     )
 
 
-main : Program Value Model Msg
+main : Program Decode.Value Model Msg
 main =
     Browser.application
         { init = init
@@ -261,3 +261,8 @@ main =
         , onUrlChange = ChangedUrl
         , onUrlRequest = ClickedLink
         }
+
+
+
+-- TODO: Fix maps
+-- TODO: Remove unused imports
