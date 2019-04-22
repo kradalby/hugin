@@ -3,9 +3,8 @@ module Request.Keyword exposing (get)
 import Data.Keyword as Keyword exposing (Keyword)
 import Data.Url as Url exposing (Url)
 import Http
-import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams)
+import HttpBuilder exposing (RequestBuilder)
 import Request.Helpers exposing (apiUrl)
-import Util
 
 
 

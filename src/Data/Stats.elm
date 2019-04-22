@@ -1,7 +1,5 @@
 module Data.Stats exposing (Stats, Statss, decoder)
 
-import Data.Photo as Photo exposing (Photo)
-import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
 

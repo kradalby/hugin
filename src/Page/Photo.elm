@@ -23,7 +23,7 @@ import Request.Photo
 import Route exposing (Route)
 import Session exposing (Session)
 import Task exposing (Task)
-import Util exposing (Status(..), cleanOwnerToName, formatExposureTime, viewIf)
+import Util exposing (Status(..), cleanOwnerToName, viewIf)
 import Views.Errors as Errors
 import Views.Misc exposing (scaledImg, viewKeywords, viewMap, viewPath)
 

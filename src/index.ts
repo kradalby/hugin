@@ -82,7 +82,7 @@ require("mapbox-gl/dist/mapbox-gl.css");
 let mapboxgl = require("mapbox-gl");
 mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
-var map: mapboxgl.Map | null = null;
+let map: mapboxgl.Map | null = null;
 
 // coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]] : List ( Float, Float ) ]
 function initMap(data: [string, [number, number][]]) {
