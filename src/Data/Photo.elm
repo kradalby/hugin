@@ -3,7 +3,7 @@ module Data.Photo exposing (Photo, biggest, decoder, thumbnail)
 --import Date exposing (Date)
 --import Json.Decode.Extra
 
-import Data.Misc as Misc exposing (..)
+import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Iso8601
 import Json.Decode as Decode exposing (Decoder)

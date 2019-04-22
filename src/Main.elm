@@ -7,7 +7,7 @@ import Browser.Navigation as Nav
 import Data.Url
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
-import Page exposing (Page)
+import Page
 import Page.Album as Album
 import Page.Blank as Blank
 import Page.Keyword as Keyword

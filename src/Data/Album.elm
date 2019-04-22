@@ -1,6 +1,6 @@
 module Data.Album exposing (Album, decoder)
 
-import Data.Misc as Misc exposing (..)
+import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)

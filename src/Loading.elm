@@ -3,7 +3,7 @@ module Loading exposing (error, icon, slowThreshold)
 {-| A loading spinner icon.
 -}
 
-import Html exposing (Attribute, Html, img)
+import Html exposing (Html, img)
 import Html.Attributes exposing (alt, class)
 import Process
 import Task exposing (Task)
