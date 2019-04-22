@@ -48,9 +48,7 @@ init session url =
       , photo = Loading
       }
     , Cmd.batch
-        [ Request.Photo.get url
-            |> Http.toTask
-            |> Task.attempt CompletedPhotoLoad
+        [ Request.Photo.get url CompletedPhotoLoad
         , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
         ]
     )

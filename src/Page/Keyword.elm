@@ -37,9 +37,7 @@ init session url =
       , keyword = Loading
       }
     , Cmd.batch
-        [ Request.Keyword.get url
-            |> Http.toTask
-            |> Task.attempt CompletedKeywordLoad
+        [ Request.Keyword.get url CompletedKeywordLoad
         , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
         ]
     )

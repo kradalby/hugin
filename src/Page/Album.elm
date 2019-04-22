@@ -47,9 +47,7 @@ init session url =
       , album = Loading
       }
     , Cmd.batch
-        [ Request.Album.get url
-            |> Http.toTask
-            |> Task.attempt CompletedAlbumLoad
+        [ Request.Album.get url CompletedAlbumLoad
         , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
         ]
     )
