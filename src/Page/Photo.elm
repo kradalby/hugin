@@ -340,7 +340,7 @@ update msg model =
                     ( model, Cmd.none )
 
         CompletedPhotoLoad (Ok photo) ->
-            ( { model | photo = Loaded photo }, Cmd.none )
+            ( { model | photo = Loaded photo }, initMap photo )
 
         CompletedPhotoLoad (Err err) ->
             ( { model | photo = Failed }
@@ -358,20 +358,14 @@ subscriptions model =
         ]
 
 
+initMap : Photo -> Cmd msg
+initMap photo =
+    case photo.gps of
+        Nothing ->
+            Util.initMap photo.name []
 
---initMap : Model -> Cmd msg
---initMap model =
---    case model.photo of
---        Loaded photo ->
---            case photo.gps of
---                Nothing ->
---                    Util.initMap photo.name []
---
---                Just gps ->
---                    Util.initMap photo.name [ gps ]
---
---        _ ->
---            Cmd.none
+        Just gps ->
+            Util.initMap photo.name [ gps ]
 
 
 toSession : Model -> Session
