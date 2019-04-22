@@ -14,9 +14,9 @@ import Log
 import Request.Keyword
 import Session exposing (Session)
 import Task exposing (Task)
-import Util exposing (Status(..), viewIf)
+import Util exposing (Status(..))
 import Views.Errors as Errors
-import Views.Misc exposing (viewMap, viewPhoto, viewPhotos)
+import Views.Misc exposing (viewMap, viewPhotos)
 
 
 

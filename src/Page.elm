@@ -9,8 +9,6 @@ import Browser exposing (Document)
 import Data.Url
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Lazy exposing (lazy2)
-import Util
 
 
 {-| Determines which navbar link (if any) will be rendered as active.

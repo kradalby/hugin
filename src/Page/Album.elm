@@ -19,10 +19,10 @@ import Request.Album
 import Route exposing (Route)
 import Session exposing (Session)
 import Task exposing (Task)
-import Util exposing (Status(..), fuzzyKeywordReduce, viewIf)
+import Util exposing (Status(..), viewIf)
 import Views.Assets as Assets
 import Views.Errors as Errors
-import Views.Misc exposing (viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
+import Views.Misc exposing (viewKeywords, viewMap, viewPath, viewPhotos)
 
 
 

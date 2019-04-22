@@ -3,9 +3,8 @@ module Request.Locations exposing (get)
 import Data.Location as Location exposing (Locations)
 import Data.Url as Url exposing (Url)
 import Http
-import HttpBuilder exposing (RequestBuilder, withExpect, withQueryParams)
+import HttpBuilder exposing (RequestBuilder)
 import Request.Helpers exposing (apiUrl)
-import Util exposing (..)
 
 
 

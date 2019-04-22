@@ -4,22 +4,18 @@ module Page.Locations exposing (Model, Msg(..), init, subscriptions, toSession, 
 -}
 
 import Data.Location as Location exposing (Locations)
-import Data.Misc exposing (..)
 import Data.Url as Url exposing (Url)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Lazy
 import Http
 import Loading
 import Log
 import Request.Locations
-import Route exposing (Route)
 import Session exposing (Session)
 import Task exposing (Task)
 import Util exposing (Status(..))
-import Views.Assets as Assets
 import Views.Errors as Errors
-import Views.Misc exposing (viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
+import Views.Misc exposing (viewMap)
 
 
 
