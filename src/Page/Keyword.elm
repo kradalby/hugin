@@ -93,9 +93,9 @@ update msg model =
         CompletedKeywordLoad (Ok keyword) ->
             ( { model | keyword = Loaded keyword }, initMap keyword )
 
-        CompletedKeywordLoad (Err _) ->
+        CompletedKeywordLoad (Err err) ->
             ( { model | keyword = Failed }
-            , Log.error
+            , Log.httpError err
             )
 
         PassedSlowLoadThreshold ->

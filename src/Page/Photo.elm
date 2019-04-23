@@ -333,9 +333,9 @@ update msg model =
         CompletedPhotoLoad (Ok photo) ->
             ( { model | photo = Loaded photo }, initMap photo )
 
-        CompletedPhotoLoad (Err _) ->
+        CompletedPhotoLoad (Err err) ->
             ( { model | photo = Failed }
-            , Log.error
+            , Log.httpError err
             )
 
         PassedSlowLoadThreshold ->
