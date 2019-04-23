@@ -81,13 +81,3 @@ fromUrl : Url -> Maybe Route
 fromUrl url =
     { url | path = Maybe.withDefault "" url.fragment, fragment = Nothing }
         |> Parser.parse parser
-
-
-
---fromLocation : Location -> Maybe Route
---fromLocation location =
---    if String.isEmpty location.hash then
---        Just Root
---
---    else
---        parseHash route location

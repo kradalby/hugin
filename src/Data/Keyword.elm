@@ -1,6 +1,6 @@
 module Data.Keyword exposing (Keyword, decoder)
 
-import Data.Misc exposing (..)
+import Data.Misc exposing (PhotoInAlbum, photoInAlbumDecoder)
 import Data.Url as Url exposing (Url)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)

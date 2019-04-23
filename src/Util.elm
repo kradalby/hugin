@@ -1,6 +1,5 @@
 module Util exposing
     ( Status(..)
-    , appendErrors
     , cleanOwnerToName
     , formatExposureTime
     , formatPhotoDate
@@ -14,7 +13,7 @@ import Data.Misc
 import Fuzzy
 import Html exposing (Html)
 import Ports
-import Time exposing (..)
+import Time exposing (Month, Weekday)
 
 
 viewIf : Bool -> Html msg -> Html msg
@@ -24,31 +23,6 @@ viewIf condition content =
 
     else
         Html.text ""
-
-
-
---onClickStopPropagation : msg -> Attribute msg
---onClickStopPropagation msg =
---    onWithOptions "click"
---        { defaultOptions | stopPropagation = True }
---        (Decode.succeed msg)
---appendErrors : { model | errors : List error } -> List error -> { model | errors : List error }
---appendErrors model errors =
---    { model | errors = model.errors ++ errors }
---traceDecoder : String -> Decode.Decoder msg -> Decode.Decoder msg
---traceDecoder message decoder =
---    Decode.value
---        |> Decode.andThen
---            (\value ->
---                case Decode.decodeValue decoder value of
---                    Ok decoded ->
---                        -- Decode.succeed <| Debug.log ("Success: " ++ message) <| decoded
---                        Decode.succeed decoded
---
---                    Err err ->
---                        -- Decode.fail <| Debug.log ("Fail: " ++ message) <| err
---                        Decode.fail err
---            )
 
 
 formatExposureTime : Float -> String
@@ -164,65 +138,65 @@ formatPhotoDate date =
 toWeekday : Weekday -> String
 toWeekday weekday =
     case weekday of
-        Mon ->
+        Time.Mon ->
             "Monday"
 
-        Tue ->
+        Time.Tue ->
             "Tuesday"
 
-        Wed ->
+        Time.Wed ->
             "Wednesday"
 
-        Thu ->
+        Time.Thu ->
             "Thursday"
 
-        Fri ->
+        Time.Fri ->
             "Friday"
 
-        Sat ->
+        Time.Sat ->
             "Saturday"
 
-        Sun ->
+        Time.Sun ->
             "Sunday"
 
 
 toMonth : Month -> String
 toMonth month =
     case month of
-        Jan ->
+        Time.Jan ->
             "January"
 
-        Feb ->
+        Time.Feb ->
             "February"
 
-        Mar ->
+        Time.Mar ->
             "March"
 
-        Apr ->
+        Time.Apr ->
             "April"
 
-        May ->
+        Time.May ->
             "May"
 
-        Jun ->
+        Time.Jun ->
             "June"
 
-        Jul ->
+        Time.Jul ->
             "July"
 
-        Aug ->
+        Time.Aug ->
             "August"
 
-        Sep ->
+        Time.Sep ->
             "September"
 
-        Oct ->
+        Time.Oct ->
             "October"
 
-        Nov ->
+        Time.Nov ->
             "November"
 
-        Dec ->
+        Time.Dec ->
             "December"
 
 
