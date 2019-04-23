@@ -5,8 +5,8 @@ module Page.Keyword exposing (Model, Msg(..), init, initMap, subscriptions, toSe
 
 import Data.Keyword exposing (Keyword)
 import Data.Url exposing (Url)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, h1, text)
+import Html.Attributes exposing (class)
 import Html.Lazy
 import Http
 import Loading

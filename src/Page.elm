@@ -3,21 +3,12 @@ module Page exposing (Page(..), view)
 {-| The frame around a typical page - that is, the header and footer.
 -}
 
---import Route exposing (Route)
-
 import Browser exposing (Document)
 import Data.Url
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, div, footer, nav, text)
+import Html.Attributes exposing (class, href)
 
 
-{-| Determines which navbar link (if any) will be rendered as active.
-
-Note that we don't enumerate every page here, because the navbar doesn't
-have links for every page. Anything that's not part of the navbar falls
-under Other.
-
--}
 type Page
     = Other
     | Album Data.Url.Url
@@ -26,15 +17,6 @@ type Page
     | Locations Data.Url.Url
 
 
-{-| Take a page's Html and frame it with a header and footer.
-
-The caller provides the current user, so we can display in either
-"signed in" (rendering username) or "signed out" mode.
-
-isLoading is for determining whether we should show a loading spinner
-in the header. (This comes up during slow page transitions.)
-
--}
 view : Page -> { title : String, content : Html msg } -> Document msg
 view page { title, content } =
     { title = title ++ " - Hugin"
@@ -79,33 +61,3 @@ viewFooter =
                 ]
             ]
         ]
-
-
-
---navbarLink : ActivePage -> Route -> List (Html msg) -> Html msg
---navbarLink page route linkContent =
---    li [ classList [ ( "nav-item", True ), ( "active", isActive page route ) ] ]
---        [ a [ class "nav-link", Route.href route ] linkContent ]
---
---
---isActive : ActivePage -> Route -> Bool
---isActive page route =
---    case ( page, route ) of
---        ( Album pageUrl, Route.Album routeUrl ) ->
---            Data.Url.urlToString pageUrl == routeUrl
---
---        ( Photo pageUrl, Route.Photo routeUrl ) ->
---            Data.Url.urlToString pageUrl == routeUrl
---
---        _ ->
---            False
---
---{-| This id comes from index.html.
---
---The Feed uses it to scroll to the top of the page (by ID) when switching pages
---in the pagination sense.
---
----}
---bodyId : String
---bodyId =
---    "page-body"

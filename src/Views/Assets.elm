@@ -1,12 +1,5 @@
 module Views.Assets exposing (loading, notFound, placeholder, src)
 
-{-| Assets, such as images, videos, and audio. (We only have images for now.)
-
-We should never expose asset URLs directly; this module should be in charge of
-all of them. One source of truth!
-
--}
-
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 

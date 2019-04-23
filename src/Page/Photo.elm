@@ -1,18 +1,12 @@
 module Page.Photo exposing (Model, Msg, init, subscriptions, toSession, update, view)
 
-{-| Viewing a user's photo.
--}
-
---import Date.Format
---import Keyboard exposing (KeyCode)
-
 import Browser.Events
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
 import File.Download as Download
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Attribute, Html, a, button, div, h5, hr, i, img, p, span, table, tbody, td, text, th, tr)
+import Html.Attributes exposing (attribute, class, href, id, scope, src, style, type_)
+import Html.Events exposing (onClick)
 import Html.Lazy
 import Http
 import Json.Decode as Decode
@@ -183,7 +177,6 @@ viewInformation photo =
                 ]
 
         rows =
-            -- TODO: Add some nice font awesome icons
             [ photo.copyright |> Maybe.map (cleanOwnerToName >> row "Photographer")
             , photo.dateTime |> Maybe.map (Util.formatPhotoDate >> row "Date")
             , photo.cameraMake |> Maybe.map (row "Camera")

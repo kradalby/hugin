@@ -1,11 +1,9 @@
 module Main exposing (main)
 
--- import Navigation exposing (Location)
-
 import Browser exposing (Document)
 import Browser.Navigation as Nav
 import Data.Url
-import Html exposing (..)
+import Html
 import Json.Decode as Decode exposing (Value)
 import Page
 import Page.Album as Album
@@ -106,7 +104,6 @@ subscriptions model =
 
 type Msg
     = Ignored
-    | ChangedRoute (Maybe Route)
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
     | GotAlbumMsg Album.Msg
@@ -220,9 +217,6 @@ update msg model =
         ( ChangedUrl url, _ ) ->
             changeRouteTo (Route.fromUrl url) model
 
-        ( ChangedRoute route, _ ) ->
-            changeRouteTo route model
-
         ( GotAlbumMsg subMsg, Album url m ) ->
             Album.update subMsg m
                 |> updateWith (Album url) GotAlbumMsg model
@@ -261,8 +255,3 @@ main =
         , onUrlChange = ChangedUrl
         , onUrlRequest = ClickedLink
         }
-
-
-
--- TODO: Fix maps
--- TODO: Remove unused imports

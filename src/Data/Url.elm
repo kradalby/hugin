@@ -30,7 +30,6 @@ json =
 
 
 
--- TODO: FIX the url parser for file paths
 -- This is stupid, but it works...
 
 
@@ -116,15 +115,3 @@ rest =
 urlDecoder : Decoder Url
 urlDecoder =
     Decode.map Url Decode.string
-
-
-
---
---encodeUrl : Url -> Value
---encodeUrl (Url url) =
---    Encode.string url
---
---
---urlToHtml : Url -> Html msg
---urlToHtml (Url url) =
---    Html.text url

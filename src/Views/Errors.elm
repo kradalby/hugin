@@ -3,7 +3,7 @@ module Views.Errors exposing (view)
 {-| Render dismissable errors. We use this all over the place!
 -}
 
-import Html exposing (..)
+import Html exposing (Html, div, hr, p, text)
 import Html.Attributes exposing (attribute, class)
 import Html.Events exposing (onClick)
 
@@ -11,7 +11,7 @@ import Html.Events exposing (onClick)
 view : msg -> List String -> Html msg
 view dismissErrors errors =
     if List.isEmpty errors then
-        Html.text ""
+        text ""
 
     else
         div [ class "row" ]

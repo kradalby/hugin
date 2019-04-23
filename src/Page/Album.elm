@@ -4,12 +4,12 @@ module Page.Album exposing (Model, Msg(..), init, initMap, subscriptions, toSess
 -}
 
 import Data.Album exposing (Album)
-import Data.Misc exposing (..)
+import Data.Misc exposing (AlbumInAlbum)
 import Data.Photo as Photo
 import Data.Url as Url exposing (Url)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, a, button, div, h4, h5, hr, i, img, input, p, span, text)
+import Html.Attributes exposing (alt, attribute, class, id, src, style, type_, value, width)
+import Html.Events exposing (onClick, onInput)
 import Html.Lazy
 import Http
 import Loading

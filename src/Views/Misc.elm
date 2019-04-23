@@ -7,11 +7,11 @@ all of them. One source of truth!
 
 -}
 
-import Data.Misc exposing (..)
+import Data.Misc exposing (KeywordPointer, Parent, PhotoInAlbum)
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, div, h5, img, span, text)
+import Html.Attributes exposing (attribute, class, id, src)
 import Route
 
 
@@ -119,8 +119,6 @@ viewMap name col sm md lg xl =
                 , "col-lg-" ++ String.fromInt lg
                 , "col-xl-" ++ String.fromInt xl
                 ]
-
-        -- String.join " " <| List.map (\col -> col ++ (String.fromInt size)) [ "col-", "col-sm-", "col-md-", "col-lg-", "col-xl-" ]
     in
     div [ class <| "p-0 " ++ cls ]
         [ div [ id <| "map-" ++ name, class "map" ] []

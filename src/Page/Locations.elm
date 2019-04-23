@@ -5,8 +5,8 @@ module Page.Locations exposing (Model, Msg(..), init, subscriptions, toSession, 
 
 import Data.Location exposing (Locations)
 import Data.Url exposing (Url)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div)
+import Html.Attributes exposing (class)
 import Http
 import Loading
 import Log

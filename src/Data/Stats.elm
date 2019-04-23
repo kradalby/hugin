@@ -1,4 +1,4 @@
-module Data.Stats exposing (Stats, Statss, decoder)
+module Data.Stats exposing (Stats, decoder)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (required)
@@ -11,10 +11,6 @@ type alias Stats =
     , keywords : Int
     , people : Int
     }
-
-
-type alias Statss =
-    { locations : List Stats }
 
 
 
