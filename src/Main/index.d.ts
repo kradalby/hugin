@@ -6,12 +6,6 @@ export namespace Elm {
   namespace Main {
     export interface App {
       ports: {
-        storeSession: {
-          subscribe(callback: (data: string | null) => void): void
-        }
-        onSessionChange: {
-          send(data: unknown): void
-        }
         downloadImages: {
           subscribe(callback: (data: string[]) => void): void
         }
@@ -19,6 +13,9 @@ export namespace Elm {
           subscribe(callback: (data: [string, [number, number][]]) => void): void
         }
         analytics: {
+          subscribe(callback: (data: string) => void): void
+        }
+        httpError: {
           subscribe(callback: (data: string) => void): void
         }
       };

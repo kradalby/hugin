@@ -224,9 +224,9 @@ update msg model =
         CompletedAlbumLoad (Ok album) ->
             ( { model | album = Loaded album }, initMap album )
 
-        CompletedAlbumLoad (Err _) ->
+        CompletedAlbumLoad (Err err) ->
             ( { model | album = Failed }
-            , Log.error
+            , Log.httpError err
             )
 
         PassedSlowLoadThreshold ->

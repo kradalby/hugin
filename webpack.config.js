@@ -24,7 +24,13 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      MAPBOX_ACCESS_TOKEN: JSON.stringify(process.env.MAPBOX_ACCESS_TOKEN)
+      MAPBOX_ACCESS_TOKEN: JSON.stringify(
+        process.env.HUGIN_MAPBOX_ACCESS_TOKEN
+      ),
+      SENTRY_DSN: JSON.stringify(process.env.HUGIN_SENTRY_DSN),
+      ROLLBAR_ACCESS_TOKEN: JSON.stringify(
+        process.env.HUGIN_ROLLBAR_ACCESS_TOKEN
+      )
     }),
     new SizePlugin(),
     new HTMLWebpackPlugin({

@@ -76,9 +76,9 @@ update msg model =
         CompletedLocationsLoad (Ok locations) ->
             ( { model | locations = Loaded locations }, Cmd.none )
 
-        CompletedLocationsLoad (Err _) ->
+        CompletedLocationsLoad (Err err) ->
             ( { model | locations = Failed }
-            , Log.error
+            , Log.httpError err
             )
 
         PassedSlowLoadThreshold ->
