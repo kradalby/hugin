@@ -8,7 +8,12 @@ pipeline:
     image: plugins/docker
     repo: kradalby/hugin
     # auto_tag: true
-    secrets: [ docker_username, docker_password, mapbox_access_token ]
+    secrets: 
+        - docker_username
+        - docker_password
+        - hugin_mapbox_access_token
+        - hugin_sentry_dsn
+        - hugin_rollbar_access_token
     build_args_from_env:
         - HUGIN_MAPBOX_ACCESS_TOKEN
         - HUGIN_SENTRY_DSN
