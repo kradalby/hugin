@@ -10,7 +10,9 @@ pipeline:
     # auto_tag: true
     secrets: [ docker_username, docker_password, mapbox_access_token ]
     build_args_from_env:
-        - MAPBOX_ACCESS_TOKEN
+        - HUGIN_MAPBOX_ACCESS_TOKEN
+        - HUGIN_SENTRY_DSN
+        - HUGIN_ROLLBAR_ACCESS_TOKEN
     tags:
         - ${DRONE_COMMIT_SHA:0:8}
         - latest
