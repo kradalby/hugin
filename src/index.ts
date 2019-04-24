@@ -109,17 +109,14 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // Helper functions
-function rafAsync() {
-  return new Promise(resolve => {
-    requestAnimationFrame(resolve); // faster than set time out
-  });
-}
-
-function checkElementById(selector: string): Promise<HTMLElement | null> {
-  if (document.getElementById(selector) === null) {
-    return rafAsync().then(() => checkElementById(selector));
+function resolveElementById(selector: string): Promise<HTMLElement> {
+  let element = document.getElementById(selector);
+  if (element === null) {
+    return new Promise(resolve => {
+      requestAnimationFrame(resolve);
+    }).then(() => resolveElementById(selector));
   } else {
-    return Promise.resolve(document.getElementById(selector));
+    return Promise.resolve(element);
   }
 }
 
@@ -156,7 +153,7 @@ function initMap(data: [string, [number, number][]]) {
   let divName = "map-" + data[0];
   let coordinates = data[1];
 
-  checkElementById(divName).then(() => {
+  resolveElementById(divName).then(() => {
     // Create map
     map = new mapboxgl.Map({
       container: divName,
