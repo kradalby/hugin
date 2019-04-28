@@ -12,7 +12,7 @@ import Views.Assets as Assets
 
 icon : Html msg
 icon =
-    img [ class "rounded mx-auto d-block mb-3", Assets.src Assets.notFound, alt "Loading..." ] []
+    img [ class "rounded mx-auto d-block mt-3", Assets.src Assets.loading, alt "Loading..." ] []
 
 
 error : String -> Html msg
