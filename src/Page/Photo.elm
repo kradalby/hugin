@@ -135,7 +135,7 @@ viewImage photo =
     in
     div [ class "col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 m-0 p-0" ]
         [ div [ class "mx-auto" ]
-            [ div []
+            [ div [ id "photo" ]
                 [ imageTag
                 , a [ previousHref photo ]
                     [ div [ class "previous-image-overlay" ] [] ]

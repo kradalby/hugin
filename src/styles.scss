@@ -19,6 +19,10 @@ $theme-colors: (
   height: calc(100vh - 56px - 60px);
 }
 
+#photo > img {
+  max-height: 88vh;
+}
+
 .previous-image-overlay {
   position: absolute;
   top: 0;
@@ -140,8 +144,6 @@ body {
   padding: 0 15px;
 }
 
-
-
 /* Flexbin
 -------------------------------------------------- */
 // Desktop, large screen devices
@@ -159,4 +161,3 @@ $flexbin-row-height-phone: 100px;
 $flexbin-space-phone: 0px;
 
 @import "../node_modules/flexbin/flexbin.scss";
-
