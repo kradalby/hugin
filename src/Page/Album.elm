@@ -22,7 +22,7 @@ import Task
 import Util exposing (Status(..), viewIf)
 import Views.Assets as Assets
 import Views.Errors as Errors
-import Views.Misc exposing (viewKeywords, viewMap, viewPath, viewPhotos)
+import Views.Misc exposing (loading, viewKeywords, viewMap, viewPath, viewPhotos)
 
 
 
@@ -160,10 +160,10 @@ viewNestedAlbum album =
             [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
                 [ case album.scaledPhotos of
                     [] ->
-                        img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300 ] []
+                        img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300, loading "lazy" ] []
 
                     _ ->
-                        img [ src (Photo.thumbnail album.scaledPhotos 300) ] []
+                        img [ src (Photo.thumbnail album.scaledPhotos 300), loading "lazy" ] []
                 , h4 [] [ text album.name ]
                 ]
             ]
