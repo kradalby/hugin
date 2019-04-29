@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser exposing (Document)
+import Browser.Dom exposing (setViewport)
 import Browser.Navigation as Nav
 import Data.Url
 import Html
@@ -16,6 +17,7 @@ import Ports
 import Request.Helpers exposing (rootUrl)
 import Route exposing (Route)
 import Session exposing (Session)
+import Task
 import Url exposing (Url)
 
 
@@ -188,7 +190,15 @@ changeRouteTo maybeRoute model =
                     Locations.init session url
                         |> updateWith (Locations url) GotLocationsMsg model
     in
-    ( m, Cmd.batch [ c, Ports.analytics analyticsUrl ] )
+    ( m
+    , Cmd.batch
+        [ c
+        , Ports.analytics analyticsUrl
+
+        -- I am not a 100% sure about this one, will test it for a while...
+        , Task.perform (\_ -> Ignored) (setViewport 0 0)
+        ]
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
