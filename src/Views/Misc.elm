@@ -1,4 +1,4 @@
-module Views.Misc exposing (scaledImg, scaledImgCount, viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
+module Views.Misc exposing (loading, scaledImg, scaledImgCount, viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -88,6 +88,7 @@ scaledImgCount widthFactor scaledPhotos count =
         , attribute "sizes" sizes
         , attribute "srcset" srcset
         , src <| Photo.biggest sp
+        , loading "lazy"
         ]
         []
 
@@ -123,3 +124,8 @@ viewMap name col sm md lg xl =
     div [ class <| "p-0 " ++ cls ]
         [ div [ id <| "map-" ++ name, class "map" ] []
         ]
+
+
+loading : String -> Html.Attribute msg
+loading value =
+    attribute "loading" value
