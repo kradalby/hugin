@@ -1,15 +1,14 @@
 pipeline:
-  lint: 
+  lint:
     image: node:10
-    commands: 
-        - yarn
-        - npx elm-analyse
-        - npx elm-format --validate src/
+    commands:
+        - make install
+        - make lint
   build:
     image: plugins/docker
     repo: kradalby/hugin
     # auto_tag: true
-    secrets: 
+    secrets:
         - docker_username
         - docker_password
         - hugin_mapbox_access_token

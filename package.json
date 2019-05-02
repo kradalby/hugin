@@ -3,12 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
-  "scripts": {
-    "prod": "webpack -p",
-    "build": "webpack --mode=development",
-    "dev": "webpack-dev-server --hot --colors --port 8000",
-    "analyse": "elm-analyse -s -p 3001 -o"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kradalby/hugin.git"
