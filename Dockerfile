@@ -7,12 +7,11 @@ ARG HUGIN_ROLLBAR_ACCESS_TOKEN
 
 COPY package.json .
 COPY yarn.lock .
-RUN yarn install --silent
+RUN yarn
 COPY elm.json .
 
-ENV NODE_ENV "production"
 COPY . .
-RUN yarn run prod
+RUN make build
 
 
 FROM kradalby/nginx-ldap-auth:1.15.3 as production
