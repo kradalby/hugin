@@ -7,7 +7,7 @@ build:
 	env NODE_ENV=production npx webpack -p
 
 dev:
-	npx webpack-dev-server --hot --colors --port 3600
+	npx webpack-dev-server --hot --colors --port 8000
 
 upgrade:
 	yarn upgrade --latest
