@@ -32,6 +32,16 @@ pipeline:
     tag:
       - ${DRONE_COMMIT_SHA:0:8}
 
+  deploy-demo:
+    image: quay.io/honestbee/drone-kubernetes
+    deployment: hugindemo-deployment
+    repo: kradalby/hugin
+    container: hugindemo-container
+    namespace: hugin
+    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
+    tag:
+      - ${DRONE_COMMIT_SHA:0:8}
+
   notify:
     image: drillster/drone-email
     host: smtp.fap.no
