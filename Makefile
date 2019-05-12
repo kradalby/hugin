@@ -1,35 +1,25 @@
-#
-#
-#
-
-all: clean install build
-
-build: ;@echo "-- Building project"
-# elm-make src/App.elm --output=./dist/app.js
-	npm run build
-
-prod: ;@echo "-- Building production and deploying"
-	npm run prod
-	ssh seel "rm -rf /usr/local/www/hugin.kradalby.no/*"
-	scp -r dist/* seel:/usr/local/www/hugin.kradalby.no/. 
 
 
-dev: ;@echo "-- Staring dev server"
-# elm reactor ./src
-	npm run dev
+install:
+	yarn
 
-clean: ;@echo "-- Cleaning up dist files"
-	rm -rf dist/
+build:
+	env NODE_ENV=production npx webpack -p
 
-install: ;@echo "-- Installing dependencies"
-	elm package install -y
-	npm i --silent
-	./node_modules/.bin/bower install
+dev:
+	npx webpack-dev-server --hot --colors --port 3600
 
+upgrade:
+	yarn upgrade --latest
 
-deinstall: ;@echo "-- Removing dependencies"
-	rm -rf elm-stuff/
-	rm -rf node_modules/
+clean:
+	rm -rf dist
 
-watch: ;@echo "-- watching files"
-	npm run watch
+reinstall:
+	rm -rf node_modules
+	rm -rf elm-stuff
+	yarn
+
+lint:
+	npx elm-analyse
+	npx elm-format --validate src/
