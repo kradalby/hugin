@@ -14,7 +14,7 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 
 ## Screenshots
 
-<a href="screenhots/hugindemo.kradalby.no.png"><img src="screenhots/hugindemo.kradalby.no.png?raw=true" align="left" width="250px" ></a>
+<a href="screenshots/hugindemo.kradalby.no.png"><img src="screenshots/hugindemo.kradalby.no.png?raw=true" align="left" width="250px" ></a>
 
 
 ## Installation
