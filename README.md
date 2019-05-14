@@ -12,6 +12,11 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 - Responsive design
 -
 
+## Screenshots
+
+<a href="screenhots/hugindemo.kradalby.no.png"><img src="screenhots/hugindemo.kradalby.no.png" align="left" width="250px" ></a>
+
+
 ## Installation
 Hugin can be hosted by all webservers that can serve static files, but does rely on a [Munin](https://github.com/kradalby/munin) generated gallery served under `/content` from the same domain.
 

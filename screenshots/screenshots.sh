@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-pageres --filename='<%= date %>-<%= url %>' --overwrite --delay=5 \
+pageres --filename='<%= url %>' --overwrite --delay=5 \
     https://hugindemo.kradalby.no/ \
     https://hugindemo.kradalby.no/#/album/content/root/2018/index.json \
     https://hugindemo.kradalby.no/#/album/content/root/2018/2018-04-22_Biking_to_Lisse/index.json \
