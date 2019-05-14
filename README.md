@@ -13,12 +13,17 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 -
 
 ## Screenshots
-<a href="screenshots/hugindemo.kradalby.no.png"><img src="screenshots/hugindemo.kradalby.no.png?raw=true" align="left" width="250px" ></a>
-<a href="screenshots/hugindemo.kradalby.no#!album!content!root!2018!2018-04-22_Biking_to_Lisse!index.json.png"><img src="screenshots/hugindemo.kradalby.no#!album!content!root!2018!2018-04-22_Biking_to_Lisse!index.json.png?raw=true" align="left" width="250px" ></a>
-<a href="screenshots/hugindemo.kradalby.no#!album!content!root!2018!index.json.png"><img src="screenshots/hugindemo.kradalby.no#!album!content!root!2018!index.json.png?raw=true" align="left" width="250px" ></a>
-<a href="screenshots/hugindemo.kradalby.no#!keyword!content!keywords!Kristoffer_Andreas_Dalby.json.png"><img src="screenshots/hugindemo.kradalby.no#!keyword!content!keywords!Kristoffer_Andreas_Dalby.json.png?raw=true" align="left" width="250px" ></a>
-<a href="screenshots/hugindemo.kradalby.no#!keyword!content!keywords!Vestfold.json.png"><img src="screenshots/hugindemo.kradalby.no#!keyword!content!keywords!Vestfold.json.png?raw=true" align="left" width="250px" ></a>
-<a href="screenshots/hugindemo.kradalby.no#!photo!content!root!2018!2018-04-22_Biking_to_Lisse!20180421-122847-IMG_6983.json.png"><img src="screenshots/hugindemo.kradalby.no#!photo!content!root!2018!2018-04-22_Biking_to_Lisse!20180421-122847-IMG_6983.json.png?raw=true" align="left" width="250px" ></a>
+album.png
+albums.png
+keyword.png
+person.png
+photo.png
+<a href="screenshots/root.png"><img src="screenshots/root.png?raw=true" align="left" width="250px" ></a>
+<a href="screenshots/albums.png"><img src="screenshots/albums.png?raw=true" align="left" width="250px" ></a>
+<a href="screenshots/album.png"><img src="screenshots/album.png?raw=true" align="left" width="250px" ></a>
+<a href="screenshots/photo.png"><img src="screenshots/photo.png?raw=true" align="left" width="250px" ></a>
+<a href="screenshots/person.png"><img src="screenshots/person.png?raw=true" align="left" width="250px" ></a>
+<a href="screenshots/keyword.png"><img src="screenshots/keyword.png?raw=true" align="left" width="250px" ></a>
 
 
 ## Installation
