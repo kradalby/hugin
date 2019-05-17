@@ -107,7 +107,7 @@ viewDownloadButton photo =
 viewHelpButton : Html Msg
 viewHelpButton =
     span [ class "pr-2" ]
-        [ a [ onClick ToggleHelpModal ]
+        [ span [ onClick ToggleHelpModal ]
             [ i [ class "fas fa-info-circle text-white" ] []
             ]
         ]
