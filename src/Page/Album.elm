@@ -79,7 +79,8 @@ view model =
                         [ class "container-fluid" ]
                         [ div [ class "row bg-darklight" ]
                             [ viewPath album.parents album.name
-                            , viewIf (album.photos /= []) viewDownloadButton
+
+                            -- , viewIf (album.photos /= []) viewDownloadButton
                             ]
                         , viewIf model.showDownloadModal (viewDownloadModal model)
                         , div [ class "row" ]
@@ -107,7 +108,7 @@ view model =
 
 viewDownloadButton : Html Msg
 viewDownloadButton =
-    div [ class "ml-auto mr-2" ] [ a [ onClick ToggleDownloadModal ] [ i [ class "fas fa-download text-white" ] [] ] ]
+    div [ class "ml-auto mr-2" ] [ span [ onClick ToggleDownloadModal ] [ i [ class "fas fa-download text-white" ] [] ] ]
 
 
 viewDownloadModal : Model -> Html Msg
