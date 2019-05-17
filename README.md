@@ -8,9 +8,14 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 
 ## Features
 
-- Show images on map if it has location data
 - Responsive design
--
+- Display image metadata
+- Display albums
+- Explore images with people tag
+- Explore images with keywords
+- Fuzzy search keywords
+- Show maps with images (given location data)
+
 
 ## Installation
 Hugin can be hosted by all webservers that can serve static files, but does rely on a [Munin](https://github.com/kradalby/munin) generated gallery served under `/content` from the same domain.
@@ -151,4 +156,3 @@ This should be exported as environment variables and will be picked up by webpac
 <a href="screenshots/person.jpg"><img src="screenshots/person.jpg?raw=true" align="left" width="250px" ></a>
 <a href="screenshots/keyword.jpg"><img src="screenshots/keyword.jpg?raw=true" align="left" width="250px" ></a>
 </div>
-
