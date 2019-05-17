@@ -1,6 +1,7 @@
 module Util exposing
     ( Status(..)
     , cleanOwnerToName
+    , formatAltitude
     , formatExposureTime
     , formatPhotoDate
     , fuzzyKeywordReduce
@@ -87,6 +88,11 @@ fuzzyKeywordReduce searchString keywordPointers =
                         keywordPointers
             in
             List.sortBy (match << keyword) filteredPointers
+
+
+formatAltitude : Float -> String
+formatAltitude altitude =
+    String.fromFloat altitude ++ " meter"
 
 
 formatPhotoDate : Time.Posix -> String
