@@ -192,6 +192,9 @@ viewInformation photo =
             , List.head photo.isoSpeed
                 |> Maybe.map String.fromInt
                 |> Maybe.map (row "ISO")
+            , photo.gps
+                |> Maybe.map .altitude
+                |> Maybe.map (Util.formatAltitude >> row "Altitude")
             , Just original
             ]
     in
