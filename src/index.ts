@@ -204,15 +204,18 @@ function urlToPromise(url: string) {
 }
 
 function downloadImages(urls: string[]) {
-  console.log("Download images is called with: ", urls);
+  console.log("[DEBUG] Download images is called with: ", urls);
   let zip = new JSZip();
   const fileStream = StreamSaver.createWriteStream("download.zip");
   const writer = fileStream.getWriter();
 
   urls.forEach(url => {
     let filename = url.replace(/.*\//g, "");
+    console.log(`[DEBUG] Adds file ${filename} to zip`);
     zip.file(filename, urlToPromise(url), { binary: true });
   });
+
+  console.log("[DEBUG] Zip: ", zip);
 
   zip
     .generateInternalStream({ type: "uint8array", streamFiles: true })
