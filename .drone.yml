@@ -31,6 +31,7 @@ pipeline:
     secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
     tag:
       - ${DRONE_COMMIT_SHA:0:8}
+    branches: [ master ]
 
   deploy-demo:
     image: quay.io/honestbee/drone-kubernetes
@@ -41,6 +42,7 @@ pipeline:
     secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
     tag:
       - ${DRONE_COMMIT_SHA:0:8}
+    branches: [ master ]
 
   notify:
     image: drillster/drone-email
