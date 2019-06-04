@@ -155,6 +155,16 @@ update msg model =
                 "ArrowLeft" ->
                     ( previousPhoto model, Cmd.none )
 
+                "ArrowUp" ->
+                    ( { model | nextPhotoDelay = model.nextPhotoDelay + 1000 }, Cmd.none )
+
+                "ArrowDown" ->
+                    let
+                        new =
+                            max (model.nextPhotoDelay - 1000) 3000
+                    in
+                    ( { model | nextPhotoDelay = new }, Cmd.none )
+
                 " " ->
                     ( { model | paused = not model.paused }, Cmd.none )
 
