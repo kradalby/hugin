@@ -15,6 +15,7 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 - Explore images with keywords
 - Fuzzy search keywords
 - Use geodata from images to display map 
+- Slideshow modus for album
 
 
 ## Installation

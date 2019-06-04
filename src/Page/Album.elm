@@ -7,7 +7,7 @@ import Data.Album exposing (Album)
 import Data.Misc exposing (AlbumInAlbum)
 import Data.Photo as Photo
 import Data.Url as Url exposing (Url)
-import Html exposing (Html, a, button, div, h4, h5, hr, img, input, p, span, text)
+import Html exposing (Html, a, button, div, h4, h5, hr, i, img, input, p, span, text)
 import Html.Attributes exposing (alt, attribute, class, id, src, style, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Html.Lazy
@@ -79,6 +79,7 @@ view model =
                         [ class "container-fluid" ]
                         [ div [ class "row bg-darklight" ]
                             [ viewPath album.parents album.name
+                            , viewSlideShowButton album
 
                             --, viewIf (album.photos /= []) viewDownloadButton
                             ]
@@ -110,6 +111,11 @@ view model =
 -- viewDownloadButton : Html Msg
 -- viewDownloadButton =
 --     div [ class "ml-auto mr-2" ] [ span [ onClick ToggleDownloadModal ] [ i [ class "fas fa-download text-white" ] [] ] ]
+
+
+viewSlideShowButton : Album -> Html Msg
+viewSlideShowButton album =
+    div [ class "ml-auto mr-2" ] [ a [ Route.href <| Route.SlideShow <| Url.urlToString album.url ] [ i [ class "fas fa-images text-white" ] [] ] ]
 
 
 viewDownloadModal : Model -> Html Msg
