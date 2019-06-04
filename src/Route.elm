@@ -15,6 +15,7 @@ import Url.Parser as Parser exposing ((</>), Parser, oneOf, s)
 type Route
     = Root
     | Album String
+    | SlideShow String
     | Photo String
     | Keyword String
     | Locations String
@@ -25,6 +26,7 @@ parser =
     oneOf
         [ Parser.map Root Parser.top
         , Parser.map (Album << String.join "/") (s "album" </> HuginUrl.rest)
+        , Parser.map (SlideShow << String.join "/") (s "slideshow" </> HuginUrl.rest)
         , Parser.map (Photo << String.join "/") (s "photo" </> HuginUrl.rest)
         , Parser.map (Keyword << String.join "/") (s "keyword" </> HuginUrl.rest)
         , Parser.map (Locations << String.join "/") (s "locations" </> HuginUrl.rest)
@@ -45,6 +47,9 @@ routeToString page =
 
                 Album url ->
                     [ "album", url ]
+
+                SlideShow url ->
+                    [ "slideshow", url ]
 
                 Photo url ->
                     [ "photo", url ]

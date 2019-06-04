@@ -12,6 +12,7 @@ import Html.Attributes exposing (class, href)
 type Page
     = Other
     | Album Data.Url.Url
+    | SlideShow Data.Url.Url
     | Photo Data.Url.Url
     | Keyword Data.Url.Url
     | Locations Data.Url.Url

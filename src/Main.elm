@@ -13,6 +13,7 @@ import Page.Keyword as Keyword
 import Page.Locations as Locations
 import Page.NotFound as NotFound
 import Page.Photo as Photo
+import Page.SlideShow as SlideShow
 import Ports
 import Request.Helpers exposing (rootUrl)
 import Route exposing (Route)
@@ -25,6 +26,7 @@ type Model
     = Redirect Session
     | NotFound Session
     | Album Data.Url.Url Album.Model
+    | SlideShow Data.Url.Url SlideShow.Model
     | Photo Data.Url.Url Photo.Model
     | Keyword Data.Url.Url Keyword.Model
     | Locations Data.Url.Url Locations.Model
@@ -62,6 +64,13 @@ view model =
         Album url m ->
             viewPage (Page.Album url) GotAlbumMsg (Album.view m)
 
+        SlideShow _ m ->
+            let
+                { title, content } =
+                    SlideShow.view m
+            in
+            { title = title, body = List.map (Html.map GotSlideShowMsg) [ content ] }
+
         Photo url m ->
             viewPage (Page.Photo url) GotPhotoMsg (Photo.view m)
 
@@ -87,6 +96,9 @@ subscriptions model =
         Album _ m ->
             Sub.map GotAlbumMsg (Album.subscriptions m)
 
+        SlideShow _ m ->
+            Sub.map GotSlideShowMsg (SlideShow.subscriptions m)
+
         Photo _ m ->
             Sub.map GotPhotoMsg (Photo.subscriptions m)
 
@@ -109,6 +121,7 @@ type Msg
     | ChangedUrl Url
     | ClickedLink Browser.UrlRequest
     | GotAlbumMsg Album.Msg
+    | GotSlideShowMsg SlideShow.Msg
     | GotPhotoMsg Photo.Msg
     | GotKeywordMsg Keyword.Msg
     | GotLocationsMsg Locations.Msg
@@ -122,6 +135,9 @@ toSession page =
 
         Album _ model ->
             Album.toSession model
+
+        SlideShow _ model ->
+            SlideShow.toSession model
 
         Photo _ model ->
             Photo.toSession model
@@ -165,6 +181,14 @@ changeRouteTo maybeRoute model =
                     in
                     Album.init session url
                         |> updateWith (Album url) GotAlbumMsg model
+
+                Just (Route.SlideShow urlString) ->
+                    let
+                        url =
+                            Data.Url.fromString urlString
+                    in
+                    SlideShow.init session url
+                        |> updateWith (SlideShow url) GotSlideShowMsg model
 
                 Just (Route.Photo urlString) ->
                     let
@@ -230,6 +254,10 @@ update msg model =
         ( GotAlbumMsg subMsg, Album url m ) ->
             Album.update subMsg m
                 |> updateWith (Album url) GotAlbumMsg model
+
+        ( GotSlideShowMsg subMsg, SlideShow url m ) ->
+            SlideShow.update subMsg m
+                |> updateWith (SlideShow url) GotSlideShowMsg model
 
         ( GotPhotoMsg subMsg, Photo url m ) ->
             Photo.update subMsg m

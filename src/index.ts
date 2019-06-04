@@ -11,6 +11,7 @@ import {
   faCaretSquareLeft,
   faCaretSquareRight,
   faSpinner,
+  faImages,
   faAngleRight
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -22,6 +23,7 @@ library.add(
   faCaretSquareLeft,
   faCaretSquareRight,
   faSpinner,
+  faImages,
   faAngleRight
 );
 
