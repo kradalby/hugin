@@ -168,6 +168,9 @@ update msg model =
                 " " ->
                     ( { model | paused = not model.paused }, Cmd.none )
 
+                "p" ->
+                    ( { model | paused = not model.paused }, Cmd.none )
+
                 "r" ->
                     ( model
                     , Random.generate Randomize <|
