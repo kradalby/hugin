@@ -6,6 +6,7 @@ module Page.SlideShow exposing (Model, Msg(..), init, subscriptions, toSession, 
 import Browser.Events
 import Data.Album exposing (Album)
 import Data.Misc
+import Data.Photo as Photo
 import Data.Url as Url exposing (Url)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
@@ -110,7 +111,11 @@ view model =
                     , style "transition-duration" "600ms"
                     , style "transition-timing-function" "ease-in-out"
                     , style "background-color" "black"
-                    , style "background-image" ("url(" ++ model.currentPhoto.originalImageURL ++ ")")
+                    , style "background-image"
+                        ("url("
+                            ++ Photo.biggest model.currentPhoto.scaledPhotos
+                            ++ ")"
+                        )
                     , style "background-position-x" "center"
                     , style "background-repeat" "no-repeat"
                     , style "background-size" "contain"
