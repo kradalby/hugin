@@ -56,6 +56,16 @@ notification message =
     }
 
 
+help : List Notification
+help =
+    [ notification "Show help with \"h\""
+    , notification "Navigate with left / right arrow"
+    , notification "Change timer with up / down arrow"
+    , notification "Pause with \"p\" or \"space\""
+    , notification "Randomize order with \"r\""
+    ]
+
+
 init : Session -> Url -> ( Model, Cmd Msg )
 init session url =
     ( { session = session
@@ -73,7 +83,7 @@ init session url =
             }
       , presented = []
       , notPresented = []
-      , notifications = []
+      , notifications = help
       }
     , Cmd.batch
         [ Request.Album.get url CompletedAlbumLoad
@@ -269,6 +279,9 @@ update msg model =
                             (Random.List.shuffle model.notPresented)
                     )
 
+                "h" ->
+                    ( { model | notifications = help }, Cmd.none )
+
                 _ ->
                     --    let
                     --        _ =
@@ -295,7 +308,7 @@ update msg model =
                 hide =
                     List.map
                         (\noti ->
-                            if noti.age == 3 then
+                            if noti.age == 5 then
                                 { noti | display = False }
 
                             else
@@ -304,7 +317,7 @@ update msg model =
                         newAge
 
                 newNotifications =
-                    List.filter (\noti -> noti.age < 5) hide
+                    List.filter (\noti -> noti.age < 7) hide
             in
             ( { model | notifications = newNotifications }, Cmd.none )
 
