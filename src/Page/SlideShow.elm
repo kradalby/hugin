@@ -275,7 +275,11 @@ update msg model =
         UpdateNotifications _ ->
             let
                 newAge =
-                    List.map (\noti -> { noti | age = noti.age + 1 }) model.notifications
+                    List.map
+                        (\noti ->
+                            { noti | age = noti.age + 1 }
+                        )
+                        model.notifications
 
                 hide =
                     List.map
