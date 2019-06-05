@@ -111,11 +111,9 @@ view model =
                     , style "transition-duration" "600ms"
                     , style "transition-timing-function" "ease-in-out"
                     , style "background-color" "black"
-                    , style "background-image"
-                        ("url("
-                            ++ Photo.biggest model.currentPhoto.scaledPhotos
-                            ++ ")"
-                        )
+                    , style "background-image" <|
+                        Util.urlToCssUrl
+                            (Photo.biggest model.currentPhoto.scaledPhotos)
                     , style "background-position-x" "center"
                     , style "background-repeat" "no-repeat"
                     , style "background-size" "contain"
@@ -160,9 +158,8 @@ preloadImage photo =
         [ style
             "background"
           <|
-            "url("
-                ++ Photo.biggest photo.scaledPhotos
-                ++ ") no-repeat -9999px -9999px"
+            Util.urlToCssUrl (Photo.biggest photo.scaledPhotos)
+                ++ "no-repeat -9999px -9999px"
         ]
         []
 

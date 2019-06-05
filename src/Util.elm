@@ -7,6 +7,7 @@ module Util exposing
     , fuzzyKeywordReduce
     , initMap
     , statusToMaybe
+    , urlToCssUrl
     , viewIf
     )
 
@@ -243,3 +244,28 @@ addOrdinalSuffix number =
 
     else
         String.fromInt number ++ "th"
+
+
+urlToCssUrl : String -> String
+urlToCssUrl url =
+    let
+        characters =
+            [ ( " ", "%20" ), ( "'", "%27" ) ]
+
+        escape str chars =
+            case chars of
+                [] ->
+                    str
+
+                ( orig, repl ) :: t ->
+                    escape
+                        (String.replace orig
+                            repl
+                            str
+                        )
+                        t
+
+        escaped =
+            escape url characters
+    in
+    "url(" ++ escaped ++ ")"
