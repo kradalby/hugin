@@ -160,4 +160,52 @@ $flexbin-phone-max: 400px;
 $flexbin-row-height-phone: 100px;
 $flexbin-space-phone: 0px;
 
+/* Slideshow notifications 
+-------------------------------------------------- */
+.notification {
+  position: fixed;
+  width: 320px;
+  min-height: 56px;
+  border-radius: 4px;
+  box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.1);
+  background: #363636;
+  z-index: 1056;
+}
+.notification:before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  content: "";
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.notification-body {
+  display: flex;
+  align-items: center;
+  padding: 13px 25px;
+  min-height: 56px;
+}
+.notification-title {
+  font-size: 18px;
+  color: #fff;
+  margin-top: -2px;
+  font-weight: 600;
+}
+.notification-desc {
+  color: #fff;
+}
+.notification-title + .notification-desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+.notification-default:before {
+  background: #b2b2b2;
+}
+.notification-default .notification-progress {
+  background: rgba(178, 178, 178, 0.15);
+}
+.notification-default .notification-progress-bar {
+  background: rgba(178, 178, 178, 0.3);
+}
+
 @import "../node_modules/flexbin/flexbin.scss";

@@ -7,8 +7,8 @@ import Browser.Events
 import Data.Album exposing (Album)
 import Data.Misc
 import Data.Url as Url exposing (Url)
-import Html exposing (Html, div)
-import Html.Attributes exposing (style)
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (class, style)
 import Http
 import Json.Decode as Decode
 import List.Extra
@@ -36,7 +36,19 @@ type alias Model =
     , currentPhoto : Data.Misc.PhotoInAlbum
     , presented : List Data.Misc.PhotoInAlbum
     , notPresented : List Data.Misc.PhotoInAlbum
+    , notifications : List Notification
     }
+
+
+type alias Notification =
+    { age : Int
+    , message : String
+    }
+
+
+notification : String -> Notification
+notification message =
+    { age = 0, message = message }
 
 
 init : Session -> Url -> ( Model, Cmd Msg )
@@ -56,6 +68,7 @@ init session url =
             }
       , presented = []
       , notPresented = []
+      , notifications = []
       }
     , Cmd.batch
         [ Request.Album.get url CompletedAlbumLoad
@@ -98,11 +111,28 @@ view model =
                     , style "background-repeat" "no-repeat"
                     , style "background-size" "contain"
                     ]
-                    []
+                <|
+                    List.indexedMap viewNotification model.notifications
 
             Failed ->
                 Loading.error "album"
     }
+
+
+viewNotification : Int -> Notification -> Html Msg
+viewNotification index noti =
+    let
+        top =
+            (76 * index) + 20 |> String.fromInt
+    in
+    div [ class "notification notification-default animation-fade-in position-top-left notification-image notification-close-on-click", style "top" (top ++ "px"), style "left" "20px" ]
+        [ div [ class "notification-body" ]
+            [ div [ class "notification-content" ]
+                [ div [ class "notification-desc" ]
+                    [ text noti.message ]
+                ]
+            ]
+        ]
 
 
 type Msg
@@ -111,6 +141,7 @@ type Msg
     | PassedSlowLoadThreshold
     | KeyMsg String
     | NextPhoto Time.Posix
+    | UpdateNotifications Time.Posix
     | Randomize ( List Data.Misc.PhotoInAlbum, List Data.Misc.PhotoInAlbum )
 
 
@@ -156,23 +187,77 @@ update msg model =
                     ( previousPhoto model, Cmd.none )
 
                 "ArrowUp" ->
-                    ( { model | nextPhotoDelay = model.nextPhotoDelay + 1000 }, Cmd.none )
+                    let
+                        new =
+                            model.nextPhotoDelay + 1000
+
+                        noti =
+                            notification <|
+                                "Timer set to "
+                                    ++ String.fromFloat (new / 1000)
+                                    ++ "s between photos"
+                    in
+                    ( { model
+                        | nextPhotoDelay = new
+                        , notifications = model.notifications ++ [ noti ]
+                      }
+                    , Cmd.none
+                    )
 
                 "ArrowDown" ->
                     let
                         new =
                             max (model.nextPhotoDelay - 1000) 3000
+
+                        noti =
+                            notification <|
+                                "Timer set to "
+                                    ++ String.fromFloat (new / 1000)
+                                    ++ "s between photos"
                     in
-                    ( { model | nextPhotoDelay = new }, Cmd.none )
+                    ( { model
+                        | nextPhotoDelay = new
+                        , notifications = model.notifications ++ [ noti ]
+                      }
+                    , Cmd.none
+                    )
 
                 " " ->
-                    ( { model | paused = not model.paused }, Cmd.none )
+                    ( { model
+                        | paused = not model.paused
+                        , notifications =
+                            model.notifications
+                                ++ [ notification
+                                        (if model.paused then
+                                            "Unpaused"
+
+                                         else
+                                            "Paused"
+                                        )
+                                   ]
+                      }
+                    , Cmd.none
+                    )
 
                 "p" ->
-                    ( { model | paused = not model.paused }, Cmd.none )
+                    ( { model
+                        | paused = not model.paused
+                        , notifications =
+                            model.notifications
+                                ++ [ notification
+                                        (if model.paused then
+                                            "Unpaused"
+
+                                         else
+                                            "Paused"
+                                        )
+                                   ]
+                      }
+                    , Cmd.none
+                    )
 
                 "r" ->
-                    ( model
+                    ( { model | notifications = model.notifications ++ [ notification "Photos have been randomized" ] }
                     , Random.generate Randomize <|
                         Random.pair
                             (Random.List.shuffle model.presented)
@@ -192,6 +277,16 @@ update msg model =
 
             else
                 ( nextPhoto model, Cmd.none )
+
+        UpdateNotifications _ ->
+            let
+                newAge =
+                    List.map (\noti -> { noti | age = noti.age + 1 }) model.notifications
+
+                newNotifications =
+                    List.filter (\noti -> noti.age < 4) newAge
+            in
+            ( { model | notifications = newNotifications }, Cmd.none )
 
         Randomize ( presented, notPresented ) ->
             ( { model | presented = presented, notPresented = notPresented }, Cmd.none )
@@ -248,6 +343,7 @@ subscriptions model =
     Sub.batch
         [ Browser.Events.onKeyDown <| Decode.map KeyMsg (Decode.field "key" Decode.string)
         , Time.every model.nextPhotoDelay NextPhoto
+        , Time.every 1000 UpdateNotifications
         ]
 
 
