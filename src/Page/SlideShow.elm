@@ -43,12 +43,16 @@ type alias Model =
 type alias Notification =
     { age : Int
     , message : String
+    , display : Bool
     }
 
 
 notification : String -> Notification
 notification message =
-    { age = 0, message = message }
+    { age = 0
+    , message = message
+    , display = True
+    }
 
 
 init : Session -> Url -> ( Model, Cmd Msg )
@@ -103,7 +107,7 @@ view model =
                     , style "top" "0px"
                     , style "left" "0px"
                     , style "transition-property" "background-image"
-                    , style "transition-duration" "1s"
+                    , style "transition-duration" "600ms"
                     , style "transition-timing-function" "ease-in-out"
                     , style "background-color" "black"
                     , style "background-image" ("url(" ++ model.currentPhoto.originalImageURL ++ ")")
@@ -125,7 +129,16 @@ viewNotification index noti =
         top =
             (76 * index) + 20 |> String.fromInt
     in
-    div [ class "notification notification-default animation-fade-in position-top-left notification-image notification-close-on-click", style "top" (top ++ "px"), style "left" "20px" ]
+    div
+        [ class "notification notification-default animation-fade-in position-top-left notification-image notification-close-on-click"
+        , style "top" (top ++ "px")
+        , style "left" "20px"
+        , if not noti.display then
+            style "opacity" "0"
+
+          else
+            style "opacity" "1"
+        ]
         [ div [ class "notification-body" ]
             [ div [ class "notification-content" ]
                 [ div [ class "notification-desc" ]
@@ -283,8 +296,19 @@ update msg model =
                 newAge =
                     List.map (\noti -> { noti | age = noti.age + 1 }) model.notifications
 
+                hide =
+                    List.map
+                        (\noti ->
+                            if noti.age == 3 then
+                                { noti | display = False }
+
+                            else
+                                noti
+                        )
+                        newAge
+
                 newNotifications =
-                    List.filter (\noti -> noti.age < 4) newAge
+                    List.filter (\noti -> noti.age < 5) hide
             in
             ( { model | notifications = newNotifications }, Cmd.none )
 

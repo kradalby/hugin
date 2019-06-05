@@ -170,6 +170,7 @@ $flexbin-space-phone: 0px;
   box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.1);
   background: #363636;
   z-index: 1056;
+  transition: opacity 900ms ease-out, top 800ms ease;
 }
 .notification:before {
   position: absolute;
