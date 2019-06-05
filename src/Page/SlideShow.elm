@@ -241,36 +241,12 @@ update msg model =
                     )
 
                 " " ->
-                    ( { model
-                        | paused = not model.paused
-                        , notifications =
-                            model.notifications
-                                ++ [ notification
-                                        (if model.paused then
-                                            "Unpaused"
-
-                                         else
-                                            "Paused"
-                                        )
-                                   ]
-                      }
+                    ( togglePause model
                     , Cmd.none
                     )
 
                 "p" ->
-                    ( { model
-                        | paused = not model.paused
-                        , notifications =
-                            model.notifications
-                                ++ [ notification
-                                        (if model.paused then
-                                            "Unpaused"
-
-                                         else
-                                            "Paused"
-                                        )
-                                   ]
-                      }
+                    ( togglePause model
                     , Cmd.none
                     )
 
@@ -319,6 +295,23 @@ update msg model =
 
         Randomize ( presented, notPresented ) ->
             ( { model | presented = presented, notPresented = notPresented }, Cmd.none )
+
+
+togglePause : Model -> Model
+togglePause model =
+    { model
+        | paused = not model.paused
+        , notifications =
+            model.notifications
+                ++ [ notification
+                        (if model.paused then
+                            "Unpaused"
+
+                         else
+                            "Paused"
+                        )
+                   ]
+    }
 
 
 nextPhoto : Model -> Model
