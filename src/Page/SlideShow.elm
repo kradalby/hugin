@@ -100,7 +100,7 @@ view model =
             LoadingSlowly ->
                 Loading.icon
 
-            Loaded _ ->
+            Loaded album ->
                 div
                     [ style "position" "absolute"
                     , style "width" "100%"
@@ -122,6 +122,7 @@ view model =
                     ]
                 <|
                     List.indexedMap viewNotification model.notifications
+                        ++ List.map preloadImage album.photos
 
             Failed ->
                 Loading.error "album"
@@ -151,6 +152,19 @@ viewNotification index noti =
                 ]
             ]
         ]
+
+
+preloadImage : Data.Misc.PhotoInAlbum -> Html Msg
+preloadImage photo =
+    div
+        [ style
+            "background"
+          <|
+            "url("
+                ++ Photo.biggest photo.scaledPhotos
+                ++ ") no-repeat -9999px -9999px"
+        ]
+        []
 
 
 type Msg
