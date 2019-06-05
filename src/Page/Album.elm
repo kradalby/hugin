@@ -79,7 +79,9 @@ view model =
                         [ class "container-fluid" ]
                         [ div [ class "row bg-darklight" ]
                             [ viewPath album.parents album.name
-                            , viewSlideShowButton album
+
+                            -- Don't show slideshow button for parent-only album yet
+                            , viewIf (album.photos /= []) <| viewSlideShowButton album
 
                             --, viewIf (album.photos /= []) viewDownloadButton
                             ]
