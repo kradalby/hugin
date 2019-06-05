@@ -11,7 +11,7 @@ RUN yarn
 COPY elm.json .
 
 COPY . .
-RUN make build
+RUN make build-debug
 
 
 FROM kradalby/nginx-ldap-auth:1.15.3 as production
