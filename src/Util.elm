@@ -92,7 +92,7 @@ fuzzyKeywordReduce searchString keywordPointers =
 
 formatAltitude : Float -> String
 formatAltitude altitude =
-    String.fromFloat altitude ++ " meter"
+    String.fromInt (round altitude) ++ " meter"
 
 
 formatPhotoDate : Time.Posix -> String
