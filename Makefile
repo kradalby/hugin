@@ -6,6 +6,9 @@ install:
 build:
 	env NODE_ENV=production npx webpack -p
 
+build-debug:
+	npx webpack
+
 dev:
 	npx webpack-dev-server --hot --colors --port 8000
 
