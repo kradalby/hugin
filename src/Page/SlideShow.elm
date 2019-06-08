@@ -72,7 +72,7 @@ init : Session -> Url -> ( Model, Cmd Msg )
 init session url =
     ( { session = session
       , errors = []
-      , nextPhotoDelay = 6000
+      , nextPhotoDelay = 10000
       , paused = False
       , album = Loading
 
