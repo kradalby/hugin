@@ -198,23 +198,33 @@ update msg model =
             ( { model | errors = [] }, Cmd.none )
 
         CompletedAlbumLoad (Ok album) ->
-            case album.photos of
-                [] ->
-                    ( { model
-                        | album = Loaded album
-                        , notPresented = []
-                      }
-                    , Cmd.none
-                    )
+            ( case model.album of
+                Loaded _ ->
+                    { model
+                        | notPresented = model.notPresented ++ album.photos
+                    }
 
-                h :: t ->
-                    ( { model
-                        | album = Loaded album
-                        , notPresented = t
-                        , currentPhoto = h
-                      }
-                    , Cmd.none
+                _ ->
+                    case album.photos of
+                        [] ->
+                            { model
+                                | album = Loaded album
+                                , notPresented = []
+                            }
+
+                        h :: t ->
+                            { model
+                                | album = Loaded album
+                                , notPresented = t
+                                , currentPhoto = h
+                            }
+            , Cmd.batch <|
+                List.map
+                    (\a ->
+                        Request.Album.get a.url CompletedAlbumLoad
                     )
+                    album.albums
+            )
 
         CompletedAlbumLoad (Err err) ->
             ( { model | album = Failed }
@@ -280,10 +290,7 @@ update msg model =
 
                 "r" ->
                     ( { model | notifications = model.notifications ++ [ notification "Photos have been randomized" ] }
-                    , Random.generate Randomize <|
-                        Random.pair
-                            (Random.List.shuffle model.presented)
-                            (Random.List.shuffle model.notPresented)
+                    , randomizeModel model
                     )
 
                 "h" ->
@@ -400,6 +407,14 @@ previousPhoto model =
                 , notPresented = model.currentPhoto :: model.notPresented
                 , presented = Maybe.withDefault [] (List.Extra.init model.presented)
             }
+
+
+randomizeModel : Model -> Cmd Msg
+randomizeModel model =
+    Random.generate Randomize <|
+        Random.pair
+            (Random.List.shuffle model.presented)
+            (Random.List.shuffle model.notPresented)
 
 
 subscriptions : Model -> Sub Msg
