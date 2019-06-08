@@ -18,6 +18,9 @@ export namespace Elm {
         httpError: {
           subscribe(callback: (data: string) => void): void
         }
+        requestFullscreen: {
+          subscribe(callback: (data: null) => void): void
+        }
       };
     }
     export function init(options: {

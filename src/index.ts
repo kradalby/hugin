@@ -39,6 +39,11 @@ require("./images/404.jpg");
 // BOOTSTRAP
 // require("bootstrap/js/dist/modal");
 
+// see https://github.com/sindresorhus/screenfull.js/issues/126
+import * as sf from "screenfull";
+import { Screenfull } from "screenfull";
+let screenfull = <Screenfull>sf;
+
 ///////////////////////////////////////////////////
 // Error reporting
 
@@ -107,6 +112,10 @@ document.addEventListener("DOMContentLoaded", function() {
   });
   app.ports.httpError.subscribe(val => {
     log.error(val);
+  });
+
+  app.ports.requestFullscreen.subscribe(() => {
+    screenfull.toggle();
   });
 });
 
