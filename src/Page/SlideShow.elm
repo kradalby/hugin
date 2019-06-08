@@ -132,7 +132,7 @@ view model =
                     ]
                 <|
                     List.indexedMap viewNotification model.notifications
-                        ++ List.map preloadImage album.photos
+                        ++ preloadNextImages 3 model.notPresented
 
             Failed ->
                 Loading.error "album"
@@ -162,6 +162,11 @@ viewNotification index noti =
                 ]
             ]
         ]
+
+
+preloadNextImages : Int -> List Data.Misc.PhotoInAlbum -> List (Html Msg)
+preloadNextImages count photos =
+    List.map preloadImage <| List.take count photos
 
 
 preloadImage : Data.Misc.PhotoInAlbum -> Html Msg
