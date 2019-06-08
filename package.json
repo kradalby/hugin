@@ -25,10 +25,10 @@
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@sentry/browser": "^5.4.0",
     "@sentry/types": "^5.4.0",
-    "@types/google.analytics": "^0.0.39",
+    "@types/google.analytics": "^0.0.40",
     "@types/jszip": "^3.1.6",
     "@types/mapbox-gl": "^0.51.7",
-    "@types/node": "^12.0.4",
+    "@types/node": "^12.0.7",
     "@types/webpack": "^4.4.32",
     "babel-loader": "^8.0.6",
     "babel-minify-webpack-plugin": "^0.3.1",
@@ -61,7 +61,7 @@
     "url-loader": "^2.0.0",
     "web-streams-polyfill": "^2.0.3",
     "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.2",
-    "webpack-dev-server": "^3.6.0"
+    "webpack-cli": "^3.3.3",
+    "webpack-dev-server": "^3.7.1"
   }
 }
