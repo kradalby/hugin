@@ -112,7 +112,7 @@ view model =
             LoadingSlowly ->
                 Loading.icon
 
-            Loaded album ->
+            Loaded _ ->
                 div
                     [ style "position" "absolute"
                     , style "width" "100%"
