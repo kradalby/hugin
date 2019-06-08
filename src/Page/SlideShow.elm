@@ -15,6 +15,7 @@ import Json.Decode as Decode
 import List.Extra
 import Loading
 import Log
+import Ports
 import Random
 import Random.List
 import Request.Album
@@ -63,6 +64,7 @@ help =
     , notification "Change timer with up / down arrow"
     , notification "Pause with \"p\" or \"space\""
     , notification "Randomize order with \"r\""
+    , notification "Toggle fullscreen \"f\""
     ]
 
 
@@ -281,6 +283,13 @@ update msg model =
 
                 "h" ->
                     ( { model | notifications = help }, Cmd.none )
+
+                "f" ->
+                    ( { model
+                        | notifications = model.notifications ++ [ notification "Toggling fullscreen" ]
+                      }
+                    , Ports.requestFullscreen ()
+                    )
 
                 _ ->
                     --    let
