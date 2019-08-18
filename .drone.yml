@@ -16,27 +16,24 @@ steps:
 
 - name: build
   pull: if-not-exists
-  image: plugins/docker
+  image: banzaicloud/drone-kaniko
   settings:
-    build_args_from_env:
-    - HUGIN_MAPBOX_ACCESS_TOKEN
-    - HUGIN_SENTRY_DSN
-    - HUGIN_ROLLBAR_ACCESS_TOKEN
+    cache: true
+    build_args:
+        - HUGIN_MAPBOX_ACCESS_TOKEN:
+          from_secret: hugin_mapbox_access_token
+        - HUGIN_ROLLBAR_ACCESS_TOKEN:
+          from_secret: hugin_rollbar_access_token
+        - HUGIN_SENTRY_DSN:
+          from_secret: hugin_sentry_dsn
     repo: kradalby/hugin
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
     - latest
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
+    username:
       from_secret: docker_username
-    HUGIN_MAPBOX_ACCESS_TOKEN:
-      from_secret: hugin_mapbox_access_token
-    HUGIN_ROLLBAR_ACCESS_TOKEN:
-      from_secret: hugin_rollbar_access_token
-    HUGIN_SENTRY_DSN:
-      from_secret: hugin_sentry_dsn
+    password:
+      from_secret: docker_password
 
 - name: deploy
   pull: if-not-exists
