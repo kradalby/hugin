@@ -1,55 +1,95 @@
-pipeline:
-  lint:
-    image: node:10
-    commands:
-        - make install
-        - make lint
-  build:
-    image: plugins/docker
-    repo: kradalby/hugin
-    # auto_tag: true
-    secrets:
-        - docker_username
-        - docker_password
-        - hugin_mapbox_access_token
-        - hugin_sentry_dsn
-        - hugin_rollbar_access_token
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: lint
+  pull: if-not-exists
+  image: node:10
+  commands:
+  - make install
+  - make lint
+
+- name: build
+  pull: if-not-exists
+  image: plugins/docker
+  settings:
     build_args_from_env:
-        - HUGIN_MAPBOX_ACCESS_TOKEN
-        - HUGIN_SENTRY_DSN
-        - HUGIN_ROLLBAR_ACCESS_TOKEN
+    - HUGIN_MAPBOX_ACCESS_TOKEN
+    - HUGIN_SENTRY_DSN
+    - HUGIN_ROLLBAR_ACCESS_TOKEN
+    repo: kradalby/hugin
     tags:
-        - ${DRONE_COMMIT_SHA:0:8}
-        - latest
+    - ${DRONE_COMMIT_SHA:0:8}
+    - latest
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    DOCKER_USERNAME:
+      from_secret: docker_username
+    HUGIN_MAPBOX_ACCESS_TOKEN:
+      from_secret: hugin_mapbox_access_token
+    HUGIN_ROLLBAR_ACCESS_TOKEN:
+      from_secret: hugin_rollbar_access_token
+    HUGIN_SENTRY_DSN:
+      from_secret: hugin_sentry_dsn
 
-  deploy:
-    image: quay.io/honestbee/drone-kubernetes
-    deployment: hugin-deployment
-    repo: kradalby/hugin
+- name: deploy
+  pull: if-not-exists
+  image: quay.io/honestbee/drone-kubernetes
+  settings:
+    branches:
+    - master
     container: hugin-container
+    deployment: hugin-deployment
     namespace: hugin
-    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
-    tag:
-      - ${DRONE_COMMIT_SHA:0:8}
-    branches: [ master ]
-
-  deploy-demo:
-    image: quay.io/honestbee/drone-kubernetes
-    deployment: hugindemo-deployment
     repo: kradalby/hugin
-    container: hugindemo-container
-    namespace: hugin
-    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
     tag:
-      - ${DRONE_COMMIT_SHA:0:8}
-    branches: [ master ]
+    - ${DRONE_COMMIT_SHA:0:8}
+  environment:
+    KUBERNETES_CERT:
+      from_secret: kubernetes_cert
+    KUBERNETES_SERVER:
+      from_secret: kubernetes_server
+    KUBERNETES_TOKEN:
+      from_secret: kubernetes_token
 
-  notify:
-    image: drillster/drone-email
-    host: smtp.fap.no
-    skip_verify: true
-    port: 25
+- name: deploy-demo
+  pull: if-not-exists
+  image: quay.io/honestbee/drone-kubernetes
+  settings:
+    branches:
+    - master
+    container: hugindemo-container
+    deployment: hugindemo-deployment
+    namespace: hugin
+    repo: kradalby/hugin
+    tag:
+    - ${DRONE_COMMIT_SHA:0:8}
+  environment:
+    KUBERNETES_CERT:
+      from_secret: kubernetes_cert
+    KUBERNETES_SERVER:
+      from_secret: kubernetes_server
+    KUBERNETES_TOKEN:
+      from_secret: kubernetes_token
+
+- name: notify
+  pull: if-not-exists
+  image: drillster/drone-email
+  settings:
     from: drone@drone.fap.no
-    recipients: [ kradalby@kradalby.no ]
-    when:
-      status: [ success, changed, failure ]
+    host: smtp.fap.no
+    port: 25
+    recipients:
+    - kradalby@kradalby.no
+    skip_verify: true
+  when:
+    status:
+    - success
+    - changed
+    - failure
