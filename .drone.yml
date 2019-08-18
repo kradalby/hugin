@@ -16,16 +16,20 @@ steps:
 
 - name: build
   pull: if-not-exists
-  image: banzaicloud/drone-kaniko
+  image: kradalby/drone-kaniko
+  environment:
+    HUGIN_MAPBOX_ACCESS_TOKEN:
+      from_secret: hugin_mapbox_access_token
+    HUGIN_ROLLBAR_ACCESS_TOKEN:
+      from_secret: hugin_rollbar_access_token
+    HUGIN_SENTRY_DSN:
+      from_secret: hugin_sentry_dsn
   settings:
     cache: true
     build_args:
-      - HUGIN_MAPBOX_ACCESS_TOKEN:
-        from_secret: hugin_mapbox_access_token
-      - HUGIN_ROLLBAR_ACCESS_TOKEN:
-        from_secret: hugin_rollbar_access_token
-      - HUGIN_SENTRY_DSN:
-        from_secret: hugin_sentry_dsn
+      - HUGIN_MAPBOX_ACCESS_TOKEN
+      - HUGIN_ROLLBAR_ACCESS_TOKEN
+      - HUGIN_SENTRY_DSN
     repo: kradalby/hugin
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
