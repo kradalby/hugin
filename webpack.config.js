@@ -12,6 +12,7 @@ const production = mode === "production";
 console.log(mode);
 console.log("Env: ", process.env)
 console.log("MAPBOX: ", process.env.HUGIN_MAPBOX_ACCESS_TOKEN)
+console.log("TESTY: ", process.env.TESTY)
 
 
 

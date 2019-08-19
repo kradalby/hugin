@@ -25,12 +25,14 @@ steps:
       from_secret: hugin_rollbar_access_token
     HUGIN_SENTRY_DSN:
       from_secret: hugin_sentry_dsn
+    TESTY: "test"
   settings:
     cache: false
     build_args_from_env:
       - HUGIN_MAPBOX_ACCESS_TOKEN
       - HUGIN_ROLLBAR_ACCESS_TOKEN
       - HUGIN_SENTRY_DSN
+      - TESTY
     repo: kradalby/hugin
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
