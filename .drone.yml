@@ -15,8 +15,9 @@ steps:
   - make lint
 
 - name: build
-  pull: if-not-exists
-  image: kradalby/drone-kaniko
+  # pull: if-not-exists
+  pull: always
+  image: kradalby/drone-kaniko:latest
   environment:
     HUGIN_MAPBOX_ACCESS_TOKEN:
       from_secret: hugin_mapbox_access_token
