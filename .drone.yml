@@ -26,7 +26,7 @@ steps:
     HUGIN_SENTRY_DSN:
       from_secret: hugin_sentry_dsn
   settings:
-    cache: true
+    cache: false
     build_args_from_env:
       - HUGIN_MAPBOX_ACCESS_TOKEN
       - HUGIN_ROLLBAR_ACCESS_TOKEN
