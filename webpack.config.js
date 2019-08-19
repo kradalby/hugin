@@ -10,6 +10,7 @@ const SizePlugin = require("size-plugin");
 const mode = process.env.NODE_ENV || "development";
 const production = mode === "production";
 console.log(mode);
+console.log("Env: ", process.env)
 console.log("MAPBOX: ", process.env.HUGIN_MAPBOX_ACCESS_TOKEN)
 
 
