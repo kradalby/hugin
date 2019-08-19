@@ -10,10 +10,6 @@ COPY yarn.lock .
 RUN yarn
 COPY elm.json .
 
-RUN echo $HUGIN_MAPBOX_ACCESS_TOKEN
-RUN echo $HUGIN_SENTRY_DSN
-RUN echo $HUGIN_ROLLBAR_ACCESS_TOKEN
-
 COPY . .
 RUN make build
 
