@@ -17,7 +17,7 @@ steps:
 - name: build
   # pull: if-not-exists
   pull: always
-  image: kradalby/drone-kaniko:latest
+  image: banzaicloud/drone-kaniko 
   environment:
     HUGIN_MAPBOX_ACCESS_TOKEN:
       from_secret: hugin_mapbox_access_token
