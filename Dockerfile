@@ -14,5 +14,5 @@ COPY . .
 RUN make build
 
 
-FROM kradalby/nginx-ldap-auth:1.15.3 as production
+FROM kradalby/nginx-ldap-auth:latest as production
 COPY --from=builder /app/dist /usr/share/nginx/html
