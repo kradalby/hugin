@@ -17,7 +17,7 @@ steps:
 - name: build
   # pull: if-not-exists
   pull: always
-  image: banzaicloud/drone-kaniko 
+  image: banzaicloud/drone-kaniko
   environment:
     HUGIN_MAPBOX_ACCESS_TOKEN:
       from_secret: hugin_mapbox_access_token
@@ -46,8 +46,8 @@ steps:
   settings:
     branches:
     - master
-    container: hugin-container
-    deployment: hugin-deployment
+    container: hugin
+    deployment: hugin
     namespace: hugin
     repo: kradalby/hugin
     tag:
@@ -60,25 +60,25 @@ steps:
     KUBERNETES_TOKEN:
       from_secret: kubernetes_token
 
-- name: deploy-demo
-  pull: if-not-exists
-  image: quay.io/honestbee/drone-kubernetes
-  settings:
-    branches:
-    - master
-    container: hugindemo-container
-    deployment: hugindemo-deployment
-    namespace: hugin
-    repo: kradalby/hugin
-    tag:
-    - ${DRONE_COMMIT_SHA:0:8}
-  environment:
-    KUBERNETES_CERT:
-      from_secret: kubernetes_cert
-    KUBERNETES_SERVER:
-      from_secret: kubernetes_server
-    KUBERNETES_TOKEN:
-      from_secret: kubernetes_token
+# - name: deploy-demo
+#   pull: if-not-exists
+#   image: quay.io/honestbee/drone-kubernetes
+#   settings:
+#     branches:
+#     - master
+#     container: common
+#     deployment: hugindemo
+#     namespace: hugindemo
+#     repo: kradalby/hugin
+#     tag:
+#     - ${DRONE_COMMIT_SHA:0:8}
+#   environment:
+#     KUBERNETES_CERT:
+#       from_secret: kubernetes_cert
+#     KUBERNETES_SERVER:
+#       from_secret: kubernetes_server
+#     KUBERNETES_TOKEN:
+#       from_secret: kubernetes_token
 
 - name: notify
   pull: if-not-exists
