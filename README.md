@@ -110,6 +110,8 @@ spec:
           servicePort: 80
 ```
 
+### Helm
+Check out the `helm/` directory for a Helm chart implementing the aforementioned Kubernetes installation.
 
 
 ## Development
