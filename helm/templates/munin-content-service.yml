@@ -1,0 +1,13 @@
+{{ if .Values.munin }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: munin-content-service
+spec:
+  ports:
+  - protocol: TCP
+    port: {{ .Values.munin.port }}
+    targetPort: {{ .Values.munin.port }}
+  type: ExternalName
+  externalName: {{ .Values.munin.address  | quote }}
+{{- end }}
