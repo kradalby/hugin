@@ -14,7 +14,18 @@ steps:
   - make install
   - make lint
 
-- name: build
+- name: upgrade-and-build
+  pull: if-not-exists
+  image: node:10
+  commands:
+  - make install
+  - make upgrade
+  - make build
+  when:
+    event:
+    - cron
+
+- name: build-docker-image
   # pull: if-not-exists
   pull: always
   image: banzaicloud/drone-kaniko
