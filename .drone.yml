@@ -14,18 +14,12 @@ steps:
   - make install
   - make lint
 
-- name: upgrade-and-build
-  pull: if-not-exists
-  image: node:10
-  commands:
-  - make install
-  - make upgrade
-  - make build
-  when:
-    event:
-    - cron
+- name: build
+  # pull: if-not-exists
+  pull: always
+  image: banzaicloud/drone-kaniko
 
-- name: build-docker-image
+- name: publish
   # pull: if-not-exists
   pull: always
   image: banzaicloud/drone-kaniko
@@ -37,7 +31,6 @@ steps:
     HUGIN_SENTRY_DSN:
       from_secret: hugin_sentry_dsn
   settings:
-    cache: true
     build_args_from_env:
       - HUGIN_MAPBOX_ACCESS_TOKEN
       - HUGIN_ROLLBAR_ACCESS_TOKEN
