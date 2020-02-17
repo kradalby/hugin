@@ -50,13 +50,6 @@ steps:
 - name: deploy
   pull: if-not-exists
   image: kradalby/drone-kubectl 
-  settings:
-    container: hugin
-    deployment: hugin
-    namespace: hugin
-    repo: kradalby/hugin
-    tag:
-    - ${DRONE_COMMIT_SHA:0:8}
   environment:
     KUBERNETES_CERT:
       from_secret: kubernetes_cert
@@ -65,7 +58,7 @@ steps:
     KUBERNETES_TOKEN:
       from_secret: kubernetes_token
   commands:
-      - kubectl -n hugin set image deployment/hugin hugin=hugin:${DRONE_COMMIT_SHA:0:8} --record
+      - kubectl -n hugin set image deployment/hugin hugin=kradalby/hugin:${DRONE_COMMIT_SHA:0:8} --record
       - kubectl -n hugin rollout status deployment hugin
   when:
     branch:
