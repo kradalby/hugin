@@ -66,7 +66,7 @@ steps:
       from_secret: kubernetes_token
   commands:
       - kubectl -n hugin set image deployment/hugin hugin=hugin:${DRONE_COMMIT_SHA:0:8} --record
-      - kubectl rollout status deployment hugin
+      - kubectl -n hugin rollout status deployment hugin
   when:
     branch:
     - master
