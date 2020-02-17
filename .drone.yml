@@ -49,10 +49,8 @@ steps:
 
 - name: deploy
   pull: if-not-exists
-  image: quay.io/honestbee/drone-kubernetes
+  image: kradalby/drone-kubectl 
   settings:
-    branches:
-    - master
     container: hugin
     deployment: hugin
     namespace: hugin
@@ -66,6 +64,9 @@ steps:
       from_secret: kubernetes_server
     KUBERNETES_TOKEN:
       from_secret: kubernetes_token
+  commands:
+      - kubectl -n hugin set image deployment/hugin hugin=hugin:${DRONE_COMMIT_SHA:0:8} --record
+      - kubectl rollout status deployment hugin
   when:
     branch:
     - master
