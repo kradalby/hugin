@@ -46,6 +46,8 @@ steps:
   when:
     branch:
     - master
+    event:
+    - push
 
 - name: deploy
   pull: if-not-exists
@@ -63,6 +65,8 @@ steps:
   when:
     branch:
     - master
+    event:
+    - push
 
 # - name: deploy-demo
 #   pull: if-not-exists
