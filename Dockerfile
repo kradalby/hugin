@@ -11,7 +11,8 @@ RUN yarn
 COPY elm.json .
 
 COPY . .
-RUN make build
+RUN cat /etc/resolv.conf
+# RUN make build
 
 
 FROM kradalby/nginx-ldap-auth:latest as production
