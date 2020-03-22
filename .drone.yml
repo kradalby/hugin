@@ -16,13 +16,13 @@ steps:
   
   - name: build
     pull: always
-    image: plugins/docker
+    image: tuxity/drone-docker
     environment:
       DOCKER_BUILDKIT: 1
     settings:
       repo: dryrun
       dry_run: true
-      custom_dns: 8.8.8.8
+      custom_dns: ["1.1.1.1"]
   
       #   - name: publish
       #     pull: always
