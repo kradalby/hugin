@@ -16,9 +16,9 @@ steps:
   
   - name: build
     pull: always
-    image: tuxity/drone-docker
-    environment:
-      DOCKER_BUILDKIT: 1
+    image: plugins/docker
+    # environment:
+    #   DOCKER_BUILDKIT: 1
     settings:
       repo: dryrun
       dry_run: true
