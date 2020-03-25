@@ -121,11 +121,11 @@ steps:
     image: kradalby/drone-kubectl
     environment:
       KUBERNETES_CERT:
-        from_secret: kubernetes_cert
+        from_secret: demo_kubernetes_cert
       KUBERNETES_SERVER:
-        from_secret: kubernetes_server
+        from_secret: demo_kubernetes_server
       KUBERNETES_TOKEN:
-        from_secret: kubernetes_token
+        from_secret: demo_kubernetes_token
       APP: hugindemo
     commands:
       - kubectl -n $APP set image deployment/$APP common=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record
