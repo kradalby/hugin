@@ -128,7 +128,7 @@ steps:
         from_secret: demo_kubernetes_token
       APP: hugindemo
     commands:
-      - kubectl -n $APP set image deployment/$APP common=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record
+      - kubectl -n $APP set image deployment/$APP common=kradalby/hugin:${DRONE_COMMIT_SHA:0:8} --record
       - kubectl -n $APP rollout status deployment $APP
     when:
       branch:
