@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: kubernetes
-name: default
+name: lint
 
 node_selector:
   drone: "true"
@@ -13,7 +13,16 @@ steps:
     commands:
     - make install
     - make lint
+
+---
+kind: pipeline
+type: kubernetes
+name: build
+
+node_selector:
+  drone: "true"
   
+steps:
   - name: build
     pull: always
     image: banzaicloud/drone-kaniko:0.5.1
@@ -21,7 +30,20 @@ steps:
       branch:
         exclude:
         - master
+
+---
+kind: pipeline
+type: kubernetes
+name: deploy
+
+depends_on:
+    - lint
+    - build
+
+node_selector:
+  drone: "true"
   
+steps:
   - name: publish
     pull: always
     image: banzaicloud/drone-kaniko:0.5.1
@@ -94,7 +116,7 @@ steps:
       - master
   
   - name: notify
-    pull: if-not-exists
+    pull: always
     image: drillster/drone-email
     settings:
       from: drone@drone.fap.no
