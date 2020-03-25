@@ -11,14 +11,6 @@ RUN yarn
 COPY elm.json .
 
 COPY . .
-RUN apt update && apt install dnsutils -y
-RUN cat /etc/resolv.conf
-RUN nslookup google.com
-RUN nslookup elm-lang.org
-RUN nslookup package.elm-lang.org
-RUN dig google.com
-RUN dig elm-lang.org
-RUN dig package.elm-lang.org
 RUN make build
 
 
