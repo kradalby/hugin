@@ -107,13 +107,13 @@
          "environment": {
             "APP": "hugindemo",
             "KUBERNETES_CERT": {
-               "from_secret": "kubernetes_cert"
+               "from_secret": "demo_kubernetes_cert"
             },
             "KUBERNETES_SERVER": {
-               "from_secret": "kubernetes_server"
+               "from_secret": "demo_kubernetes_server"
             },
             "KUBERNETES_token": {
-               "from_secret": "kubernetes_token"
+               "from_secret": "demo_kubernetes_token"
             },
             "REPO": "kradalby/hugin"
          },
