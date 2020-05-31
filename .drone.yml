@@ -40,7 +40,7 @@
             }
          },
          "image": "banzaicloud/drone-kaniko:0.5.1",
-         "name": "Publish container image",
+         "name": "Publish image kradalby/hugin",
          "pull": "always",
          "settings": {
             "build_args_from_env": [
@@ -87,7 +87,7 @@
             }
          },
          "image": "kradalby/drone-kubectl",
-         "name": "Deploy to Kubernetes",
+         "name": "Deploy hugin to Kubernetes",
          "pull": "always",
          "trigger": {
             "branch": [
@@ -116,7 +116,7 @@
             }
          },
          "image": "kradalby/drone-kubectl",
-         "name": "Deploy to Kubernetes",
+         "name": "Deploy hugindemo to Kubernetes",
          "pull": "always",
          "trigger": {
             "branch": [
