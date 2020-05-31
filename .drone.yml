@@ -1,186 +1,190 @@
 ---
-kind: pipeline
-type: kubernetes
-name: lint
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: lint
-    image: node:10
-    commands:
-      - make install
-      - make lint
-
+{
+   "kind": "pipeline",
+   "name": "default",
+   "node_selector": {
+      "drone": true
+   },
+   "steps": [
+      {
+         "commands": [
+            "make install",
+            "make lint"
+         ],
+         "image": "node:10",
+         "name": "Node lint",
+         "pull": "always"
+      },
+      {
+         "image": "banzaicloud/drone-kaniko:0.5.1",
+         "name": "Build container image",
+         "pull": "always",
+         "when": {
+            "branch": {
+               "exclude": [
+                  "master"
+               ]
+            }
+         }
+      },
+      {
+         "environment": {
+            "HUGIN_MAPBOX_ACCESS_TOKEN": {
+               "from_secret": "hugin_mapbox_access_token"
+            },
+            "HUGIN_ROLLBAR_ACCESS_TOKEN": {
+               "from_secret": "hugin_rollbar_access_token"
+            },
+            "HUGIN_SENTRY_DSN": {
+               "from_secret": "hugin_sentry_dsn"
+            }
+         },
+         "image": "banzaicloud/drone-kaniko:0.5.1",
+         "name": "Publish container image",
+         "pull": "always",
+         "settings": {
+            "build_args_from_env": [
+               "HUGIN_MAPBOX_ACCESS_TOKEN",
+               "HUGIN_ROLLBAR_ACCESS_TOKEN",
+               "HUGIN_SENTRY_DSN"
+            ],
+            "password": {
+               "from_secret": "docker_password"
+            },
+            "repo": "kradalby/hugin",
+            "tags": [
+               "latest",
+               "${DRONE_COMMIT_SHA:0:8}"
+            ],
+            "username": {
+               "from_secret": "docker_username"
+            }
+         },
+         "trigger": {
+            "branch": [
+               "master"
+            ],
+            "event": [
+               "push"
+            ]
+         }
+      },
+      {
+         "commands": [
+            "kubectl -n $APP set image deployment/$APP $APP=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record",
+            "kubectl -n $APP rollout status deployment $APP"
+         ],
+         "environment": {
+            "APP": "hugin",
+            "KUBERNETES_CERT": {
+               "from_secret": "kubernetes_cert"
+            },
+            "KUBERNETES_SERVER": {
+               "from_secret": "kubernetes_server"
+            },
+            "KUBERNETES_token": {
+               "from_secret": "kubernetes_token"
+            }
+         },
+         "image": "kradalby/drone-kubectl",
+         "name": "Deploy to Kubernetes",
+         "pull": "always",
+         "trigger": {
+            "branch": [
+               "master"
+            ],
+            "event": [
+               "push"
+            ]
+         }
+      },
+      {
+         "commands": [
+            "kubectl -n $APP set image deployment/$APP $APP=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record",
+            "kubectl -n $APP rollout status deployment $APP"
+         ],
+         "environment": {
+            "APP": "hugindemo",
+            "KUBERNETES_CERT": {
+               "from_secret": "kubernetes_cert"
+            },
+            "KUBERNETES_SERVER": {
+               "from_secret": "kubernetes_server"
+            },
+            "KUBERNETES_token": {
+               "from_secret": "kubernetes_token"
+            }
+         },
+         "image": "kradalby/drone-kubectl",
+         "name": "Deploy to Kubernetes",
+         "pull": "always",
+         "trigger": {
+            "branch": [
+               "master"
+            ],
+            "event": [
+               "push"
+            ]
+         }
+      },
+      {
+         "image": "appleboy/drone-discord",
+         "name": "Notify Discord",
+         "pull": "always",
+         "settings": {
+            "message": "{{#success build.status}} ✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐 {{ build.link }}\n\n ✅ duration: {{duration build.started build.finished}} \n\n ✅ started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}} \n\n ✅ finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}} {{else}} ❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐 {{ build.link }}\n\n ✅ duration: {{duration build.started build.finished}} \n\n ✅ started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}} \n\n ✅ finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}}{{/success}}\n",
+            "webhook_id": {
+               "from_secret": "discord_webhook_id"
+            },
+            "webhook_token": {
+               "from_secret": "discord_webhook_token"
+            }
+         },
+         "trigger": {
+            "status": [
+               "success",
+               "changed",
+               "failed"
+            ]
+         }
+      }
+   ],
+   "type": "kubernetes"
+}
 ---
-kind: pipeline
-type: kubernetes
-name: build
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: build
-    pull: always
-    image: banzaicloud/drone-kaniko:0.5.1
-    when:
-      branch:
-        exclude:
-          - master
-
+{
+   "get": {
+      "name": "id",
+      "path": "discord-build"
+   },
+   "kind": "secret",
+   "name": "discord_webhook_id"
+}
 ---
-kind: pipeline
-type: kubernetes
-name: publish
-
-depends_on:
-  - lint
-  - build
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: publish
-    pull: always
-    image: banzaicloud/drone-kaniko:0.5.1
-    environment:
-      HUGIN_MAPBOX_ACCESS_TOKEN:
-        from_secret: hugin_mapbox_access_token
-      HUGIN_ROLLBAR_ACCESS_TOKEN:
-        from_secret: hugin_rollbar_access_token
-      HUGIN_SENTRY_DSN:
-        from_secret: hugin_sentry_dsn
-    settings:
-      build_args_from_env:
-        - HUGIN_MAPBOX_ACCESS_TOKEN
-        - HUGIN_ROLLBAR_ACCESS_TOKEN
-        - HUGIN_SENTRY_DSN
-      repo: kradalby/hugin
-      tags:
-        - ${DRONE_COMMIT_SHA:0:8}
-        - latest
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-    when:
-      branch:
-        - master
-      event:
-        - push
-
+{
+   "get": {
+      "name": "token",
+      "path": "discord-build"
+   },
+   "kind": "secret",
+   "name": "discord_webhook_token"
+}
 ---
-kind: pipeline
-type: kubernetes
-name: deploy
-
-depends_on:
-  - publish
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: deploy
-    pull: always
-    image: kradalby/drone-kubectl
-    environment:
-      KUBERNETES_CERT:
-        from_secret: kubernetes_cert
-      KUBERNETES_SERVER:
-        from_secret: kubernetes_server
-      KUBERNETES_TOKEN:
-        from_secret: kubernetes_token
-      APP: hugin
-    commands:
-      - kubectl -n $APP set image deployment/$APP $APP=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record
-      - kubectl -n $APP rollout status deployment $APP
-    when:
-      branch:
-        - master
-      event:
-        - push
-
+{
+   "get": {
+      "name": "username",
+      "path": "docker"
+   },
+   "kind": "secret",
+   "name": "docker_username"
+}
 ---
-kind: pipeline
-type: kubernetes
-name: deploy-demo
-
-depends_on:
-  - publish
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: deploy
-    pull: always
-    image: kradalby/drone-kubectl
-    environment:
-      KUBERNETES_CERT:
-        from_secret: demo_kubernetes_cert
-      KUBERNETES_SERVER:
-        from_secret: demo_kubernetes_server
-      KUBERNETES_TOKEN:
-        from_secret: demo_kubernetes_token
-      APP: hugindemo
-    commands:
-      - kubectl -n $APP set image deployment/$APP common=kradalby/hugin:${DRONE_COMMIT_SHA:0:8} --record
-      - kubectl -n $APP rollout status deployment $APP
-    when:
-      branch:
-        - master
-      event:
-        - push
-
----
-kind: pipeline
-type: kubernetes
-name: notify
-
-depends_on:
-  - deploy
-  - deploy-demo
-
-node_selector:
-  drone: "true"
-
-steps:
-  - name: discord notification
-    image: appleboy/drone-discord
-    settings:
-      webhook_id:
-        from_secret: discord_webhook_id
-      webhook_token:
-        from_secret: discord_webhook_token
-
----
-kind: secret
-name: discord_webhook_id
-get:
-  path: discord-build
-  name: id
-
----
-kind: secret
-name: discord_webhook_token
-get:
-  path: discord-build
-  name: token
-
----
-kind: secret
-name: docker_username
-get:
-  path: docker
-  name: username
-
----
-kind: secret
-name: docker_password
-get:
-  path: docker
-  name: password
+{
+   "get": {
+      "name": "password",
+      "path": "docker"
+   },
+   "kind": "secret",
+   "name": "docker_password"
+}
+...
