@@ -71,7 +71,7 @@
       },
       {
          "commands": [
-            "kubectl -n $APP set image deployment/$APP $APP=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record",
+            "kubectl -n $APP set image deployment/$APP $APP=$REPO:${DRONE_COMMIT_SHA:0:8} --record",
             "kubectl -n $APP rollout status deployment $APP"
          ],
          "environment": {
@@ -84,7 +84,8 @@
             },
             "KUBERNETES_token": {
                "from_secret": "kubernetes_token"
-            }
+            },
+            "REPO": "kradalby/hugin"
          },
          "image": "kradalby/drone-kubectl",
          "name": "Deploy hugin to Kubernetes",
@@ -100,7 +101,7 @@
       },
       {
          "commands": [
-            "kubectl -n $APP set image deployment/$APP $APP=kradalby/$APP:${DRONE_COMMIT_SHA:0:8} --record",
+            "kubectl -n $APP set image deployment/$APP $APP=$REPO:${DRONE_COMMIT_SHA:0:8} --record",
             "kubectl -n $APP rollout status deployment $APP"
          ],
          "environment": {
@@ -113,7 +114,8 @@
             },
             "KUBERNETES_token": {
                "from_secret": "kubernetes_token"
-            }
+            },
+            "REPO": "kradalby/hugin"
          },
          "image": "kradalby/drone-kubectl",
          "name": "Deploy hugindemo to Kubernetes",
