@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled -}}
+{{- $munin := .Values.munin -}}
 {{- $fullName := include "hugin.fullname" . -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -28,11 +29,11 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ $fullName }} 
+              serviceName: {{ $fullName }}
               servicePort: 80
           - path: /content
             backend:
               serviceName: munin-content-service
-              servicePort: 80
+              servicePort: {{ $munin.port }}
   {{- end }}
 {{- end }}
