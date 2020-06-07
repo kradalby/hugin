@@ -60,7 +60,7 @@
                "from_secret": "docker_username"
             }
          },
-         "trigger": {
+         "when": {
             "branch": [
                "master"
             ],
@@ -90,7 +90,7 @@
          "image": "kradalby/drone-kubectl",
          "name": "Deploy hugin to Kubernetes",
          "pull": "always",
-         "trigger": {
+         "when": {
             "branch": [
                "master"
             ],
@@ -120,7 +120,7 @@
          "image": "kradalby/drone-kubectl",
          "name": "Deploy hugindemo to Kubernetes",
          "pull": "always",
-         "trigger": {
+         "when": {
             "branch": [
                "master"
             ],
