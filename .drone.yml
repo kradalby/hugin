@@ -82,7 +82,7 @@
             "KUBERNETES_SERVER": {
                "from_secret": "kubernetes_server"
             },
-            "KUBERNETES_token": {
+            "KUBERNETES_TOKEN": {
                "from_secret": "kubernetes_token"
             },
             "REPO": "kradalby/hugin"
@@ -111,6 +111,9 @@
             },
             "KUBERNETES_SERVER": {
                "from_secret": "demo_kubernetes_server"
+            },
+            "KUBERNETES_TOKEN": {
+               "from_secret": "kubernetes_token"
             },
             "KUBERNETES_token": {
                "from_secret": "demo_kubernetes_token"
