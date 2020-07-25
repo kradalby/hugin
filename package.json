@@ -33,7 +33,7 @@
     "babel-loader": "^8.0.6",
     "babel-minify-webpack-plugin": "^0.3.1",
     "bootstrap": "^4.4.1",
-    "css-loader": "^3.4.2",
+    "css-loader": "^4.0.0",
     "elm": "latest-0.19.1",
     "elm-analyse": "^0.16.5",
     "elm-format": "^0.8.2",
