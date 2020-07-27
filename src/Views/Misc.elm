@@ -13,6 +13,7 @@ import Data.Url as Url
 import Html exposing (Html, a, div, h5, img, span, text)
 import Html.Attributes exposing (attribute, class, id, src)
 import Route
+import Time
 
 
 viewKeywords : String -> List KeywordPointer -> Html msg
@@ -100,7 +101,15 @@ scaledImg scaledPhotos =
 
 viewPhotos : List PhotoInAlbum -> Html msg
 viewPhotos photos =
-    div [ class "flexbin" ] <| List.map viewPhoto (List.sortBy (\photo -> Url.urlToString photo.url) photos)
+    div [ class "flexbin" ] <|
+        List.map viewPhoto
+            (List.sortBy
+                (\photo ->
+                    photo.dateTime
+                        |> Time.posixToMillis
+                )
+                photos
+            )
 
 
 viewPhoto : PhotoInAlbum -> Html msg

@@ -122,10 +122,12 @@ formatPhotoDate date =
         minute =
             Time.toMinute Time.utc date
                 |> String.fromInt
+                |> String.padLeft 2 '0'
 
         second =
             Time.toSecond Time.utc date
                 |> String.fromInt
+                |> String.padLeft 2 '0'
     in
     weekday
         ++ " "
