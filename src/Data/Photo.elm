@@ -25,7 +25,7 @@ type alias Photo =
     , name : String
     , keywords : List KeywordPointer
     , originalImageURL : String
-    , modifiedDate : String
+    , modifiedDate : Time.Posix
     , fNumber : Maybe Float
     , height : Maybe Int
     , width : Maybe Int
@@ -58,7 +58,7 @@ decoder =
         |> required "name" Decode.string
         |> required "keywords" (Decode.list keywordPointerDecoder)
         |> required "originalImageURL" Decode.string
-        |> required "modifiedDate" Decode.string
+        |> required "modifiedDate" Iso8601.decoder
         |> optional "fNumber" (Decode.nullable Decode.float) Nothing
         |> optional "height" (Decode.nullable Decode.int) Nothing
         |> optional "width" (Decode.nullable Decode.int) Nothing

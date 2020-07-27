@@ -1,12 +1,15 @@
 module Data.Misc exposing (AlbumInAlbum, GPS, KeywordPointer, LocationData, Parent, PhotoInAlbum, ScaledPhoto, albumInAlbumDecoder, gpsDecoder, keywordPointerDecoder, locationDataDecoder, parentDecoder, photoInAlbumDecoder, scaledPhotoDecoder)
 
 import Data.Url as Url exposing (Url)
+import Iso8601
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
+import Time
 
 
 type alias PhotoInAlbum =
     { url : Url
+    , dateTime : Time.Posix
     , originalImageURL : String
     , scaledPhotos : List ScaledPhoto
     , gps : Maybe GPS
@@ -61,6 +64,7 @@ photoInAlbumDecoder : Decoder PhotoInAlbum
 photoInAlbumDecoder =
     Decode.succeed PhotoInAlbum
         |> required "url" Url.urlDecoder
+        |> required "dateTime" Iso8601.decoder
         |> required "originalImageURL" Decode.string
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing

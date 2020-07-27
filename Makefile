@@ -3,7 +3,7 @@
 install:
 	yarn
 
-build:
+build: clean
 	env NODE_ENV=production npx webpack -p
 
 build-debug:

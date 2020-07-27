@@ -35,7 +35,7 @@ type alias Model =
     , nextPhotoDelay : Float
     , paused : Bool
     , album : Status Album
-    , currentPhoto : Data.Misc.PhotoInAlbum
+    , currentPhoto : Maybe Data.Misc.PhotoInAlbum
     , presented : List Data.Misc.PhotoInAlbum
     , notPresented : List Data.Misc.PhotoInAlbum
     , notifications : List Notification
@@ -77,12 +77,7 @@ init session url =
       , album = Loading
 
       -- TODO: This is currently because i would prefer this to not be maybe...
-      , currentPhoto =
-            { url = Url.fromString ""
-            , originalImageURL = ""
-            , scaledPhotos = []
-            , gps = Nothing
-            }
+      , currentPhoto = Nothing
       , presented = []
       , notPresented = []
       , notifications = help
@@ -113,6 +108,16 @@ view model =
                 Loading.icon
 
             Loaded _ ->
+                let
+                    url =
+                        case model.currentPhoto of
+                            Nothing ->
+                                ""
+
+                            Just currentPhoto ->
+                                Util.urlToCssUrl
+                                    (Photo.biggest currentPhoto.scaledPhotos)
+                in
                 div
                     [ style "position" "absolute"
                     , style "width" "100%"
@@ -123,9 +128,7 @@ view model =
                     , style "transition-duration" "600ms"
                     , style "transition-timing-function" "ease-in-out"
                     , style "background-color" "black"
-                    , style "background-image" <|
-                        Util.urlToCssUrl
-                            (Photo.biggest model.currentPhoto.scaledPhotos)
+                    , style "background-image" url
                     , style "background-position-x" "center"
                     , style "background-repeat" "no-repeat"
                     , style "background-size" "contain"
@@ -216,7 +219,7 @@ update msg model =
                             { model
                                 | album = Loaded album
                                 , notPresented = t
-                                , currentPhoto = h
+                                , currentPhoto = Just h
                             }
             , Cmd.batch <|
                 List.map
@@ -372,17 +375,35 @@ nextPhoto model =
                     model
 
                 h :: t ->
+                    let
+                        currentPhotoInList =
+                            case model.currentPhoto of
+                                Nothing ->
+                                    []
+
+                                Just current ->
+                                    [ current ]
+                    in
                     { model
-                        | notPresented = t ++ [ model.currentPhoto ]
+                        | notPresented = t ++ currentPhotoInList
                         , presented = []
-                        , currentPhoto = h
+                        , currentPhoto = Just h
                     }
 
         h :: t ->
+            let
+                currentPhotoInList =
+                    case model.currentPhoto of
+                        Nothing ->
+                            []
+
+                        Just current ->
+                            [ current ]
+            in
             { model
-                | currentPhoto = h
+                | currentPhoto = Just h
                 , notPresented = t
-                , presented = model.presented ++ [ model.currentPhoto ]
+                , presented = model.presented ++ currentPhotoInList
             }
 
 
@@ -396,15 +417,27 @@ previousPhoto model =
 
                 Just last ->
                     { model
-                        | currentPhoto = last
+                        | currentPhoto = Just last
                         , notPresented = []
-                        , presented = model.currentPhoto :: Maybe.withDefault [] (List.Extra.init model.notPresented)
+                        , presented =
+                            case model.currentPhoto of
+                                Nothing ->
+                                    Maybe.withDefault [] (List.Extra.init model.notPresented)
+
+                                Just current ->
+                                    current :: Maybe.withDefault [] (List.Extra.init model.notPresented)
                     }
 
         Just last ->
             { model
-                | currentPhoto = last
-                , notPresented = model.currentPhoto :: model.notPresented
+                | currentPhoto = Just last
+                , notPresented =
+                    case model.currentPhoto of
+                        Nothing ->
+                            model.notPresented
+
+                        Just current ->
+                            current :: model.notPresented
                 , presented = Maybe.withDefault [] (List.Extra.init model.presented)
             }
 
