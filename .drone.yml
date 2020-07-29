@@ -136,7 +136,7 @@
                "dist/*"
             ],
             "strip_components": 1,
-            "target": "/hugin/dist",
+            "target": "/hugin/dist/.",
             "username": "deploy"
          },
          "when": {
