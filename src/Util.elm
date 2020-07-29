@@ -40,7 +40,19 @@ cleanOwnerToName : String -> String
 cleanOwnerToName owner =
     let
         keywords =
-            [ "Copyright: ", "copyright: ", "Photograph: ", "photograph: ", "Copyright", "copyright", "Photograph", "photograph" ]
+            [ "Copyright: "
+            , "copyright: "
+            , "Photograph: "
+            , "photograph: "
+            , "Copyright"
+            , "copyright"
+            , "Photograph"
+            , "photograph"
+            , "photographer:"
+            , "Photographer:"
+            , "photographer: "
+            , "Photographer: "
+            ]
     in
     List.foldl (\word acc -> String.replace word "" acc) owner keywords
 
@@ -118,6 +130,7 @@ formatPhotoDate date =
         hour =
             Time.toHour Time.utc date
                 |> String.fromInt
+                |> String.padLeft 2 '0'
 
         minute =
             Time.toMinute Time.utc date

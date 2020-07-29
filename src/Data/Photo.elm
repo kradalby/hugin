@@ -14,11 +14,13 @@ import Time
 
 type alias Photo =
     { shutterSpeed : Maybe Float
+    , shutterSpeedFormatted : Maybe String
     , lensModel : Maybe String
     , people : List KeywordPointer
     , url : Url
     , owner : Maybe String
     , meteringMode : Maybe Int
+    , meteringModeFormatted : Maybe String
     , cameraMake : Maybe String
     , isoSpeed : List Int
     , dateTime : Maybe Time.Posix
@@ -27,14 +29,18 @@ type alias Photo =
     , originalImageURL : String
     , modifiedDate : Time.Posix
     , fNumber : Maybe Float
+    , fNumberFormatted : Maybe String
     , height : Maybe Int
     , width : Maybe Int
     , scaledPhotos : List ScaledPhoto
     , aperture : Maybe Float
+    , apertureFormatted : Maybe String
     , copyright : Maybe String
     , cameraModel : Maybe String
     , focalLength : Maybe Float
+    , focalLengthFormatted : Maybe String
     , exposureTime : Maybe Float
+    , exposureTimeFormatted : Maybe String
     , gps : Maybe GPS
     , location : Maybe LocationData
     , previous : Maybe Url
@@ -47,11 +53,13 @@ decoder : Decoder Photo
 decoder =
     Decode.succeed Photo
         |> optional "shutterSpeed" (Decode.nullable Decode.float) Nothing
+        |> optional "shutterSpeedFormatted" (Decode.nullable Decode.string) Nothing
         |> optional "lensModel" (Decode.nullable Decode.string) Nothing
         |> required "people" (Decode.list keywordPointerDecoder)
         |> required "url" Url.urlDecoder
         |> optional "owner" (Decode.nullable Decode.string) Nothing
         |> optional "meteringMode" (Decode.nullable Decode.int) Nothing
+        |> optional "meteringModeFormatted" (Decode.nullable Decode.string) Nothing
         |> optional "cameraMake" (Decode.nullable Decode.string) Nothing
         |> required "isoSpeed" (Decode.list Decode.int)
         |> optional "dateTime" (Decode.nullable Iso8601.decoder) Nothing
@@ -60,14 +68,18 @@ decoder =
         |> required "originalImageURL" Decode.string
         |> required "modifiedDate" Iso8601.decoder
         |> optional "fNumber" (Decode.nullable Decode.float) Nothing
+        |> optional "fNumberFormatted" (Decode.nullable Decode.string) Nothing
         |> optional "height" (Decode.nullable Decode.int) Nothing
         |> optional "width" (Decode.nullable Decode.int) Nothing
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
         |> optional "aperture" (Decode.nullable Decode.float) Nothing
+        |> optional "apertureFormatted" (Decode.nullable Decode.string) Nothing
         |> optional "copyright" (Decode.nullable Decode.string) Nothing
         |> optional "cameraModel" (Decode.nullable Decode.string) Nothing
         |> optional "focalLength" (Decode.nullable Decode.float) Nothing
+        |> optional "focalLengthFormatted" (Decode.nullable Decode.string) Nothing
         |> optional "exposureTime" (Decode.nullable Decode.float) Nothing
+        |> optional "exposureTimeFormatted" (Decode.nullable Decode.string) Nothing
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing
         |> optional "location" (Decode.nullable locationDataDecoder) Nothing
         |> optional "previous" (Decode.nullable Url.urlDecoder) Nothing
