@@ -12,7 +12,7 @@ import Http
 import Json.Decode as Decode
 import Loading
 import Log
-import Maybe.Extra
+import Maybe.Extra exposing (orElse)
 import Request.Photo
 import Route
 import Session exposing (Session)
@@ -177,18 +177,32 @@ viewInformation photo =
                 ]
 
         rows =
-            [ photo.copyright |> Maybe.map (cleanOwnerToName >> row "Photographer")
+            [ photo.owner |> Maybe.map (cleanOwnerToName >> row "Photographer")
             , photo.dateTime |> Maybe.map (Util.formatPhotoDate >> row "Date")
             , photo.cameraMake |> Maybe.map (row "Camera")
             , photo.cameraModel |> Maybe.map (row "Model")
             , photo.lensModel |> Maybe.map (row "Lens")
-            , photo.focalLength
-                |> Maybe.map String.fromFloat
+
+            -- If the formatted version is available, use it, if not try the raw
+            -- value.
+            , photo.focalLengthFormatted
+                |> orElse
+                    (photo.focalLength
+                        |> Maybe.map String.fromFloat
+                    )
                 |> Maybe.map (row "Focal length")
-            , photo.fNumber
-                |> Maybe.map String.fromFloat
-                |> Maybe.map (row "f/")
-            , photo.exposureTime |> Maybe.map (Util.formatExposureTime >> row "Shutter speed")
+            , photo.fNumberFormatted
+                |> orElse
+                    (photo.fNumber
+                        |> Maybe.map String.fromFloat
+                    )
+                |> Maybe.map (row "f-stop")
+
+            -- , photo.exposureTimeFormatted |> orElse photo.exposureTime |> Maybe.map (Util.formatExposureTime >> row "Shutter speed")
+            , photo.exposureTimeFormatted |> Maybe.map (row "Exposure time")
+            , photo.shutterSpeedFormatted |> Maybe.map (row "Shutter speed")
+            , photo.meteringModeFormatted |> Maybe.map (row "Metering mode")
+            , photo.apertureFormatted |> Maybe.map (row "Aperture")
             , List.head photo.isoSpeed
                 |> Maybe.map String.fromInt
                 |> Maybe.map (row "ISO")
