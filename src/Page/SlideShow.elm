@@ -7,7 +7,7 @@ import Browser.Events
 import Data.Album exposing (Album)
 import Data.Misc
 import Data.Photo as Photo
-import Data.Url as Url exposing (Url)
+import Data.Url exposing (Url)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class, style)
 import Http
