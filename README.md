@@ -14,11 +14,11 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 - Explore images with people tag
 - Explore images with keywords
 - Fuzzy search keywords
-- Use geodata from images to display map 
+- Use geodata from images to display map
 - Slideshow modus for album
 
-
 ## Installation
+
 Hugin can be hosted by all webservers that can serve static files, but does rely on a [Munin](https://github.com/kradalby/munin) generated gallery served under `/content` from the same domain.
 
 For example
@@ -27,6 +27,7 @@ For example
     https://hugin.example.no/content ⬅ Munin gallery
 
 ### Nginx
+
 Here is an example configuration with Nginx:
 
 ```
@@ -57,13 +58,14 @@ server {
 }
 ```
 
-
 ### Kubernetes
+
 The current setup of the Hugin demo is installed on [Kubernetes](https://kubernetes.io) with the `/content` served from a storage server and proxied. Following is an example of that setup adding the storage server as a Kubernetes service and setting up the Ingress.
 
 A up to date [Hugin docker container can be found here](https://hub.docker.com/r/kradalby/hugin)
 
 Munin service:
+
 ```
 kind: Service
 apiVersion: v1
@@ -80,6 +82,7 @@ spec:
 ```
 
 Ingress:
+
 ```
 ---
 apiVersion: extensions/v1beta1
@@ -111,10 +114,11 @@ spec:
 ```
 
 ### Helm
+
 Check out the `helm/` directory for a Helm chart implementing the aforementioned Kubernetes installation.
 
-
 ## Development
+
 Hugin is made with Elm and Node is required to install the compilers, and webpack.
 
 To set up the development environment:
@@ -133,6 +137,7 @@ In addition to the development server, hugin needs a "api" from a [Munin](https:
 Where `<MUNIN GALLERY>` is a directory containing a `root/` and a `keywords/` folder.
 
 ### Code style
+
 When developing on the project, be sure to follow the standard setup of [elm-format](https://github.com/avh4/elm-format) and [elm-analyse](https://github.com/stil4m/elm-analyse)
 
 All linters can be run with:
@@ -142,6 +147,7 @@ All linters can be run with:
 All linters are ran on the CI whenever a change is comitted.
 
 ### Environment variables
+
 For all features of the Hugin to work, you need tokens for a few services:
 
 - `HUGIN_MAPBOX_ACCESS_TOKEN` - For rendering maps on Album and Photos pages
@@ -151,6 +157,7 @@ For all features of the Hugin to work, you need tokens for a few services:
 This should be exported as environment variables and will be picked up by webpack.
 
 ## Screenshots
+
 <div width="100%">
 <a href="screenshots/root.jpg"><img src="screenshots/root.jpg?raw=true" align="left" width="250px" ></a>
 <a href="screenshots/albums.jpg"><img src="screenshots/albums.jpg?raw=true" align="left" width="250px" ></a>

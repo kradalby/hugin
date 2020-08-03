@@ -12,7 +12,7 @@ import {
   faCaretSquareRight,
   faSpinner,
   faImages,
-  faAngleRight
+  faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -50,7 +50,7 @@ let screenfull = <Screenfull>sf;
 import * as Sentry from "@sentry/browser";
 
 Sentry.init({
-  dsn: SENTRY_DSN
+  dsn: SENTRY_DSN,
 });
 
 import * as Rollbar from "rollbar";
@@ -58,30 +58,30 @@ import * as Rollbar from "rollbar";
 let rollbar = new Rollbar({
   accessToken: ROLLBAR_ACCESS_TOKEN,
   captureUncaught: true,
-  captureUnhandledRejections: true
+  captureUnhandledRejections: true,
 });
 
 let log = {
-  critical: function(val: string): void {
+  critical: function (val: string): void {
     rollbar.critical(val);
     Sentry.captureMessage(`[CRITICAL]: ${val}`);
   },
-  error: function(val: string): void {
+  error: function (val: string): void {
     rollbar.error(val);
     Sentry.captureMessage(`[ERROR]: ${val}`);
   },
-  warning: function(val: string): void {
+  warning: function (val: string): void {
     rollbar.warning(val);
     Sentry.captureMessage(`[WARNING]: ${val}`);
   },
-  info: function(val: string): void {
+  info: function (val: string): void {
     rollbar.info(val);
     Sentry.captureMessage(`[INFO]: ${val}`);
   },
-  debug: function(val: string): void {
+  debug: function (val: string): void {
     rollbar.debug(val);
     Sentry.captureMessage(`[DEBUG]: ${val}`);
-  }
+  },
 };
 
 ///////////////////////////////////////////////////
@@ -90,27 +90,27 @@ let log = {
 // ELM
 import { Elm } from "./Main";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   let app = Elm.Main.init({
     node: document.getElementById("root"),
-    flags: null
+    flags: null,
   });
 
   // Download albums
-  app.ports.downloadImages.subscribe(urls => {
+  app.ports.downloadImages.subscribe((urls) => {
     // downloadImages(urls);
   });
   // Google Analytics
-  app.ports.analytics.subscribe(url => {
+  app.ports.analytics.subscribe((url) => {
     console.log("DEBUG: gtag called with: ", url);
     gtag("config", "UA-18856525-25", { page_path: "/" + url });
   });
 
-  app.ports.initMap.subscribe(data => {
+  app.ports.initMap.subscribe((data) => {
     console.log("DEBUG: Elm Port initMap called");
     initMap(data);
   });
-  app.ports.httpError.subscribe(val => {
+  app.ports.httpError.subscribe((val) => {
     log.error(val);
   });
 
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function resolveElementById(selector: string): Promise<HTMLElement> {
   let element = document.getElementById(selector);
   if (element === null) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       requestAnimationFrame(resolve);
     }).then(() => resolveElementById(selector));
   } else {
@@ -153,7 +153,7 @@ function initMap(data: [string, [number, number][]]) {
   }
 
   // Ugly hack to remove not garbage collected rouge maps
-  document.querySelectorAll("[class^=mapboxgl]").forEach(element => {
+  document.querySelectorAll("[class^=mapboxgl]").forEach((element) => {
     if (element.parentNode !== null) {
       element.parentNode.removeChild(element);
     }
@@ -172,13 +172,13 @@ function initMap(data: [string, [number, number][]]) {
       zoom: 13,
       interactive: false,
       maxZoom: 10,
-      minZoom: 2
+      minZoom: 2,
     });
 
     let bounds = new mapboxgl.LngLatBounds();
 
     // Draw markers
-    coordinates.forEach(coordinate => {
+    coordinates.forEach((coordinate) => {
       new mapboxgl.Marker().setLngLat(coordinate).addTo(map);
 
       bounds.extend(coordinate);
@@ -187,7 +187,7 @@ function initMap(data: [string, [number, number][]]) {
       map.fitBounds(bounds, {
         padding: { top: 65, bottom: 50, left: 50, right: 50 },
         linear: false,
-        maxZoom: 10
+        maxZoom: 10,
       });
     }
   });
