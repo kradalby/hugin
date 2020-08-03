@@ -7,20 +7,22 @@ export namespace Elm {
     export interface App {
       ports: {
         downloadImages: {
-          subscribe(callback: (data: string[]) => void): void
-        }
+          subscribe(callback: (data: string[]) => void): void;
+        };
         initMap: {
-          subscribe(callback: (data: [string, [number, number][]]) => void): void
-        }
+          subscribe(
+            callback: (data: [string, [number, number][]]) => void
+          ): void;
+        };
         analytics: {
-          subscribe(callback: (data: string) => void): void
-        }
+          subscribe(callback: (data: string) => void): void;
+        };
         httpError: {
-          subscribe(callback: (data: string) => void): void
-        }
+          subscribe(callback: (data: string) => void): void;
+        };
         requestFullscreen: {
-          subscribe(callback: (data: null) => void): void
-        }
+          subscribe(callback: (data: null) => void): void;
+        };
       };
     }
     export function init(options: {

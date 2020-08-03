@@ -16,11 +16,11 @@ module.exports = {
   entry: "./src/index.ts",
   output: {
     path: path.join(__dirname, "dist"),
-    filename: production ? "[name]-[hash].js" : "index.js"
+    filename: production ? "[name]-[hash].js" : "index.js",
   },
   resolve: {
     modules: [path.join(__dirname, "src"), "node_modules"],
-    extensions: [".js", ".elm", ".scss", ".ts"]
+    extensions: [".js", ".elm", ".scss", ".ts"],
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -30,17 +30,17 @@ module.exports = {
       SENTRY_DSN: JSON.stringify(process.env.HUGIN_SENTRY_DSN),
       ROLLBAR_ACCESS_TOKEN: JSON.stringify(
         process.env.HUGIN_ROLLBAR_ACCESS_TOKEN
-      )
+      ),
     }),
     new SizePlugin(),
     new HTMLWebpackPlugin({
       template: "src/index.html",
-      inject: "body"
+      inject: "body",
     }),
     new MiniCssExtractPlugin({
       filename: "[name]-[hash].css",
-      chunkFileName: "[id].[hash].css"
-    })
+      chunkFileName: "[id].[hash].css",
+    }),
   ],
   module: {
     rules: [
@@ -49,24 +49,24 @@ module.exports = {
         exclude: [/elm-stuff/, /node_modules/],
         use: [
           {
-            loader: "elm-hot-webpack-loader"
+            loader: "elm-hot-webpack-loader",
           },
           {
             loader: "elm-webpack-loader",
             options: {
               debug: !production,
               verbose: !production,
-              optimize: production
-            }
-          }
-        ]
+              optimize: production,
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader"
-        }
+          loader: "babel-loader",
+        },
       },
       { test: /\.ts$/, loader: "ts-loader" },
       {
@@ -74,15 +74,15 @@ module.exports = {
         loaders: [
           production ? MiniCssExtractPlugin.loader : "style-loader",
           "css-loader",
-          "sass-loader"
-        ]
+          "sass-loader",
+        ],
       },
       {
         test: /\.css$/,
         loaders: [
           production ? MiniCssExtractPlugin.loader : "style-loader",
-          "css-loader"
-        ]
+          "css-loader",
+        ],
       },
 
       {
@@ -91,33 +91,33 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              name: "[name].[ext]"
-            }
-          }
-        ]
-      }
-    ]
+              name: "[name].[ext]",
+            },
+          },
+        ],
+      },
+    ],
   },
   optimization: {
     splitChunks: {
-      chunks: "all"
+      chunks: "all",
     },
     minimizer: [
       new MinifyPlugin({ builtIns: false }, {}), // Option so MapBox minify will work
-      new OptimizeCssAssetsPlugin({})
-    ]
+      new OptimizeCssAssetsPlugin({}),
+    ],
   },
   devServer: {
     proxy: {
       "/content": {
         target: "http://localhost:3000",
-        pathRewrite: { "^/content": "" }
-      }
+        pathRewrite: { "^/content": "" },
+      },
     },
     inline: true,
     stats: { colors: true },
-    disableHostCheck: true
-  }
+    disableHostCheck: true,
+  },
 };
 
 //       // Suggested for hot-loading
