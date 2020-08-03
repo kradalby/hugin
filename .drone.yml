@@ -179,39 +179,6 @@
          }
       },
       {
-         "commands": [
-            "kubectl -n $APP set image deployment/$APP $APP=$REPO:${DRONE_COMMIT_SHA:0:8} --record",
-            "kubectl -n $APP rollout status deployment $APP"
-         ],
-         "environment": {
-            "APP": "hugindemo",
-            "KUBERNETES_CERT": {
-               "from_secret": "demo_kubernetes_cert"
-            },
-            "KUBERNETES_SERVER": {
-               "from_secret": "demo_kubernetes_server"
-            },
-            "KUBERNETES_TOKEN": {
-               "from_secret": "kubernetes_token"
-            },
-            "KUBERNETES_token": {
-               "from_secret": "demo_kubernetes_token"
-            },
-            "REPO": "kradalby/hugin"
-         },
-         "image": "kradalby/drone-kubectl",
-         "name": "Deploy hugindemo to Kubernetes",
-         "pull": "always",
-         "when": {
-            "branch": [
-               "master"
-            ],
-            "event": [
-               "push"
-            ]
-         }
-      },
-      {
          "image": "appleboy/drone-discord",
          "name": "Notify Discord",
          "pull": "always",
