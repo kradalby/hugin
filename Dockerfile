@@ -1,4 +1,4 @@
-FROM node:10 as builder
+FROM node:lts-buster as builder
 WORKDIR /app
 
 ARG HUGIN_MAPBOX_ACCESS_TOKEN

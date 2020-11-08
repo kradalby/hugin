@@ -11,6 +11,10 @@
    "node_selector": {
       "drone": true
    },
+   "platform": {
+      "arch": "amd64",
+      "os": "linux"
+   },
    "steps": [
       {
          "commands": [
