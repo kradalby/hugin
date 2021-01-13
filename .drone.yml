@@ -1,270 +1,177 @@
 ---
 {
-   "dns_config": {
-      "nameservers": [
-         "1.1.1.1",
-         "1.0.0.1"
-      ]
-   },
-   "kind": "pipeline",
-   "name": "Kubernetes",
-   "node_selector": {
-      "drone": true
-   },
-   "platform": {
-      "arch": "amd64",
-      "os": "linux"
-   },
-   "steps": [
+  "dns_config": { "nameservers": ["1.1.1.1", "1.0.0.1"] },
+  "kind": "pipeline",
+  "name": "Kubernetes",
+  "node_selector": { "drone": true },
+  "platform": { "arch": "amd64", "os": "linux" },
+  "steps":
+    [
       {
-         "commands": [
+        "commands":
+          [
             "npm install prettier",
-            "npx prettier --check \"**/*.{ts,js,md,yaml,yml,sass,css,scss}\""
-         ],
-         "image": "node:lts-buster",
-         "name": "Prettier lint",
-         "pull": "always"
+            'npx prettier --check "**/*.{ts,js,md,yaml,yml,sass,css,scss}"',
+          ],
+        "image": "node:lts-buster",
+        "name": "Prettier lint",
+        "pull": "always",
       },
       {
-         "commands": [
+        "commands":
+          [
             "npm install elm-analyse elm-format",
             "npx elm-analyse",
-            "npx elm-format --validate src/"
-         ],
-         "image": "node:lts-buster",
-         "name": "Elm lint",
-         "pull": "always"
+            "npx elm-format --validate src/",
+          ],
+        "image": "node:lts-buster",
+        "name": "Elm lint",
+        "pull": "always",
       },
       {
-         "image": "banzaicloud/drone-kaniko:0.5.1",
-         "name": "Build container image",
-         "pull": "always",
-         "trigger": {
-            "event": [
-               "pull_request"
-            ]
-         },
-         "when": {
-            "branch": {
-               "exclude": [
-                  "master"
-               ]
-            }
-         }
+        "image": "banzaicloud/drone-kaniko:0.5.1",
+        "name": "Build container image",
+        "pull": "always",
+        "trigger": { "event": ["pull_request"] },
+        "when": { "branch": { "exclude": ["master"] } },
       },
       {
-         "environment": {
-            "HUGIN_MAPBOX_ACCESS_TOKEN": {
-               "from_secret": "hugin_mapbox_access_token"
-            },
-            "HUGIN_ROLLBAR_ACCESS_TOKEN": {
-               "from_secret": "hugin_rollbar_access_token"
-            },
-            "HUGIN_SENTRY_DSN": {
-               "from_secret": "hugin_sentry_dsn"
-            }
-         },
-         "image": "banzaicloud/drone-kaniko:0.5.1",
-         "name": "Publish image kradalby/hugin",
-         "pull": "always",
-         "settings": {
-            "build_args_from_env": [
-               "HUGIN_MAPBOX_ACCESS_TOKEN",
-               "HUGIN_ROLLBAR_ACCESS_TOKEN",
-               "HUGIN_SENTRY_DSN"
-            ],
-            "password": {
-               "from_secret": "docker_password"
-            },
+        "environment":
+          {
+            "HUGIN_MAPBOX_ACCESS_TOKEN":
+              { "from_secret": "hugin_mapbox_access_token" },
+            "HUGIN_ROLLBAR_ACCESS_TOKEN":
+              { "from_secret": "hugin_rollbar_access_token" },
+            "HUGIN_SENTRY_DSN": { "from_secret": "hugin_sentry_dsn" },
+          },
+        "image": "banzaicloud/drone-kaniko:0.5.1",
+        "name": "Publish image kradalby/hugin",
+        "pull": "always",
+        "settings":
+          {
+            "build_args_from_env":
+              [
+                "HUGIN_MAPBOX_ACCESS_TOKEN",
+                "HUGIN_ROLLBAR_ACCESS_TOKEN",
+                "HUGIN_SENTRY_DSN",
+              ],
+            "password": { "from_secret": "docker_password" },
             "repo": "kradalby/hugin",
-            "tags": [
-               "latest",
-               "latest-${DRONE_STAGE_OS}-${DRONE_STAGE_ARCH}",
-               "${DRONE_COMMIT_SHA:0:8}"
-            ],
-            "username": {
-               "from_secret": "docker_username"
-            }
-         },
-         "when": {
-            "branch": [
-               "master"
-            ],
-            "event": [
-               "push"
-            ]
-         }
+            "tags":
+              [
+                "latest",
+                "latest-${DRONE_STAGE_OS}-${DRONE_STAGE_ARCH}",
+                "${DRONE_COMMIT_SHA:0:8}",
+              ],
+            "username": { "from_secret": "docker_username" },
+          },
+        "when": { "branch": ["master"], "event": ["push"] },
       },
       {
-         "commands": [
-            "container-file-extractor \"kradalby/hugin\" \"${DRONE_COMMIT_SHA:0:8}\" \"usr/share/nginx/html\"",
+        "commands":
+          [
+            'container-file-extractor "kradalby/hugin" "${DRONE_COMMIT_SHA:0:8}" "usr/share/nginx/html"',
             "mkdir -p dist/",
-            "mv output/usr/share/nginx/html/* dist/."
-         ],
-         "image": "kradalby/container-file-extractor:latest",
-         "name": "Extract from container",
-         "pull": "always",
-         "when": {
-            "branch": [
-               "master"
-            ],
-            "event": [
-               "push"
-            ]
-         }
+            "mv output/usr/share/nginx/html/* dist/.",
+          ],
+        "image": "kradalby/container-file-extractor:latest",
+        "name": "Extract from container",
+        "pull": "always",
+        "when": { "branch": ["master"], "event": ["push"] },
       },
       {
-         "environment": {
-            "SSH_KEY": {
-               "from_secret": "ssh_key"
-            }
-         },
-         "image": "appleboy/drone-scp",
-         "name": "Deploy to builds",
-         "pull": "always",
-         "settings": {
+        "environment": { "SSH_KEY": { "from_secret": "ssh_key" } },
+        "image": "appleboy/drone-scp",
+        "name": "Deploy to builds",
+        "pull": "always",
+        "settings":
+          {
             "host": "storage.terra.fap.no",
             "rm": true,
-            "source": [
-               "dist/*"
-            ],
+            "source": ["dist/*"],
             "strip_components": 1,
             "target": "/storage/serve/builds/hugin",
-            "username": "deploy"
-         },
-         "when": {
-            "branch": [
-               "master"
-            ],
-            "event": [
-               "push"
-            ]
-         }
+            "username": "deploy",
+          },
+        "when": { "branch": ["master"], "event": ["push"] },
       },
       {
-         "environment": {
-            "SSH_KEY": {
-               "from_secret": "ssh_key"
-            }
-         },
-         "image": "appleboy/drone-scp",
-         "name": "Deploy to hugin",
-         "pull": "always",
-         "settings": {
+        "environment": { "SSH_KEY": { "from_secret": "ssh_key" } },
+        "image": "appleboy/drone-scp",
+        "name": "Deploy to hugin",
+        "pull": "always",
+        "settings":
+          {
             "host": "hugin.terra.fap.no",
             "rm": true,
-            "source": [
-               "dist/*"
-            ],
+            "source": ["dist/*"],
             "strip_components": 1,
             "target": "/hugin/web",
-            "username": "deploy"
-         },
-         "when": {
-            "branch": [
-               "master"
-            ],
-            "event": [
-               "push"
-            ]
-         }
+            "username": "deploy",
+          },
+        "when": { "branch": ["master"], "event": ["push"] },
       },
       {
-         "commands": [
+        "commands":
+          [
             "kubectl -n $APP set image deployment/$APP $APP=$REPO:${DRONE_COMMIT_SHA:0:8} --record",
-            "kubectl -n $APP rollout status deployment $APP"
-         ],
-         "environment": {
+            "kubectl -n $APP rollout status deployment $APP",
+          ],
+        "environment":
+          {
             "APP": "hugin",
-            "KUBERNETES_CERT": {
-               "from_secret": "kubernetes_cert"
-            },
-            "KUBERNETES_SERVER": {
-               "from_secret": "kubernetes_server"
-            },
-            "KUBERNETES_TOKEN": {
-               "from_secret": "kubernetes_token"
-            },
-            "REPO": "kradalby/hugin"
-         },
-         "image": "kradalby/drone-kubectl",
-         "name": "Deploy hugin to Kubernetes",
-         "pull": "always",
-         "when": {
-            "branch": [
-               "master"
-            ],
-            "event": [
-               "push"
-            ]
-         }
+            "KUBERNETES_CERT": { "from_secret": "kubernetes_cert" },
+            "KUBERNETES_SERVER": { "from_secret": "kubernetes_server" },
+            "KUBERNETES_TOKEN": { "from_secret": "kubernetes_token" },
+            "REPO": "kradalby/hugin",
+          },
+        "image": "kradalby/drone-kubectl",
+        "name": "Deploy hugin to Kubernetes",
+        "pull": "always",
+        "when": { "branch": ["master"], "event": ["push"] },
       },
       {
-         "image": "appleboy/drone-discord",
-         "name": "Notify Discord",
-         "pull": "always",
-         "settings": {
+        "image": "appleboy/drone-discord",
+        "name": "Notify Discord",
+        "pull": "always",
+        "settings":
+          {
             "message": "{{#success build.status}}\n✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝  Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐  {{ build.link }}\n\n✅  duration: {{duration build.started build.finished}}\n✅  started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}}\n✅  finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}}\n\n{{else}}\n@everyone\n❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝  Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n🌐  {{ build.link }}\n\n✅  duration: {{duration build.started build.finished}}\n✅  started: {{datetime build.started \"2006/01/02 15:04\" \"UTC\"}}\n✅  finished: {{datetime build.finished \"2006/01/02 15:04\" \"UTC\"}}\n\n{{/success}}\n",
-            "webhook_id": {
-               "from_secret": "discord_webhook_id"
-            },
-            "webhook_token": {
-               "from_secret": "discord_webhook_token"
-            }
-         },
-         "when": {
-            "status": [
-               "success",
-               "failure"
-            ]
-         }
-      }
-   ],
-   "type": "kubernetes"
+            "webhook_id": { "from_secret": "discord_webhook_id" },
+            "webhook_token": { "from_secret": "discord_webhook_token" },
+          },
+        "when": { "status": ["success", "failure"] },
+      },
+    ],
+  "type": "kubernetes",
 }
 ---
 {
-   "get": {
-      "name": "id",
-      "path": "discord-build"
-   },
-   "kind": "secret",
-   "name": "discord_webhook_id"
+  "get": { "name": "id", "path": "discord-build" },
+  "kind": "secret",
+  "name": "discord_webhook_id",
 }
 ---
 {
-   "get": {
-      "name": "token",
-      "path": "discord-build"
-   },
-   "kind": "secret",
-   "name": "discord_webhook_token"
+  "get": { "name": "token", "path": "discord-build" },
+  "kind": "secret",
+  "name": "discord_webhook_token",
 }
 ---
 {
-   "get": {
-      "name": "username",
-      "path": "docker"
-   },
-   "kind": "secret",
-   "name": "docker_username"
+  "get": { "name": "username", "path": "docker" },
+  "kind": "secret",
+  "name": "docker_username",
 }
 ---
 {
-   "get": {
-      "name": "password",
-      "path": "docker"
-   },
-   "kind": "secret",
-   "name": "docker_password"
+  "get": { "name": "password", "path": "docker" },
+  "kind": "secret",
+  "name": "docker_password",
 }
 ---
 {
-   "get": {
-      "name": "deploy",
-      "path": "ssh"
-   },
-   "kind": "secret",
-   "name": "ssh_key"
+  "get": { "name": "deploy", "path": "ssh" },
+  "kind": "secret",
+  "name": "ssh_key",
 }
-...
