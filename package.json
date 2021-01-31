@@ -52,7 +52,7 @@
     "rollbar": "^2.14.4",
     "sass-loader": "^10.0.0",
     "screenfull": "^5.0.2",
-    "size-plugin": "^2.0.1",
+    "size-plugin": "^3.0.0",
     "streamsaver": "^2.0.3",
     "style-loader": "^2.0.0",
     "ts-loader": "^8.0.0",
