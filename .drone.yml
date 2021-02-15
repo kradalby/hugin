@@ -89,7 +89,7 @@
             "rm": true,
             "source": ["dist/*"],
             "strip_components": 1,
-            "target": "/fastest/serve/hugin/.",
+            "target": "/fastest/serve/hugin/test",
             "username": "deploy",
           },
         "when": { "branch": ["master"], "event": ["push"] },
