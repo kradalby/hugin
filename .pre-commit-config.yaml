@@ -21,15 +21,6 @@ repos:
       - id: double-quote-string-fixer
       - id: requirements-txt-fixer
 
-  - repo: git://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.45.0
-    hooks:
-      - id: terraform_fmt
-      - id: terraform_validate
-      - id: terraform_tflint
-      # - id: terraform_tfsec
-      - id: terraform_docs
-
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
