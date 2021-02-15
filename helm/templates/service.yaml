@@ -5,9 +5,9 @@ metadata:
   labels:
 {{ include "hugin.labels" . | indent 4 }}
 spec:
-  type: ClusterIP 
+  type: ClusterIP
   ports:
-    - port: 80 
+    - port: 80
       targetPort: http
       protocol: TCP
       name: http
