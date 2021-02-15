@@ -25,7 +25,7 @@ spec:
       {{- if .Values.configmap }}
       - name: configmapping
         configMap:
-          name: {{ include "hugin.fullname" . }} 
+          name: {{ include "hugin.fullname" . }}
       {{- end }}
       {{- end }}
       containers:
