@@ -39,9 +39,3 @@ repos:
     rev: v1.22.1
     hooks:
       - id: hadolint
-
-
-
-
-
-
