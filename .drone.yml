@@ -90,7 +90,12 @@
             "source": ["dist/"],
             "target": "/fastest/serve/hugin/",
             "exclude": ["content", "munin.json"],
-            "args": "--delete",
+            "args": "--delete --omit-dir-times",
+            "script":
+              [
+                "chown -R caddy:caddy /fastest/serve/hugin",
+                "chmod -R 775 /fastest/serve/hugin",
+              ],
           },
         "when": { "branch": ["master"], "event": ["push"] },
       },
