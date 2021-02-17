@@ -84,13 +84,14 @@
         "pull": "always",
         "settings":
           {
+            "args": "--delete --omit-dir-times --no-perms",
+            "exclude": ["content", "munin.json", "50x.html"],
             "hosts": ["core.terra.fap.no"],
-            "user": "deploy",
+            "include": [],
             "key": { "from_secret": "ssh_key" },
             "source": ["dist/"],
             "target": "/fastest/serve/hugin/",
-            "exclude": ["content", "munin.json", "50x.html"],
-            "args": "--delete --omit-dir-times --no-perms",
+            "user": "deploy",
           },
         "when": { "branch": ["master"], "event": ["push"] },
       },
