@@ -89,8 +89,8 @@
             "key": { "from_secret": "ssh_key" },
             "source": ["dist/"],
             "target": "/fastest/serve/hugin/",
-            "exclude": ["content", "munin.json"],
-            "args": "--delete --omit-dir-times",
+            "exclude": ["content", "munin.json", "50x.html"],
+            "args": "--delete --omit-dir-times --no-perms",
             "script":
               [
                 "chown -R caddy:caddy /fastest/serve/hugin",
