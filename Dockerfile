@@ -13,6 +13,6 @@ COPY elm.json .
 COPY . .
 RUN make build
 
-
 FROM kradalby/nginx-ldap-auth:latest as production
+RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /app/dist /usr/share/nginx/html
