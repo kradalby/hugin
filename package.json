@@ -39,7 +39,7 @@
     "elm-format": "^0.8.5",
     "elm-hot-webpack-loader": "^1.1.8",
     "elm-typescript-interop": "^0.0.17",
-    "elm-webpack-loader": "7.0.1",
+    "elm-webpack-loader": "8.0.0",
     "file-loader": "^6.2.0",
     "flexbin": "^0.2.0",
     "html-webpack-plugin": "<5.0.0",
