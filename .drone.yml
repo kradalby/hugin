@@ -10,6 +10,7 @@
         "commands":
           [
             "npm install prettier",
+            "echo .pre-commit-config.yaml >> .prettierignore",
             'npx prettier --check "**/*.{ts,js,md,yaml,yml,sass,css,scss}"',
           ],
         "image": "node:lts-buster",
@@ -85,7 +86,14 @@
         "settings":
           {
             "args": "--delete --omit-dir-times --no-perms",
-            "exclude": ["content", "munin.json", "50x.html"],
+            "exclude":
+              [
+                "content",
+                "munin.json",
+                "50x.html",
+                "people.json",
+                "legacy_people.json",
+              ],
             "hosts": ["core.terra.fap.no"],
             "include": [],
             "key": { "from_secret": "ssh_key" },

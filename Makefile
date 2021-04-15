@@ -10,7 +10,7 @@ build-debug:
 	npx webpack
 
 dev:
-	npx webpack-dev-server --hot --colors --port 8000
+	npx webpack serve --hot --port 8000
 
 upgrade:
 	yarn upgrade --latest
