@@ -8,7 +8,7 @@ all of them. One source of truth!
 -}
 
 import Data.Misc exposing (KeywordPointer, Parent, PhotoInAlbum)
-import Data.Photo as Photo exposing (Photo)
+import Data.Photo as Photo
 import Data.Url as Url
 import Html exposing (Html, a, div, h5, img, span, text)
 import Html.Attributes exposing (attribute, class, id, src)
@@ -31,9 +31,8 @@ viewKeywords name keywords =
     in
     div [ class "col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" ]
         [ div [ class "mt-3 mb-3" ] <|
-            [ h5 [] [ text name ]
-            ]
-                ++ links
+            h5 [] [ text name ]
+                :: links
         ]
 
 
@@ -52,7 +51,7 @@ viewPath parents current =
                         (\parent ->
                             a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
                         )
-                        parents
+                        (List.sortBy (\parent -> Url.urlToString parent.url |> String.length) parents |> List.reverse)
                         ++ [ span [ class "text-secondary" ] [ text current ] ]
                     )
 
