@@ -51,7 +51,7 @@ viewPath parents current =
                         (\parent ->
                             a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
                         )
-                        (List.sortBy (\parent -> Url.urlToString parent.url |> String.length) parents |> List.reverse)
+                        (List.sortBy (\parent -> Url.urlToString parent.url |> String.length) parents)
                         ++ [ span [ class "text-secondary" ] [ text current ] ]
                     )
 
