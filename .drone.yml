@@ -29,9 +29,11 @@
         "pull": "always",
       },
       {
-        "image": "banzaicloud/drone-kaniko:0.5.1",
+        "environment": { "DOCKER_BUILDKIT": 1 },
+        "image": "plugins/docker",
         "name": "Build container image",
         "pull": "always",
+        "settings": { "dry_run": true, "purge": true, "repo": "build-only" },
         "trigger": { "event": ["pull_request"] },
         "when": { "branch": { "exclude": ["master"] } },
       },
@@ -44,7 +46,7 @@
               { "from_secret": "hugin_rollbar_access_token" },
             "HUGIN_SENTRY_DSN": { "from_secret": "hugin_sentry_dsn" },
           },
-        "image": "banzaicloud/drone-kaniko:0.5.1",
+        "image": "plugins/docker",
         "name": "Publish image kradalby/hugin",
         "pull": "always",
         "settings":
@@ -56,6 +58,7 @@
                 "HUGIN_SENTRY_DSN",
               ],
             "password": { "from_secret": "docker_password" },
+            "purge": true,
             "repo": "kradalby/hugin",
             "tags":
               [
