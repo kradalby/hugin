@@ -57,7 +57,7 @@ viewFooter =
                     ]
                 , div [ class "col-sm-4 text-muted text-right" ]
                     [ text
-                        "Copyright 2019"
+                        "Copyright 2021"
                     ]
                 ]
             ]

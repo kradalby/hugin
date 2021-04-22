@@ -1,5 +1,8 @@
-// require('./styles/reset.css');
-// require('materialize-css/sass/materialize.scss')
+import placeholder from "url:./images/placeholder.png";
+import loading from "url:./images/loading.svg";
+import notFound from "url:./images/404.jpg";
+
+console.log(placeholder, loading, notFound);
 
 // FONT AWESOME
 import { library, dom } from "@fortawesome/fontawesome-svg-core";
@@ -29,34 +32,24 @@ library.add(
 
 dom.watch();
 
-// SCSS
-require("./styles.scss");
-
-require("./images/placeholder.png");
-require("./images/loading.svg");
-require("./images/404.jpg");
-
-// BOOTSTRAP
-// require("bootstrap/js/dist/modal");
-
 // see https://github.com/sindresorhus/screenfull.js/issues/126
 import * as sf from "screenfull";
 import { Screenfull } from "screenfull";
 let screenfull = <Screenfull>sf;
 
 ///////////////////////////////////////////////////
-// Error reporting
+// Error reporting and Analytics
 
 import * as Sentry from "@sentry/browser";
 
 Sentry.init({
-  dsn: SENTRY_DSN,
+  dsn: process.env.HUGIN_SENTRY_DSN,
 });
 
 import * as Rollbar from "rollbar";
 
 let rollbar = new Rollbar({
-  accessToken: ROLLBAR_ACCESS_TOKEN,
+  accessToken: process.env.HUGIN_ROLLBAR_ACCESS_TOKEN,
   captureUncaught: true,
   captureUnhandledRejections: true,
 });
@@ -84,11 +77,23 @@ let log = {
   },
 };
 
+import Analytics from "analytics";
+import googleAnalytics from "@analytics/google-analytics";
+
+const analytics = Analytics({
+  app: "hugin",
+  plugins: [
+    googleAnalytics({
+      trackingId: "UA-18856525-25",
+    }),
+  ],
+});
+
 ///////////////////////////////////////////////////
 //
 
 // ELM
-import { Elm } from "./Main";
+import { Elm } from "./Main.elm";
 
 document.addEventListener("DOMContentLoaded", function () {
   let app = Elm.Main.init({
@@ -103,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Google Analytics
   app.ports.analytics.subscribe((url) => {
     console.log("DEBUG: gtag called with: ", url);
-    gtag("config", "UA-18856525-25", { page_path: "/" + url });
+    analytics.page({ path: "/" + url });
   });
 
   app.ports.initMap.subscribe((data) => {
@@ -134,7 +139,7 @@ function resolveElementById(selector: string): Promise<HTMLElement> {
 // MAPBOX
 require("mapbox-gl/dist/mapbox-gl.css");
 let mapboxgl = require("mapbox-gl");
-mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
+mapboxgl.accessToken = process.env.HUGIN_MAPBOX_ACCESS_TOKEN;
 
 let map: mapboxgl.Map | null = null;
 
