@@ -17,17 +17,17 @@ type Image
 
 placeholder : Image
 placeholder =
-    Image "/placeholder.png"
+    Image "/placeholder.fe8e4556.png"
 
 
 notFound : Image
 notFound =
-    Image "/404.jpg"
+    Image "/404.f70fed75.jpg"
 
 
 loading : Image
 loading =
-    Image "/loading.svg"
+    Image "/loading.fb790484.svg"
 
 
 

@@ -1,6 +1,7 @@
 ./index.html
 dist/
 size-plugin.json
+.parcel-cache
 
 # Created by https://www.gitignore.io/api/elm,node,bower,vim,osx
 

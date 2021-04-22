@@ -1,19 +1,14 @@
-
-
 install:
 	yarn
 
 build: clean
-	env NODE_ENV=production npx webpack
-
-build-debug:
-	npx webpack
+	npx parcel build src/index.html
 
 dev:
-	npx webpack serve --hot --port 8000
+	npx parcel serve src/index.html
 
 upgrade:
-	yarn upgrade --latest
+	yarn upgrade-interactive --latest
 
 clean:
 	rm -rf dist

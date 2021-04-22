@@ -1,0 +1,6 @@
+{
+  "/content": {
+    target: "http://localhost:8000",
+    pathRewrite: { "^/content": "" },
+  },
+}
