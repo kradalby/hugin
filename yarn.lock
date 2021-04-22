@@ -956,7 +956,7 @@
     "@babel/plugin-transform-react-jsx-development" "^7.12.17"
     "@babel/plugin-transform-react-pure-annotations" "^7.12.1"
 
-"@babel/preset-typescript@^7.13.0":
+"@babel/preset-typescript@7.13.0":
   version "7.13.0"
   resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.13.0.tgz#ab107e5f050609d806fbb039bec553b33462c60a"
   integrity sha512-LXJwxrHy0N3f6gIJlYbLta1D9BDtHpQeqwzM0LIfjDlr6UE/D5Mc7W4iDiQzaE+ks0sTjT26ArcHWnJVt0QiHw==
@@ -1513,6 +1513,18 @@
     strip-ansi "^6.0.0"
     term-size "^2.2.1"
 
+"@parcel/reporter-dev-server@2.0.0-alpha.3":
+  version "2.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@parcel/reporter-dev-server/-/reporter-dev-server-2.0.0-alpha.3.tgz#c0151daee0c20ce1fdacde9392672fc69ff73f99"
+  integrity sha512-vk7bLavE6+ryCtENOYnO1vmIcF8vpkHkEuD5Ts0ID6/7dlkid3HIiR1BE+YFuMTLejG9bmwX+f6A3nzvygUMJg==
+  dependencies:
+    "@parcel/plugin" "^2.0.0-alpha.3"
+    "@parcel/utils" "^2.0.0-alpha.3"
+    connect "^3.7.0"
+    ejs "^2.6.1"
+    http-proxy-middleware "^0.19.1"
+    mime "^2.4.4"
+
 "@parcel/reporter-dev-server@2.0.0-beta.2":
   version "2.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/@parcel/reporter-dev-server/-/reporter-dev-server-2.0.0-beta.2.tgz#4069b1c1472c8f8a23ab50d0cdd7d331d81336d4"
@@ -1526,18 +1538,6 @@
     nullthrows "^1.1.1"
     serve-handler "^6.0.0"
     ws "^7.0.0"
-
-"@parcel/reporter-dev-server@^2.0.0-alpha.3":
-  version "2.0.0-alpha.3"
-  resolved "https://registry.yarnpkg.com/@parcel/reporter-dev-server/-/reporter-dev-server-2.0.0-alpha.3.tgz#c0151daee0c20ce1fdacde9392672fc69ff73f99"
-  integrity sha512-vk7bLavE6+ryCtENOYnO1vmIcF8vpkHkEuD5Ts0ID6/7dlkid3HIiR1BE+YFuMTLejG9bmwX+f6A3nzvygUMJg==
-  dependencies:
-    "@parcel/plugin" "^2.0.0-alpha.3"
-    "@parcel/utils" "^2.0.0-alpha.3"
-    connect "^3.7.0"
-    ejs "^2.6.1"
-    http-proxy-middleware "^0.19.1"
-    mime "^2.4.4"
 
 "@parcel/resolver-default@2.0.0-beta.2":
   version "2.0.0-beta.2"
@@ -1875,7 +1875,7 @@
     "@sentry/types" "6.3.0"
     tslib "^1.9.3"
 
-"@sentry/types@6.3.0", "@sentry/types@^6.3.0":
+"@sentry/types@6.3.0":
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/@sentry/types/-/types-6.3.0.tgz#919cc1870f34b7126546c77e3c695052795d3add"
   integrity sha512-xWyCYDmFPjS5ex60kxOOHbHEs4vs00qHbm0iShQfjl4OSg9S2azkcWofDmX8Xbn0FSOUXgdPCjNJW1B0bPVhCA==
@@ -1893,7 +1893,7 @@
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.7.tgz#c8fa532b60a0042219cdf173ca21a975ef0666ad"
   integrity sha512-wE2v81i4C4Ol09RtsWFAqg3BUitWbHSpSlIo+bNdsCJijO9sjme+zm+73ZMCa/qMC8UEERxzGbvmr1cffo2SiQ==
 
-"@types/google.analytics@^0.0.41":
+"@types/google.analytics@0.0.41":
   version "0.0.41"
   resolved "https://registry.yarnpkg.com/@types/google.analytics/-/google.analytics-0.0.41.tgz#7905553890bb8651c93927c1ce4c1c4a26e41505"
   integrity sha512-LE6AfJFJtxUl1d56oQ1PvQDEOtU+0fgqTVgmOw+T0eaz7FB4DTqKxbI6x8sq+7FDvAeIXOugZyGHJLR4CAxO4A==
@@ -1905,7 +1905,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/jszip@^3.4.1":
+"@types/jszip@3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@types/jszip/-/jszip-3.4.1.tgz#e7a4059486e494c949ef750933d009684227846f"
   integrity sha512-TezXjmf3lj+zQ651r6hPqvSScqBLvyPI9FxdXBqpEwBijNGQ2NXpaFW/7joGzveYkKQUil7iiDHLo6LV71Pc0A==
@@ -1919,7 +1919,7 @@
   dependencies:
     "@types/geojson" "*"
 
-"@types/node@*", "@types/node@^14.14.41":
+"@types/node@*", "@types/node@14.14.41":
   version "14.14.41"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.41.tgz#d0b939d94c1d7bd53d04824af45f1139b8c45615"
   integrity sha512-dueRKfaJL4RTtSa7bWeTK1M+VH+Gns73oCgzvYfHZywRCoPSd8EkXBL0mZ9unPTveBn+D9phZBaxuzpwjWkW0g==
@@ -3671,7 +3671,7 @@ elliptic@^6.5.3:
     minimalistic-assert "^1.0.1"
     minimalistic-crypto-utils "^1.0.1"
 
-elm-analyse@^0.16.5:
+elm-analyse@0.16.5:
   version "0.16.5"
   resolved "https://registry.yarnpkg.com/elm-analyse/-/elm-analyse-0.16.5.tgz#eb3278317bf90a3092994b53b80b64365157cfa3"
   integrity sha512-I7dgGFOc+mYDcDuyo1/HcIn3E5MiMbocStNzivsPSjCUviuEieHdDKZmJJ9uM3IdCu0fdBmRNWQBSOXtXrgzKg==
@@ -3690,7 +3690,7 @@ elm-analyse@^0.16.5:
     sums "0.2.4"
     ws "3.3.1"
 
-elm-format@^0.8.5:
+elm-format@0.8.5:
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/elm-format/-/elm-format-0.8.5.tgz#bd87c344d371ccd7eb694c6f7bccf29487596454"
   integrity sha512-/Mjwz5RhJ8cdcMsHT98AEKprSIHyRde+URIPvnHez9WH7Xp+rFCOJx0FNMPIYrbHE9Ei7HDSVwhjDP0i+mlvpQ==
@@ -3702,7 +3702,7 @@ elm-hot@^1.1.5:
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.6.tgz#93e3962b40670e65f0a3640951b3add2702bfd0e"
   integrity sha512-zYZJlfs7Gt4BdjA+D+857K+XAWzwwySJmXCgFpHW1dIEfaHSZCIPYPf7/jinZBLfKRkOAlKzI32AA84DY50g7Q==
 
-elm-typescript-interop@^0.0.17:
+elm-typescript-interop@0.0.17:
   version "0.0.17"
   resolved "https://registry.yarnpkg.com/elm-typescript-interop/-/elm-typescript-interop-0.0.17.tgz#e5bb1f85ddd531080607c977544986a676324499"
   integrity sha512-6k/WuRZBY6NaefXt5WwGz70U6wXkK06R6TK8PN6Mm0s9HrYW3159NjgYFEp8Ice/fQNm0698v8nbuuZww3uvmA==
@@ -6253,7 +6253,7 @@ pako@~1.0.2, pako@~1.0.5:
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
 
-parcel@^2.0.0-beta.2:
+parcel@2.0.0-beta.2:
   version "2.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/parcel/-/parcel-2.0.0-beta.2.tgz#0a58f0b810fe2199b35d7bf7a949906568222d75"
   integrity sha512-fOoxOYdoZpmBP4jd+qNKuW5DeqLTIILIKtaBqXm+DCRjaQGbZw0zQ+mhW9PStcT0pbjJedcXuUyc1GGHdvobYw==
@@ -8513,7 +8513,7 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.2.4:
+typescript@4.2.4:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
   integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
