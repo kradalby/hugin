@@ -4,6 +4,13 @@
   "description": "",
   "main": "dist/index.html",
   "scripts": {},
+  "engines": {
+    "browsers": "> 0.25%"
+  },
+  "browserslist": [
+    "> 0.2%",
+    "not dead"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kradalby/hugin.git"
@@ -26,11 +33,11 @@
     "analytics": "^0.7.5",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
-    "jszip": "^3.6.0",
-    "jszip-utils": "0.1.0",
     "mapbox-gl": "2.2.0",
     "screenfull": "^5.1.0",
     "streamsaver": "^2.0.5",
+    "jszip": "^3.6.0",
+    "jszip-utils": "0.1.0",
     "web-streams-polyfill": "^3.0.3"
   },
   "devDependencies": {
