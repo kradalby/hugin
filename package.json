@@ -40,7 +40,7 @@
     "@parcel/transformer-elm": "2.0.0-beta.2",
     "@parcel/transformer-image": "2.0.0-beta.2",
     "@parcel/transformer-sass": "2.0.0-beta.2",
-    "@sentry/types": "6.3.0",
+    "@sentry/types": "6.3.1",
     "@types/google.analytics": "0.0.41",
     "@types/jszip": "3.4.1",
     "@types/mapbox-gl": "2.1.1",
