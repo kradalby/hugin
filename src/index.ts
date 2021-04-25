@@ -91,20 +91,20 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Download albums
-  app.ports.downloadImages.subscribe((urls) => {
+  app.ports.downloadImages.subscribe((urls: [string]) => {
     // downloadImages(urls);
   });
   // Google Analytics
-  app.ports.analytics.subscribe((url) => {
+  app.ports.analytics.subscribe((url: string) => {
     console.log("DEBUG: gtag called with: ", url);
     analytics.page({ path: "/" + url });
   });
 
-  app.ports.initMap.subscribe((data) => {
+  app.ports.initMap.subscribe((data: [string, [number, number][]]) => {
     console.log("DEBUG: Elm Port initMap called");
     initMap(data);
   });
-  app.ports.httpError.subscribe((val) => {
+  app.ports.httpError.subscribe((val: string) => {
     log.error(val);
   });
 
