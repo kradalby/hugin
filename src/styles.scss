@@ -7,7 +7,7 @@ $theme-colors: (
 
 // Add new theme-colors as backgrounds
 @each $color, $value in $theme-colors {
-  @include bg-variant(".bg-#{$color}", $value);
+  @include bg-variant(".bg-#{$color}", $value, true);
 }
 
 .map {
