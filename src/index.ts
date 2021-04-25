@@ -46,33 +46,20 @@ Sentry.init({
   dsn: process.env.HUGIN_SENTRY_DSN,
 });
 
-import * as Rollbar from "rollbar";
-
-let rollbar = new Rollbar({
-  accessToken: process.env.HUGIN_ROLLBAR_ACCESS_TOKEN,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
-
 let log = {
   critical: function (val: string): void {
-    rollbar.critical(val);
     Sentry.captureMessage(`[CRITICAL]: ${val}`);
   },
   error: function (val: string): void {
-    rollbar.error(val);
     Sentry.captureMessage(`[ERROR]: ${val}`);
   },
   warning: function (val: string): void {
-    rollbar.warning(val);
     Sentry.captureMessage(`[WARNING]: ${val}`);
   },
   info: function (val: string): void {
-    rollbar.info(val);
     Sentry.captureMessage(`[INFO]: ${val}`);
   },
   debug: function (val: string): void {
-    rollbar.debug(val);
     Sentry.captureMessage(`[DEBUG]: ${val}`);
   },
 };
