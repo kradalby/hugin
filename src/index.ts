@@ -4,7 +4,7 @@ import notFound from "url:./images/404.jpg";
 
 console.log(placeholder, loading, notFound);
 
-import initMap from './map';
+import initMap from "./map";
 
 // FONT AWESOME
 import { library, dom } from "@fortawesome/fontawesome-svg-core";
@@ -112,5 +112,3 @@ document.addEventListener("DOMContentLoaded", function () {
     screenfull.toggle();
   });
 });
-
-

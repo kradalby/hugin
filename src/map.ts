@@ -1,6 +1,5 @@
-
 // MAPBOX
-import mapboxgl from 'mapbox-gl';
+import mapboxgl from "mapbox-gl";
 
 mapboxgl.accessToken = process.env.HUGIN_MAPBOX_ACCESS_TOKEN;
 
