@@ -1424,7 +1424,7 @@
   dependencies:
     "@parcel/types" "^2.0.0-alpha.3"
 
-"@parcel/reporter-bundle-buddy@^2.0.0-nightly.1902":
+"@parcel/reporter-bundle-buddy@^2.0.0-nightly":
   version "2.0.0-nightly.1902"
   resolved "https://registry.yarnpkg.com/@parcel/reporter-bundle-buddy/-/reporter-bundle-buddy-2.0.0-nightly.1902.tgz#51753afc737dd8f6ac47ab0b81e64d0c0601b768"
   integrity sha512-CuW0Qry+fUVK+CfKBl6Q5zy1YRR+/y8XF1G+RZbQYWim6dX0z8He7Vr7q1XxVPy1HXej/P7q0QgJdduKyW9odg==
