@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "7.13.0",
-    "@parcel/reporter-bundle-buddy": "^2.0.0-nightly.1902",
+    "@parcel/reporter-bundle-buddy": "2.0.0-nightly.2292",
     "@parcel/reporter-dev-server": "2.0.0-alpha.3",
     "@parcel/transformer-elm": "2.0.0-beta.2",
     "@parcel/transformer-image": "2.0.0-beta.2",
