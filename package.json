@@ -24,12 +24,14 @@
   "homepage": "https://github.com/kradalby/hugin",
   "dependencies": {
     "@analytics/google-analytics": "^0.5.2",
+    "@babel/core": "^7.14.3",
     "@fortawesome/fontawesome-common-types": "^0.2.35",
     "@fortawesome/fontawesome-free": "^5.15.3",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@sentry/browser": "^6.4.0",
+    "@types/umami": "^0.1.0",
     "analytics": "^0.7.5",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
@@ -38,6 +40,7 @@
     "mapbox-gl": "2.2.0",
     "screenfull": "^5.1.0",
     "streamsaver": "^2.0.5",
+    "umami": "^0.1.0",
     "web-streams-polyfill": "^3.0.3"
   },
   "devDependencies": {
