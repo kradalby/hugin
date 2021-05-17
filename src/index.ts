@@ -79,7 +79,6 @@ const analytics = Analytics({
 });
 
 import "umami";
-umami("Loading Hugin");
 
 ///////////////////////////////////////////////////
 //
