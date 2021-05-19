@@ -40,7 +40,6 @@
     "mapbox-gl": "2.2.0",
     "screenfull": "^5.1.0",
     "streamsaver": "^2.0.5",
-    "umami": "^0.1.0",
     "web-streams-polyfill": "^3.0.3"
   },
   "devDependencies": {
