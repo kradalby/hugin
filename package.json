@@ -29,7 +29,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@sentry/browser": "^6.4.0",
+    "@sentry/browser": "^6.4.1",
     "analytics": "^0.7.5",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
