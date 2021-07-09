@@ -49,7 +49,7 @@
     "@sentry/types": "6.8.0",
     "@types/google.analytics": "0.0.41",
     "@types/jszip": "3.4.1",
-    "@types/mapbox-gl": "2.3.1",
+    "@types/mapbox-gl": "2.3.3",
     "@types/node": "15.12.4",
     "@types/umami": "0.1.0",
     "elm": "0.19.1-5",
