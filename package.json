@@ -38,7 +38,7 @@
     "mapbox-gl": "2.3.1",
     "screenfull": "^5.1.0",
     "streamsaver": "^2.0.5",
-    "web-streams-polyfill": "^3.0.3"
+    "web-streams-polyfill": "^3.1.0"
   },
   "devDependencies": {
     "@parcel/reporter-bundle-buddy": "^2.0.0-beta.3.1",
