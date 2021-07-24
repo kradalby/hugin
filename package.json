@@ -30,7 +30,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@sentry/browser": "^6.9.0",
-    "analytics": "^0.7.5",
+    "analytics": "^0.7.7",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
     "jszip": "^3.6.0",
