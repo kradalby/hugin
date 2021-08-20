@@ -2,7 +2,6 @@
   "name": "hugin",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.html",
   "scripts": {},
   "engines": {
     "browsers": "> 0.25%"
@@ -41,22 +40,22 @@
     "web-streams-polyfill": "^3.1.0"
   },
   "devDependencies": {
-    "@parcel/reporter-bundle-buddy": "^2.0.0-beta.3.1",
-    "@parcel/reporter-dev-server": "2.0.0-beta.3.1",
-    "@parcel/transformer-elm": "2.0.0-beta.3.1",
-    "@parcel/transformer-image": "2.0.0-beta.3.1",
-    "@parcel/transformer-sass": "2.0.0-beta.3.1",
+    "@parcel/reporter-bundle-buddy": "2.0.0-rc.0",
+    "@parcel/reporter-dev-server": "2.0.0-rc.0",
+    "@parcel/transformer-elm": "2.0.0-rc.0",
+    "@parcel/transformer-image": "2.0.0-rc.0",
+    "@parcel/transformer-sass": "2.0.0-rc.0",
     "@sentry/types": "6.11.0",
     "@types/google.analytics": "0.0.42",
     "@types/jszip": "3.4.1",
     "@types/mapbox-gl": "2.4.0",
-    "@types/node": "15.12.4",
+    "@types/node": "16.6.2",
     "@types/umami": "0.1.0",
     "elm": "0.19.1-5",
     "elm-analyse": "0.16.5",
     "elm-format": "0.8.5",
     "node-sass": "6.0.1",
-    "parcel": "2.0.0-beta.3.1",
+    "parcel": "2.0.0-rc.0",
     "typescript": "4.3.5"
   }
 }
