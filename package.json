@@ -31,6 +31,7 @@
     "@sentry/browser": "^6.11.0",
     "analytics": "^0.7.13",
     "bootstrap": "<5.0.0",
+    "elm-json": "^0.2.10",
     "flexbin": "^0.2.0",
     "jszip": "^3.7.1",
     "jszip-utils": "0.1.0",
