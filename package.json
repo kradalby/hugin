@@ -29,7 +29,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@sentry/browser": "^6.13.2",
-    "analytics": "^0.7.14",
+    "analytics": "^0.7.15",
     "bootstrap": "<5.0.0",
     "elm-json": "^0.2.10",
     "flexbin": "^0.2.0",
