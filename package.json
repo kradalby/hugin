@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@parcel/reporter-bundle-buddy": "2.0.0-rc.0",
-    "@parcel/reporter-dev-server": "2.0.0-rc.0",
+    "@parcel/reporter-dev-server": "2.0.0",
     "@parcel/transformer-elm": "2.0.0-rc.0",
     "@parcel/transformer-image": "2.0.0-rc.0",
     "@parcel/transformer-sass": "2.0.0-rc.0",
