@@ -1135,13 +1135,13 @@
     posthtml-render "^2.0.6"
     semver "^5.4.1"
 
-"@parcel/transformer-image@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@parcel/transformer-image/-/transformer-image-2.0.0.tgz#e1387f2983bcb0fdb2838b535b3b8e89ba3508c2"
-  integrity sha512-1QXllyEDpITACi+1WY67SEAgmNKp4zohffvJoEkF3scjSX6fRIlOEXe8cSEiGVklWzik/iQN7UqHOTAqSZ3Yng==
+"@parcel/transformer-image@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@parcel/transformer-image/-/transformer-image-2.0.1.tgz#b13eb2a54546059a7ab260153e4009a3df5808f9"
+  integrity sha512-1xHPdE4W8jzsI0AWi4XWYioG2sDZvxJHprlTYNGK8GE+A2U7bOi7T2aoa44fEfK1pRa+N5GTkoNVTYiv4hza0g==
   dependencies:
-    "@parcel/plugin" "^2.0.0"
-    "@parcel/workers" "^2.0.0"
+    "@parcel/plugin" "^2.0.1"
+    "@parcel/workers" "^2.0.1"
     nullthrows "^1.1.1"
 
 "@parcel/transformer-js@2.0.0-rc.0":
