@@ -36,7 +36,7 @@
     "jszip": "^3.7.1",
     "jszip-utils": "0.1.0",
     "mapbox-gl": "2.6.1",
-    "screenfull": "^5.1.0",
+    "screenfull": "^5.2.0",
     "streamsaver": "^2.0.5",
     "web-streams-polyfill": "^3.1.1"
   },
