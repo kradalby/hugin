@@ -50,7 +50,7 @@
     "@types/google.analytics": "0.0.42",
     "@types/jszip": "3.4.1",
     "@types/mapbox-gl": "2.6.0",
-    "@types/node": "16.11.14",
+    "@types/node": "16.11.17",
     "@types/umami": "0.1.0",
     "elm": "0.19.1-5",
     "elm-analyse": "0.16.5",
