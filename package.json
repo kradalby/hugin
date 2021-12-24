@@ -57,6 +57,6 @@
     "elm-format": "0.8.5",
     "node-sass": "6.0.1",
     "parcel": "2.0.1",
-    "typescript": "4.5.3"
+    "typescript": "4.5.4"
   }
 }
