@@ -41,7 +41,7 @@
     "web-streams-polyfill": "^3.2.0"
   },
   "devDependencies": {
-    "@parcel/reporter-bundle-buddy": "2.0.1",
+    "@parcel/reporter-bundle-buddy": "2.2.0",
     "@parcel/reporter-dev-server": "2.0.1",
     "@parcel/transformer-elm": "2.0.1",
     "@parcel/transformer-image": "2.0.1",
