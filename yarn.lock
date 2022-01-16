@@ -924,7 +924,21 @@
     term-size "^2.2.1"
     wrap-ansi "^7.0.0"
 
-"@parcel/reporter-dev-server@2.0.1", "@parcel/reporter-dev-server@^2.0.1":
+"@parcel/reporter-dev-server@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@parcel/reporter-dev-server/-/reporter-dev-server-2.2.0.tgz#307d386197f45bd2c7b8e25c5c25142d89400b87"
+  integrity sha512-r6FRJ1BU/zHZvAxSvG5p0o2ZJgEkYDqU2y99a5tvRhQAIMupNp9Oc3PkAIOcoGtM3aiJvGO5pwDBoOpNwS4hwQ==
+  dependencies:
+    "@parcel/plugin" "^2.2.0"
+    "@parcel/utils" "^2.2.0"
+    connect "^3.7.0"
+    ejs "^3.1.6"
+    http-proxy-middleware "^1.0.0"
+    nullthrows "^1.1.1"
+    serve-handler "^6.0.0"
+    ws "^7.0.0"
+
+"@parcel/reporter-dev-server@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@parcel/reporter-dev-server/-/reporter-dev-server-2.0.1.tgz#a122645277d20da94d5fc54d92d9b5ffc8801703"
   integrity sha512-dm2zgE8mPgLD5Nkmw9WQENZunrBN29fDRkNZhqnQyq4BBXF7e6Q/J/uamUjdtxAp7Qzobw1ZjybqlFuEh0z2tg==
