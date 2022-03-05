@@ -894,10 +894,10 @@
   dependencies:
     jszip "*"
 
-"@types/mapbox-gl@2.6.1":
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/@types/mapbox-gl/-/mapbox-gl-2.6.1.tgz#a15d92f694ecc11cd885d09f1e6b29875d290c69"
-  integrity sha512-ErM4hS1cAH9eJZ+b0bgrF9JuSN1P5i9jhfiJTZ6uOb2Bib7a8tkUivLz/fA69h51JN2CE3G5RE8EZIslgBzIIA==
+"@types/mapbox-gl@2.6.3":
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/@types/mapbox-gl/-/mapbox-gl-2.6.3.tgz#09e4992bb540fe5e024eebc5fbc315317cb13ffe"
+  integrity sha512-oF5eQmczkoPQfxfRSwpF9GcrWi3YleptJ67uiCQKps+7aKxwIbww0EHHqIrxvOg49l07+AZBtJU2FPKZm1jKAg==
   dependencies:
     "@types/geojson" "*"
 
