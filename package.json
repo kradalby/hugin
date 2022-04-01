@@ -51,7 +51,7 @@
     "flexbin": "^0.2.0",
     "jszip": "^3.7.1",
     "jszip-utils": "0.1.0",
-    "mapbox-gl": "2.7.0",
+    "mapbox-gl": "2.7.1",
     "node-sass": "7.0.1",
     "parcel": "2.3.2",
     "screenfull": "^6.0.1",
