@@ -2,6 +2,7 @@
 dist/
 size-plugin.json
 .parcel-cache
+.direnv/
 
 # Created by https://www.gitignore.io/api/elm,node,bower,vim,osx
 
