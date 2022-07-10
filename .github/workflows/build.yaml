@@ -13,23 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install dos2unix, fd
-        run: sudo apt-get install -y dos2unix fd-find
-
       - uses: actions/checkout@v2
-
-      - name: Use Node.js
-        uses: actions/setup-node@v2
         with:
-          node-version: 17
-          cache: "yarn"
+          fetch-depth: 2
+
+      - uses: cachix/install-nix-action@v16
 
       - name: Install dependencies
-        run: yarn
-
-      # TODO: figure out if we can avoid this
-      - name: dos2unix
-        run: fdfind . node_modules/ -x dos2unix {}
+        run: nix develop --command -- yarn
 
       - name: Build
         uses: nick-invision/retry@v2
@@ -40,7 +31,7 @@ jobs:
           # but it isnt correct.
           max_attempts: 3
           retry_on: error
-          command: make build
+          command: nix develop --command -- make build
 
       # - name: Deploy to Github Pages
       #   uses: peaceiris/actions-gh-pages@v3
