@@ -8,7 +8,7 @@
 
   outputs = { self, nixpkgs, flake-utils, ... }:
     let
-      headscaleVersion = if (self ? shortRev) then self.shortRev else "dev";
+      huginVersion = if (self ? shortRev) then self.shortRev else "dev";
     in
     {
       overlay = final: prev:
@@ -39,20 +39,6 @@
               elm-json
               elm-analyse
             ]);
-
-
-          # Add entry to build a docker image with headscale
-          # caveat: only works on Linux
-          #
-          # Usage:
-          # nix build .#headscale-docker
-          # docker load < result
-          headscale-docker = pkgs.dockerTools.buildLayeredImage {
-            name = "headscale";
-            tag = headscaleVersion;
-            contents = [ pkgs.headscale ];
-            config.Entrypoint = [ (pkgs.headscale + "/bin/headscale") ];
-          };
         in
         rec {
           # `nix develop`
@@ -60,17 +46,16 @@
 
           # `nix build`
           packages = with pkgs; {
-            inherit headscale;
-            inherit headscale-docker;
+            inherit hugin;
           };
 
-          defaultPackage = pkgs.headscale;
+          defaultPackage = pkgs.hugin;
 
           # `nix run`
-          apps.headscale = flake-utils.lib.mkApp {
-            drv = packages.headscale;
+          apps.hugin = flake-utils.lib.mkApp {
+            drv = packages.hugin;
           };
-          defaultApp = apps.headscale;
+          defaultApp = apps.hugin;
 
           checks = {
             format = pkgs.runCommand "check-format"
@@ -78,20 +63,12 @@
                 buildInputs = with pkgs; [
                   gnumake
                   nixpkgs-fmt
-                  golangci-lint
                   nodePackages.prettier
-                  golines
-                  clang-tools
                 ];
               } ''
               ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt ${./.}
-              ${pkgs.golangci-lint}/bin/golangci-lint run --fix --timeout 10m
               ${pkgs.nodePackages.prettier}/bin/prettier --write '**/**.{ts,js,md,yaml,yml,sass,css,scss,html}'
-              ${pkgs.golines}/bin/golines --max-len=88 --base-formatter=gofumpt -w ${./.}
-              ${pkgs.clang-tools}/bin/clang-format -style="{BasedOnStyle: Google, IndentWidth: 4, AlignConsecutiveDeclarations: true, AlignConsecutiveAssignments: true, ColumnLimit: 0}" -i ${./.}
             '';
           };
-
-
         });
 }
