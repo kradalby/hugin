@@ -52,7 +52,7 @@
     "jszip": "^3.10.0",
     "jszip-utils": "0.1.0",
     "mapbox-gl": "2.9.2",
-    "node-sass": "7.0.1",
+    "node-sass": "7.0.3",
     "parcel": "2.6.2",
     "screenfull": "^6.0.2",
     "streamsaver": "^2.0.6",
