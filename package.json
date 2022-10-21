@@ -47,7 +47,7 @@
     "elm": "0.19.1-5",
     "elm-analyse": "0.16.5",
     "elm-format": "0.8.5",
-    "elm-json": "^0.2.12",
+    "elm-json": "^0.2.13",
     "flexbin": "^0.2.0",
     "jszip": "^3.10.0",
     "jszip-utils": "0.1.0",
