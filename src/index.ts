@@ -78,7 +78,7 @@ const analytics = Analytics({
       reportUri: "https://umami.kradalby.no",
     }),
     googleAnalytics({
-      trackingId: "UA-18856525-25",
+      measurementIds: ["UA-18856525-25"],
     }),
   ],
 });
