@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"tailscale.com/client/tailscale"
 	"tailscale.com/tsnet"
@@ -24,6 +25,13 @@ var (
 		"",
 		"if non-empty, listen on this addr and run in dev mode; don't use tsnet",
 	)
+
+	tailscaleKeyPath = flag.String(
+		"tailscale-auth-key-path",
+		"",
+		"path to tailscale auth key, can be passed as TS_AUTH_KEY",
+	)
+
 	hostname = flag.String("hostname", defaultHostname, "service name")
 
 	certMode = flag.String(
@@ -108,9 +116,20 @@ func Run() error {
 		Logf:       func(format string, args ...any) {},
 		ControlURL: *controlURL,
 	}
+
+	if *tailscaleKeyPath != "" {
+		key, err := os.ReadFile(*tailscaleKeyPath)
+		if err != nil {
+			log.Fatal("failed to load tailscale auth key")
+		}
+
+		srv.AuthKey = string(key)
+	}
+
 	if *verbose {
 		srv.Logf = log.Printf
 	}
+
 	if err := srv.Start(); err != nil {
 		return err
 	}
