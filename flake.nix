@@ -24,15 +24,11 @@
         huginDeps = pkgs.yarn2nix-moretea.mkYarnPackage {
           name = "huginYarnDeps";
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
-          # packageJSON = ./package.json;
-          # unpackPhase = ":";
-          # yarnLock = ./yarn.lock;
-          # publishBinsFor = ["parcel-bundler"];
         };
 
         huginElm = pkgs.stdenv.mkDerivation rec {
           name = "huginElm";
-          src = pkgs.nix-gitignore.gitignoreSource [] ./.;
+          src = pkgs.nix-gitignore.gitignoreSource ["Makefile"] ./.;
 
           buildInputs = with pkgs; [
             huginDeps
@@ -52,11 +48,7 @@
 
           patchPhase = ''
             rm -rf elm-stuff
-            # ln -sf ${huginDeps}/node_modules .
-          '';
-
-          shellHook = ''
-            ln -fs ${huginDeps}/node_modules .
+            ln -fs ${huginDeps}/libexec/hugin/node_modules .
           '';
 
           configurePhase = pkgs.elmPackages.fetchElmDeps {
@@ -64,6 +56,8 @@
             elmPackages = import ./elm-srcs.nix;
             registryDat = ./registry.dat;
           };
+
+          dontBuild = true;
 
           installPhase = ''
             mkdir -p $out
@@ -82,7 +76,7 @@
             cp -r ${huginElm} dist
           '';
 
-          vendorSha256 = "sha256-pZM7zdB74hQD+oGzYjGR9RSZ4mKLEd7euFi2htAs0tU=";
+          vendorSha256 = "sha256-c5kPTsil2k91iXENOcIgiBlWGNhJo8h7H1e+TJX48MQ=";
         };
       };
     }
