@@ -149,6 +149,7 @@
         pkgs,
         lib,
         config,
+        ...
       }: let
         cfg = config.services.hugin;
       in {
