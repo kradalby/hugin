@@ -154,45 +154,47 @@
         cfg = config.services.hugin;
       in {
         options = with lib; {
-          enable = mkEnableOption "Enable hugin";
+          services.hugin = {
+            enable = mkEnableOption "Enable hugin";
 
-          package = mkOption {
-            type = types.package;
-            description = ''
-              hugin package to use
-            '';
-            default = pkgs.hugin;
-          };
+            package = mkOption {
+              type = types.package;
+              description = ''
+                hugin package to use
+              '';
+              default = pkgs.hugin;
+            };
 
-          dataDir = mkOption {
-            type = types.path;
-            default = "/var/lib/hugin";
-            description = "Path to data dir";
-          };
+            dataDir = mkOption {
+              type = types.path;
+              default = "/var/lib/hugin";
+              description = "Path to data dir";
+            };
 
-          user = mkOption {
-            type = types.str;
-            default = "hugin";
-            description = "User account under which hugin runs.";
-          };
+            user = mkOption {
+              type = types.str;
+              default = "hugin";
+              description = "User account under which hugin runs.";
+            };
 
-          group = mkOption {
-            type = types.str;
-            default = "hugin";
-            description = "Group account under which hugin runs.";
-          };
+            group = mkOption {
+              type = types.str;
+              default = "hugin";
+              description = "Group account under which hugin runs.";
+            };
 
-          tailscaleKeyPath = mkOption {
-            type = types.path;
-          };
+            tailscaleKeyPath = mkOption {
+              type = types.path;
+            };
 
-          album = mkOption {
-            type = types.path;
-          };
+            album = mkOption {
+              type = types.path;
+            };
 
-          controlUrl = mkOption {
-            type = types.string;
-            default = "";
+            controlUrl = mkOption {
+              type = types.string;
+              default = "";
+            };
           };
         };
         config = lib.mkIf cfg.enable {
