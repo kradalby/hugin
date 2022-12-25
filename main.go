@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 
 	"tailscale.com/client/tailscale"
 	"tailscale.com/tsnet"
@@ -123,7 +124,7 @@ func Run() error {
 			log.Fatal("failed to load tailscale auth key")
 		}
 
-		srv.AuthKey = string(key)
+		srv.AuthKey = strings.TrimSuffix(string(key), "\n")
 	}
 
 	if *verbose {

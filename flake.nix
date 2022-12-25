@@ -185,6 +185,11 @@
               type = types.path;
             };
 
+            verbose = mkOption {
+              type = types.bool;
+              default = false;
+            };
+
             controlUrl = mkOption {
               type = types.string;
               default = "";
@@ -194,8 +199,15 @@
         config = lib.mkIf cfg.enable {
           systemd.services.hugin = {
             enable = true;
-            script = ''
-              ${cfg.package}/bin/hugin --tailscale-auth-key-path ${cfg.tailscaleKeyPath} --album ${cfg.album}
+            script = let
+              args =
+                [
+                  "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
+                  "--album ${cfg.album}"
+                ]
+                ++ lib.optionals cfg.verbose ["--verbose"];
+            in ''
+              ${cfg.package}/bin/hugin ${builtins.concatStringsSep " " args}
             '';
             wantedBy = ["multi-user.target"];
             after = ["network-online.target"];
