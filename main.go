@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"embed"
 	"errors"
 	"flag"
@@ -34,17 +35,6 @@ var (
 	)
 
 	hostname = flag.String("hostname", defaultHostname, "service name")
-
-	certMode = flag.String(
-		"certmode",
-		"letsencrypt",
-		"mode for getting a cert. possible options: manual, letsencrypt",
-	)
-	certDir = flag.String(
-		"certdir",
-		tsweb.DefaultCertDir("derper-certs"),
-		"directory to store LetsEncrypt certs, if addr's port is :443",
-	)
 
 	albumDir = flag.String("album", "", "directory containing a Munin album")
 
@@ -81,7 +71,7 @@ func Run() error {
 
 	mux.Handle("/", distHandler())
 
-	httpsrv := &http.Server{
+	httpSrv := &http.Server{
 		Handler: mux,
 	}
 
@@ -102,10 +92,10 @@ func Run() error {
 			}
 		}
 
-		httpsrv.Addr = *dev
+		httpSrv.Addr = *dev
 
 		log.Printf("Running in dev mode on %s ...", *dev)
-		log.Fatal(httpsrv.ListenAndServe())
+		log.Fatal(httpSrv.ListenAndServe())
 	}
 
 	if *hostname == "" {
@@ -141,9 +131,25 @@ func Run() error {
 		return err
 	}
 
+	l443, err := srv.Listen("tcp", ":443")
+	if err != nil {
+		return err
+	}
+	l443 = tls.NewListener(l443, &tls.Config{
+		GetCertificate: localClient.GetCertificate,
+	})
+
+	// Starting HTTPS server
+	go func() {
+		log.Printf("Serving http://%s/ ...", *hostname)
+		if err := httpSrv.Serve(l443); err != nil {
+			log.Printf("failed to start https server: %s", err)
+		}
+	}()
+
 	// TODO: Add support for magic auto HTTPS
 	log.Printf("Serving http://%s/ ...", *hostname)
-	if err := httpsrv.Serve(l80); err != nil {
+	if err := httpSrv.Serve(l80); err != nil {
 		return err
 	}
 	return nil
