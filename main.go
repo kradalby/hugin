@@ -131,16 +131,16 @@ func Run() error {
 		return err
 	}
 
-	l443, err := srv.Listen("tcp", ":443")
-	if err != nil {
-		return err
-	}
-	l443 = tls.NewListener(l443, &tls.Config{
-		GetCertificate: localClient.GetCertificate,
-	})
-
 	// Starting HTTPS server
 	go func() {
+		l443, err := srv.Listen("tcp", ":443")
+		if err != nil {
+			log.Printf("failed to start https server: %s", err)
+		}
+		l443 = tls.NewListener(l443, &tls.Config{
+			GetCertificate: localClient.GetCertificate,
+		})
+
 		log.Printf("Serving http://%s/ ...", *hostname)
 		if err := httpSrv.Serve(l443); err != nil {
 			log.Printf("failed to start https server: %s", err)
