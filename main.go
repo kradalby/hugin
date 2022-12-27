@@ -69,16 +69,21 @@ func Run() error {
 	mux := http.NewServeMux()
 	tsweb.Debugger(mux)
 
-	mux.Handle("/", distHandler())
+	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 
 	httpSrv := &http.Server{
-		Handler: mux,
+		Handler:  mux,
+		ErrorLog: logger,
 	}
+
+	mux.Handle("/", distHandler())
 
 	if *albumDir == "" {
 		log.Printf("-album is required to serve an album in production")
 	} else {
-		mux.Handle("/content/", http.FileServer(http.Dir(*albumDir)))
+		log.Printf("Serving content from %s", *albumDir)
+		mux.Handle("/album/", http.StripPrefix("/album", http.FileServer(http.Dir(*albumDir))))
+		mux.Handle("/content/", http.StripPrefix("/content", http.FileServer(http.Dir(*albumDir))))
 	}
 
 	if *dev != "" {
