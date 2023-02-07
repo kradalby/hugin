@@ -9,6 +9,9 @@ dev:
 
 upgrade:
 	yarn upgrade-interactive --latest
+	elm-json upgrade
+	elm2nix convert > elm-srcs.nix
+	elm2nix snapshot
 
 clean:
 	rm -rf dist

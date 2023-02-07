@@ -6,7 +6,7 @@
     "elm-version": "0.19.1",
     "dependencies": {
         "direct": {
-            "NoRedInk/elm-json-decode-pipeline": "1.0.0",
+            "NoRedInk/elm-json-decode-pipeline": "1.0.1",
             "elm/browser": "1.0.2",
             "elm/core": "1.0.5",
             "elm/file": "1.0.5",
@@ -16,8 +16,8 @@
             "elm/random": "1.0.0",
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
-            "elm-community/list-extra": "8.4.0",
-            "elm-community/maybe-extra": "5.2.0",
+            "elm-community/list-extra": "8.7.0",
+            "elm-community/maybe-extra": "5.3.0",
             "elm-community/random-extra": "3.2.0",
             "rtfeldman/elm-iso8601-date-strings": "1.1.4",
             "tripokey/elm-fuzzy": "5.2.1"
@@ -25,7 +25,7 @@
         "indirect": {
             "elm/bytes": "1.0.8",
             "elm/parser": "1.1.0",
-            "elm/virtual-dom": "1.0.2"
+            "elm/virtual-dom": "1.0.3"
         }
     },
     "test-dependencies": {
