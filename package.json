@@ -47,7 +47,7 @@
     "analytics": "^0.8.1",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
-    "jszip": "^3.10.0",
+    "jszip": "^3.10.1",
     "jszip-utils": "0.1.0",
     "mapbox-gl": "2.11.1",
     "screenfull": "^6.0.2",
