@@ -68,17 +68,17 @@ let log = {
 
 import Analytics from "analytics";
 import googleAnalytics from "@analytics/google-analytics";
-import umamiAnalytics from "@binance-chain/analytics-plugin-umami";
+// import umamiAnalytics from "@binance-chain/analytics-plugin-umami";
 
 const analytics = Analytics({
   app: "hugin",
   plugins: [
-    umamiAnalytics({
-      id: "85c8d24a-dc4a-4204-8b63-5f4c75bec4a5",
-      reportUri: "https://umami.kradalby.no",
-    }),
+    // umamiAnalytics({
+    //   id: "85c8d24a-dc4a-4204-8b63-5f4c75bec4a5",
+    //   reportUri: "https://umami.kradalby.no",
+    // }),
     googleAnalytics({
-      trackingId: "UA-18856525-25",
+      measurementIds: ["UA-18856525-25"],
     }),
   ],
 });
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
   app.ports.analytics.subscribe((url: string) => {
     console.log("DEBUG: gtag called with: ", url);
     analytics.page({ path: "/" + url });
-    umami.trackView("/" + url);
+    // umami.trackView("/" + url);
   });
 
   app.ports.initMap.subscribe((data: [string, [number, number][]]) => {
