@@ -65,7 +65,7 @@
           '';
         };
 
-        hugin = pkgs.buildGo119Module rec {
+        hugin = pkgs.buildGo120Module rec {
           pname = "hugin";
           version = huginVersion;
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
