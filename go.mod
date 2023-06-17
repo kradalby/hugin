@@ -2,10 +2,7 @@ module github.com/kradalby/hugin
 
 go 1.20
 
-require (
-	github.com/prometheus/client_golang v1.16.0
-	tailscale.com v1.42.0
-)
+require github.com/kradalby/kraweb v0.0.0-20230617162240-05f1f43b9c9e
 
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect
@@ -51,6 +48,7 @@ require (
 	github.com/mitchellh/go-ps v1.0.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
@@ -82,4 +80,5 @@ require (
 	gvisor.dev/gvisor v0.0.0-20230504175454-7b0a1988a28f // indirect
 	inet.af/peercred v0.0.0-20210906144145-0893ea02156a // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
+	tailscale.com v1.42.0 // indirect
 )

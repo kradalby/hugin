@@ -116,6 +116,14 @@ github.com/kortschak/wol v0.0.0-20200729010619-da482cc4850a/go.mod h1:YTtCCM3ryy
 github.com/kr/fs v0.1.0 h1:Jskdu9ieNAYnjxsi0LbQp1ulIKZV1LAFgK1tWhpZgl8=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
+github.com/kradalby/kraweb v0.0.0-20230617155144-bbdb380be79f h1:/ofeLp/6B5JfLbvEnolDm06l6wxVxljIdjWq64rVLvk=
+github.com/kradalby/kraweb v0.0.0-20230617155144-bbdb380be79f/go.mod h1:NiBOEAzNzEMcMd66GATTbzlYlUUbBxwsOHNvH/8vUQI=
+github.com/kradalby/kraweb v0.0.0-20230617160634-7f674c36065b h1:KDmjRZJ+SFGGEMf3N6lYBcX7uE+bNNB2c5Ke922N1BY=
+github.com/kradalby/kraweb v0.0.0-20230617160634-7f674c36065b/go.mod h1:Dvd8wf9kqy3VUtAwXvIOU+q9Rj8I5zhohxbqGu5FKXM=
+github.com/kradalby/kraweb v0.0.0-20230617161810-97c450550212 h1:Ovs+P23Mf3iKNflNnpG8Mn/ozlWhH4VXPGHVVlQb18o=
+github.com/kradalby/kraweb v0.0.0-20230617161810-97c450550212/go.mod h1:Dvd8wf9kqy3VUtAwXvIOU+q9Rj8I5zhohxbqGu5FKXM=
+github.com/kradalby/kraweb v0.0.0-20230617162240-05f1f43b9c9e h1:NlRCWvbdgcb1t/hrCYCSF9yBsfQ9gIquOE9Bl975bPU=
+github.com/kradalby/kraweb v0.0.0-20230617162240-05f1f43b9c9e/go.mod h1:Dvd8wf9kqy3VUtAwXvIOU+q9Rj8I5zhohxbqGu5FKXM=
 github.com/leodido/go-urn v1.2.0 h1:hpXL4XnriNwQ/ABnpepYM/1vCLWNDfUNts8dX3xTG6Y=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
