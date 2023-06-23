@@ -23,7 +23,7 @@
   "homepage": "https://github.com/kradalby/hugin",
   "dependencies": {
     "@analytics/google-analytics": "^1.0.5",
-    "@analytics/type-utils": "^0.6.0",
+    "@analytics/type-utils": "^0.6.2",
     "@binance-chain/analytics-plugin-umami": "^0.0.16",
     "@fortawesome/fontawesome-common-types": "^6.3.0",
     "@fortawesome/fontawesome-free": "^6.3.0",
