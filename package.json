@@ -44,7 +44,7 @@
     "@types/mapbox-gl": "2.7.10",
     "@types/node": "18.15.5",
     "@types/umami": "0.1.0",
-    "analytics": "^0.8.1",
+    "analytics": "^0.8.9",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
     "jszip": "^3.10.0",
