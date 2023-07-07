@@ -195,6 +195,11 @@
               type = types.string;
               default = "";
             };
+
+            localhostPort = mkOption {
+              type = types.port;
+              default = 56664;
+            };
           };
         };
         config = lib.mkIf cfg.enable {
@@ -205,6 +210,7 @@
                 [
                   "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
                   "--album ${cfg.album}"
+                  "--localAddr localhost:${cfg.localhostPort}"
                 ]
                 ++ lib.optionals cfg.verbose ["--verbose"];
             in ''
