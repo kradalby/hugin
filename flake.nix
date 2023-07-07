@@ -24,6 +24,9 @@
         huginDeps = pkgs.yarn2nix-moretea.mkYarnPackage {
           name = "huginYarnDeps";
           src = pkgs.nix-gitignore.gitignoreSource ["Makefile" "go.mod" "go.sum" "*.go"] ./.;
+          publishBinsFor = [
+            "parcel"
+          ];
         };
 
         huginElm = pkgs.stdenv.mkDerivation {
@@ -37,7 +40,6 @@
             yarn
             nodejs
             nodePackages.sass
-            nodePackages.parcel
 
             python311
           ];
@@ -76,7 +78,7 @@
             cp -r ${huginElm} dist
           '';
 
-          vendorSha256 = "sha256-5cDbp5O7m0uLYTGpoQx4zHLrBKnHA2S1jWlGNDLMqPA=";
+          vendorSha256 = "sha256-ih2zylpbUX3wNpYPXGmpDl+WBc51AzeQnH1Qs8GHTKw=";
         };
       };
     }
@@ -87,9 +89,9 @@
         inherit system;
       };
       buildDeps = with pkgs; [
+        huginDeps
         elmPackages.elm
         nodePackages.sass
-        nodePackages.parcel
         git
         gnumake
         go_1_20
@@ -210,7 +212,7 @@
                 [
                   "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
                   "--album ${cfg.album}"
-                  "--localAddr localhost:${toString cfg.localhostPort}"
+                  "--addr localhost:${toString cfg.localhostPort}"
                 ]
                 ++ lib.optionals cfg.verbose ["--verbose"];
             in ''
