@@ -210,7 +210,7 @@
                 [
                   "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
                   "--album ${cfg.album}"
-                  "--localAddr localhost:${cfg.localhostPort}"
+                  "--localAddr localhost:${toString cfg.localhostPort}"
                 ]
                 ++ lib.optionals cfg.verbose ["--verbose"];
             in ''
