@@ -78,7 +78,7 @@
             cp -r ${huginElm} dist
           '';
 
-          vendorSha256 = "sha256-ih2zylpbUX3wNpYPXGmpDl+WBc51AzeQnH1Qs8GHTKw=";
+          vendorSha256 = "sha256-+5ijFpx2dcSoG8cAPfqci/LN9sdEE/Po231zdhFdVq0=";
         };
       };
     }
@@ -202,6 +202,12 @@
               type = types.port;
               default = 56664;
             };
+
+            environmentFile = mkOption {
+              type = types.nullOr types.path;
+              default = null;
+              example = "/var/lib/secrets/huginSecrets";
+            };
           };
         };
         config = lib.mkIf cfg.enable {
@@ -226,6 +232,7 @@
               Restart = "always";
               RestartSec = "15";
               WorkingDirectory = "${cfg.dataDir}";
+              EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
             };
             path = [cfg.package];
             environment = {};

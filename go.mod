@@ -2,7 +2,7 @@ module github.com/kradalby/hugin
 
 go 1.20
 
-require github.com/kradalby/kraweb v0.0.0-20230617162240-05f1f43b9c9e
+require github.com/kradalby/kraweb v0.0.0-20230709193422-b99bfffb4970
 
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect

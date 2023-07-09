@@ -2,12 +2,14 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"errors"
 	"flag"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/kradalby/kraweb"
 )
@@ -38,6 +40,23 @@ func main() {
 	}
 }
 
+func tokenHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokens := make(map[string]string)
+		env := os.Environ()
+
+		for _, kv := range env {
+			if rest, ok := strings.CutPrefix(kv, "HUGIN_TOKEN_"); ok {
+				parts := strings.Split(rest, "=")
+
+				tokens[strings.ToLower(parts[0])] = parts[1]
+			}
+		}
+
+		json.NewEncoder(w).Encode(tokens)
+	})
+}
+
 //go:embed dist/*
 var distFS embed.FS
 
@@ -55,25 +74,7 @@ func Run() error {
 
 	logger := log.New(os.Stdout, "hugin: ", log.LstdFlags)
 
-	handlers := map[string]http.Handler{}
-
-	handlers["/"] = distHandler()
-
-	if *albumDir == "" {
-		log.Printf("--album is required to serve an album")
-	} else {
-		log.Printf("Serving content from %s", *albumDir)
-		handlers["/album/"] = http.StripPrefix("/album", http.FileServer(http.Dir(*albumDir)))
-		handlers["/content/"] = http.StripPrefix("/content", http.FileServer(http.Dir(*albumDir)))
-	}
-
-	if *hostname == "" {
-		return errors.New("--hostname, if specified, cannot be empty")
-	}
-
-	srv := kraweb.NewKraWeb(
-		handlers,
-		nil,
+	k := kraweb.NewKraWeb(
 		*hostname,
 		*tailscaleKeyPath,
 		*controlURL,
@@ -82,5 +83,20 @@ func Run() error {
 		logger,
 	)
 
-	return srv.ListenAndServe()
+	k.Handle("/", distHandler())
+	k.Handle("/tokens", tokenHandler())
+
+	if *albumDir == "" {
+		log.Printf("--album is required to serve an album")
+	} else {
+		log.Printf("Serving content from %s", *albumDir)
+		k.Handle("/album/", http.StripPrefix("/album", http.FileServer(http.Dir(*albumDir))))
+		k.Handle("/content/", http.StripPrefix("/content", http.FileServer(http.Dir(*albumDir))))
+	}
+
+	if *hostname == "" {
+		return errors.New("--hostname, if specified, cannot be empty")
+	}
+
+	return k.ListenAndServe()
 }

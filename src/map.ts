@@ -1,7 +1,17 @@
 // MAPBOX
 import mapboxgl from "mapbox-gl";
 
-mapboxgl.accessToken = process.env.HUGIN_MAPBOX_ACCESS_TOKEN;
+async function setMapboxToken() {
+  const response = await fetch(
+    "/tokens"
+  );
+
+  let body = await response.json()
+
+  mapboxgl.accessToken = body.mapbox
+}
+
+setMapboxToken()
 
 let map: mapboxgl.Map | null = null;
 
