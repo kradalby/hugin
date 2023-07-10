@@ -11,13 +11,16 @@ async function setMapboxToken() {
   mapboxgl.accessToken = body.mapbox
 }
 
-setMapboxToken()
 
 let map: mapboxgl.Map | null = null;
 
 // coordinates: [Name : String, [[-80.425, 46.437], [-71.516, 46.437]] : List ( Float, Float ) ]
-export default function initMap(data: [string, [number, number][]]) {
+export default async function initMap(data: [string, [number, number][]]) {
   console.log("DEBUG: initMap called with: ", data);
+
+  if (mapboxgl.accessToken === null) {
+    await setMapboxToken()
+  }
 
   // ----------------------------------------------
   // Clean up maps and old maps
@@ -41,36 +44,36 @@ export default function initMap(data: [string, [number, number][]]) {
   let divName = "map-" + data[0];
   let coordinates = data[1];
 
-  resolveElementById(divName).then(() => {
-    // Create map
-    map = new mapboxgl.Map({
-      container: divName,
-      style: "mapbox://styles/mapbox/light-v9",
-      zoom: 13,
-      interactive: false,
-      maxZoom: 10,
-      minZoom: 2,
-    });
+  await resolveElementById(divName)
 
-    let bounds = new mapboxgl.LngLatBounds();
-
-    // Draw markers
-    coordinates.forEach((coordinate) => {
-      new mapboxgl.Marker().setLngLat(coordinate).addTo(map);
-
-      bounds.extend(coordinate);
-    });
-    if (map) {
-      map.fitBounds(bounds, {
-        padding: { top: 65, bottom: 50, left: 50, right: 50 },
-        linear: false,
-        maxZoom: 10,
-      });
-    }
+  // Create map
+  map = new mapboxgl.Map({
+    container: divName,
+    style: "mapbox://styles/mapbox/light-v9",
+    zoom: 13,
+    interactive: false,
+    maxZoom: 10,
+    minZoom: 2,
   });
+
+  let bounds = new mapboxgl.LngLatBounds();
+
+  // Draw markers
+  coordinates.forEach((coordinate) => {
+    new mapboxgl.Marker().setLngLat(coordinate).addTo(map);
+
+    bounds.extend(coordinate);
+  });
+  if (map) {
+    map.fitBounds(bounds, {
+      padding: { top: 65, bottom: 50, left: 50, right: 50 },
+      linear: false,
+      maxZoom: 10,
+    });
+  }
 }
 
-function resolveElementById(selector: string): Promise<HTMLElement> {
+async function resolveElementById(selector: string): Promise<HTMLElement> {
   let element = document.getElementById(selector);
   if (element === null) {
     return new Promise((resolve) => {
