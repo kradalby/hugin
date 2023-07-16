@@ -48,7 +48,7 @@
     "bootstrap": "<5.0.0",
     "eslint-plugin-prettier": "^4.2.1",
     "flexbin": "^0.2.0",
-    "jszip": "^3.10.0",
+    "jszip": "^3.10.1",
     "jszip-utils": "0.1.0",
     "mapbox-gl": "2.15.0",
     "parcel": "^2.9.3",
