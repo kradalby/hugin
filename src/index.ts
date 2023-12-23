@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function() {
   app.ports.analytics.subscribe((url: string) => {
     console.log("DEBUG: gtag called with: ", url);
     analytics.page({ path: "/" + url });
-    umami.trackView("/" + url);
   });
 
   app.ports.initMap.subscribe((data: [string, [number, number][]]) => {
