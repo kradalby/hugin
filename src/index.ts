@@ -49,34 +49,34 @@ Sentry.init({
 });
 
 let log = {
-  critical: function (val: string): void {
+  critical: function(val: string): void {
     Sentry.captureMessage(`[CRITICAL]: ${val}`);
   },
-  error: function (val: string): void {
+  error: function(val: string): void {
     Sentry.captureMessage(`[ERROR]: ${val}`);
   },
-  warning: function (val: string): void {
+  warning: function(val: string): void {
     Sentry.captureMessage(`[WARNING]: ${val}`);
   },
-  info: function (val: string): void {
+  info: function(val: string): void {
     Sentry.captureMessage(`[INFO]: ${val}`);
   },
-  debug: function (val: string): void {
+  debug: function(val: string): void {
     Sentry.captureMessage(`[DEBUG]: ${val}`);
   },
 };
 
 import Analytics from "analytics";
 import googleAnalytics from "@analytics/google-analytics";
-// import umamiAnalytics from "@binance-chain/analytics-plugin-umami";
+import umamiAnalytics from "@binance-chain/analytics-plugin-umami";
 
 const analytics = Analytics({
   app: "hugin",
   plugins: [
-    // umamiAnalytics({
-    //   id: "85c8d24a-dc4a-4204-8b63-5f4c75bec4a5",
-    //   reportUri: "https://umami.kradalby.no",
-    // }),
+    umamiAnalytics({
+      id: "2145b3cd-1fcf-496c-8b45-c43951ff9129",
+      reportUri: "https://umami.kradalby.no",
+    }),
     googleAnalytics({
       measurementIds: ["UA-18856525-25"],
     }),
@@ -89,7 +89,7 @@ const analytics = Analytics({
 // ELM
 import { Elm } from "./Main.elm";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
   let app = Elm.Main.init({
     node: document.getElementById("root"),
     flags: null,
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
   app.ports.analytics.subscribe((url: string) => {
     console.log("DEBUG: gtag called with: ", url);
     analytics.page({ path: "/" + url });
-    // umami.trackView("/" + url);
+    umami.trackView("/" + url);
   });
 
   app.ports.initMap.subscribe((data: [string, [number, number][]]) => {
