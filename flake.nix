@@ -78,7 +78,7 @@
             cp -r ${huginElm} dist
           '';
 
-          vendorSha256 = "sha256-+5ijFpx2dcSoG8cAPfqci/LN9sdEE/Po231zdhFdVq0=";
+          vendorHash = "sha256-+5ijFpx2dcSoG8cAPfqci/LN9sdEE/Po231zdhFdVq0=";
         };
       };
     }
@@ -94,7 +94,7 @@
         nodePackages.sass
         git
         gnumake
-        go_1_20
+        go_1_22
       ];
       devDeps = with pkgs;
         buildDeps
