@@ -81,7 +81,7 @@ func Run() error {
 		*verbose,
 		*localAddr,
 		logger,
-		false,
+		true,
 	)
 
 	k.Handle("/", distHandler())
