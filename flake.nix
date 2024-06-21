@@ -78,7 +78,7 @@
             cp -r ${huginElm} dist
           '';
 
-          vendorHash = "sha256-Mf+cJRSnWWLsBvCgooDlojtnpBc0pTqQz82vqjDFRwQ=";
+          vendorHash = "sha256-xSs/dqjrOTwZu2nL8K5F1xZcOvc1VFTSF3pzzSb68Gk=";
         };
       };
     }
