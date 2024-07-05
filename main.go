@@ -69,9 +69,9 @@ func distHandler() http.Handler {
 	return http.FileServer(http.FS(sub))
 }
 
-func loggingHandler(h http.Handler) http.Handler {
+func loggingHandler(h http.Handler, dir string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Method, r.URL.Path)
+		log.Printf("%s - %s: %s", r.Method, r.URL.Path, dir+r.URL.Path)
 		h.ServeHTTP(w, r)
 	})
 }
@@ -98,8 +98,8 @@ func Run() error {
 		log.Printf("--album is required to serve an album")
 	} else {
 		log.Printf("Serving content from %s", *albumDir)
-		k.Handle("/album/", loggingHandler(http.FileServer(http.Dir(*albumDir))))
-		k.Handle("/content/", loggingHandler(http.FileServer(http.Dir(*albumDir))))
+		k.Handle("/album/", http.StripPrefix("/album", loggingHandler(http.FileServer(http.Dir(*albumDir)), *albumDir)))
+		k.Handle("/content/", http.StripPrefix("/content", loggingHandler(http.FileServer(http.Dir(*albumDir)), *albumDir)))
 	}
 
 	if *hostname == "" {
