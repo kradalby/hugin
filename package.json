@@ -46,7 +46,7 @@
     "@types/umami": "0.1.5",
     "analytics": "^0.8.9",
     "bootstrap": "<5.0.0",
-    "eslint-plugin-prettier": "^5.1.1",
+    "eslint-plugin-prettier": "^5.2.1",
     "flexbin": "^0.2.0",
     "jszip": "^3.10.0",
     "jszip-utils": "0.1.0",
