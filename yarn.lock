@@ -1130,10 +1130,10 @@
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.7.tgz#c8fa532b60a0042219cdf173ca21a975ef0666ad"
   integrity sha512-wE2v81i4C4Ol09RtsWFAqg3BUitWbHSpSlIo+bNdsCJijO9sjme+zm+73ZMCa/qMC8UEERxzGbvmr1cffo2SiQ==
 
-"@types/google.analytics@0.0.45":
-  version "0.0.45"
-  resolved "https://registry.yarnpkg.com/@types/google.analytics/-/google.analytics-0.0.45.tgz#dc95c78d192df7f13c3a9a68d8873cb4094c68c2"
-  integrity sha512-h5H/Psvt0AErRDl392yYWXjhqGbrm8Anab6YOFRDKyHYJJ759+WVGvNJwYwfbgTGU+qV88CbPP+VPkm+ePrqZQ==
+"@types/google.analytics@0.0.46":
+  version "0.0.46"
+  resolved "https://registry.yarnpkg.com/@types/google.analytics/-/google.analytics-0.0.46.tgz#621be217fa21f847df62188fcaa86a7340c689da"
+  integrity sha512-wuMJ3GqLFGsTZdJ315b+uNnH2AwFScyS67NHlKOD4RaPMFt/N0vxdh6fvDgvOFg62a11Fqn2ggJwUypFmIko+A==
 
 "@types/jszip@3.4.1":
   version "3.4.1"
