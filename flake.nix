@@ -67,7 +67,7 @@
           '';
         };
 
-        hugin = pkgs.buildGo122Module {
+        hugin = pkgs.buildGoModule {
           pname = "hugin";
           version = huginVersion;
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
@@ -78,7 +78,7 @@
             cp -r ${huginElm} dist
           '';
 
-          vendorHash = "sha256-xSs/dqjrOTwZu2nL8K5F1xZcOvc1VFTSF3pzzSb68Gk=";
+          vendorHash = "sha256-rZ5CJW9iRi7Ozhg/cBCyByIqlKYLw1GtgGWiE3iTtDE=";
         };
       };
     }
@@ -94,7 +94,7 @@
         nodePackages.sass
         git
         gnumake
-        go_1_22
+        go
       ];
       devDeps = with pkgs;
         buildDeps
