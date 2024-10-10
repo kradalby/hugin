@@ -38,7 +38,7 @@
     "@parcel/transformer-image": "2.10.3",
     "@parcel/transformer-sass": "2.10.3",
     "@sentry/browser": "^7.91.0",
-    "@sentry/types": "7.91.0",
+    "@sentry/types": "7.119.2",
     "@types/google.analytics": "0.0.45",
     "@types/jszip": "3.4.1",
     "@types/mapbox-gl": "2.7.19",
