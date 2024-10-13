@@ -67,19 +67,20 @@
           '';
         };
 
-        hugin = pkgs.buildGoModule {
-          pname = "hugin";
-          version = huginVersion;
-          src = pkgs.nix-gitignore.gitignoreSource [] ./.;
+        hugin = pkgs.callPackage ({buildGoModule}:
+          buildGoModule {
+            pname = "hugin";
+            version = huginVersion;
+            src = pkgs.nix-gitignore.gitignoreSource [] ./.;
 
-          buildInputs = [huginElm];
+            buildInputs = [huginElm];
 
-          patchPhase = ''
-            cp -r ${huginElm} dist
-          '';
+            patchPhase = ''
+              cp -r ${huginElm} dist
+            '';
 
-          vendorHash = "sha256-rZ5CJW9iRi7Ozhg/cBCyByIqlKYLw1GtgGWiE3iTtDE=";
-        };
+            vendorHash = "sha256-rZ5CJW9iRi7Ozhg/cBCyByIqlKYLw1GtgGWiE3iTtDE=";
+          }) {};
       };
     }
     // flake-utils.lib.eachDefaultSystem
