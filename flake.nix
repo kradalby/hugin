@@ -18,22 +18,20 @@
       else "dev";
   in
     {
-      overlay = _: prev: let
-        pkgs = nixpkgs.legacyPackages.${prev.system};
-      in rec {
-        huginDeps = pkgs.yarn2nix-moretea.mkYarnPackage {
+      overlay = _: prev: rec {
+        huginDeps = prev.yarn2nix-moretea.mkYarnPackage {
           name = "huginYarnDeps";
-          src = pkgs.nix-gitignore.gitignoreSource ["Makefile" "go.mod" "go.sum" "*.go"] ./.;
+          src = prev.nix-gitignore.gitignoreSource ["Makefile" "go.mod" "go.sum" "*.go"] ./.;
           publishBinsFor = [
             "parcel"
           ];
         };
 
-        huginElm = pkgs.stdenv.mkDerivation {
+        huginElm = prev.stdenv.mkDerivation {
           name = "huginElm";
-          src = pkgs.nix-gitignore.gitignoreSource ["Makefile" "go.mod" "go.sum" "*.go"] ./.;
+          src = prev.nix-gitignore.gitignoreSource ["Makefile" "go.mod" "go.sum" "*.go"] ./.;
 
-          buildInputs = with pkgs; [
+          buildInputs = with prev; [
             huginDeps
 
             elmPackages.elm
@@ -53,7 +51,7 @@
             ln -fs ${huginDeps}/libexec/hugin/node_modules .
           '';
 
-          configurePhase = pkgs.elmPackages.fetchElmDeps {
+          configurePhase = prev.elmPackages.fetchElmDeps {
             elmVersion = "0.19.1";
             elmPackages = import ./elm-srcs.nix;
             registryDat = ./registry.dat;
@@ -67,11 +65,11 @@
           '';
         };
 
-        hugin = pkgs.callPackage ({buildGoModule}:
+        hugin = prev.callPackage ({buildGoModule}:
           buildGoModule {
             pname = "hugin";
             version = huginVersion;
-            src = pkgs.nix-gitignore.gitignoreSource [] ./.;
+            src = prev.nix-gitignore.gitignoreSource [] ./.;
 
             buildInputs = [huginElm];
 
