@@ -138,13 +138,22 @@ Where `<MUNIN GALLERY>` is a directory containing a `root/` and a `keywords/` fo
 
 ### Code style
 
-When developing on the project, be sure to follow the standard setup of [elm-format](https://github.com/avh4/elm-format) and [elm-analyse](https://github.com/stil4m/elm-analyse)
+Linters and formatters are driven by [prek](https://github.com/j178/prek)
+(a drop-in, Rust-native replacement for pre-commit) and configured in
+`.pre-commit-config.yaml`. The current set covers prettier, gofmt,
+golangci-lint, elm-format, nixpkgs-fmt and shellcheck. All tool binaries
+are provided by the flake's devShell, so `nix develop` (or direnv)
+must be active.
 
-All linters can be run with:
+Install the git hook once per checkout:
+
+    prek install
+
+Run every hook against every tracked file:
 
     make lint
 
-All linters are ran on the CI whenever a change is comitted.
+The same hooks run automatically on `git commit`.
 
 ### Environment variables
 

@@ -110,15 +110,20 @@
         ];
         devDeps = with pkgs;
           buildDeps
-          ++ [ elm2nix ]
-          ++ (with elmPackages; [
+          ++ [
+            # Tooling
+            elm2nix
             golangci-lint
+            nixpkgs-fmt
+            prek
+            prettier
             yarn
-            elm
-            elm-format
-            elm-json
-            elm-analyse
-          ]);
+
+            # Elm toolchain
+            elmPackages.elm
+            elmPackages.elm-format
+            elmPackages.elm-json
+          ];
       in
       {
         # `nix develop`
