@@ -58,64 +58,31 @@ server {
 }
 ```
 
-### Kubernetes
+### NixOS
 
-The current setup of the Hugin demo is installed on [Kubernetes](https://kubernetes.io) with the `/content` served from a storage server and proxied. Following is an example of that setup adding the storage server as a Kubernetes service and setting up the Ingress.
+The flake ships a NixOS module that wraps hugin in a systemd unit and
+fronts it with a Tailscale sidecar for access control:
 
-A up to date [Hugin docker container can be found here](https://hub.docker.com/r/kradalby/hugin)
+```nix
+{
+  inputs.hugin.url = "github:kradalby/hugin";
 
-Munin service:
-
+  outputs = { self, nixpkgs, hugin }: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      modules = [
+        hugin.nixosModules.default
+        {
+          services.hugin = {
+            enable = true;
+            album = "/var/lib/munin/gallery";
+            tailscaleKeyPath = "/run/secrets/hugin-tailscale-key";
+          };
+        }
+      ];
+    };
+  };
+}
 ```
-kind: Service
-apiVersion: v1
-metadata:
-  name: munin-content-service
-  namespace: hugin
-spec:
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-  type: ExternalName
-  externalName: storage.example.no
-```
-
-Ingress:
-
-```
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: hugin-ingress
-  namespace: hugin
-  annotations:
-    ingress.kubernetes.io/ssl-redirect: "true"
-    kubernetes.io/ingress.class: "nginx"
-    kubernetes.io/tls-acme: "true"
-spec:
-  tls:
-  - hosts:
-    - hugin.example.no
-    secretName: hugin-example-no-tls
-  rules:
-  - host: hugin.example.no
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: hugin-service
-          servicePort: 80
-      - path: /content
-        backend:
-          serviceName: munin-content-service
-          servicePort: 80
-```
-
-### Helm
-
-Check out the `helm/` directory for a Helm chart implementing the aforementioned Kubernetes installation.
 
 ## Development
 
