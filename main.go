@@ -53,7 +53,9 @@ func tokenHandler() http.Handler {
 			}
 		}
 
-		json.NewEncoder(w).Encode(tokens)
+		if err := json.NewEncoder(w).Encode(tokens); err != nil {
+			log.Printf("encoding tokens: %s", err)
+		}
 	})
 }
 
