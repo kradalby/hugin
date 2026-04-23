@@ -8,22 +8,15 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-      - id: check-ast
       - id: check-case-conflict
-      - id: check-docstring-first
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
       - id: check-merge-conflict
       - id: check-symlinks
-      - id: check-toml
       - id: check-xml
-      - id: debug-statements
       - id: destroyed-symlinks
       - id: detect-private-key
-      - id: double-quote-string-fixer
       - id: end-of-file-fixer
-      - id: name-tests-test
-      - id: requirements-txt-fixer
       - id: trailing-whitespace
 
   - repo: https://github.com/gruntwork-io/pre-commit
@@ -31,14 +24,35 @@ repos:
     hooks:
       - id: shellcheck
 
-  # - repo: https://github.com/Yelp/detect-secrets
-  #   rev: v1.1.0
-  #   hooks:
-  #     - id: detect-secrets
-  #       args:
-  #         - --exclude-files .drone.yml
-
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.14.0
+  # Language-specific linters run as local hooks so they come from the
+  # flake's devShell (nixpkgs pin), keeping tool versions reproducible.
+  # `nix develop` (or direnv) must be active for these to resolve.
+  - repo: local
     hooks:
-      - id: hadolint
+      - id: gofmt
+        name: gofmt
+        entry: gofmt -l -d -s
+        language: system
+        types: [go]
+
+      - id: golangci-lint
+        name: golangci-lint
+        # The go:embed directive in main.go references `dist/*`, which
+        # is produced by the Parcel build. Create a placeholder so the
+        # linter can type-check without running the full asset build.
+        entry: bash -c 'mkdir -p dist && touch dist/.placeholder && exec golangci-lint run ./...'
+        language: system
+        types: [go]
+        pass_filenames: false
+
+      - id: elm-format
+        name: elm-format
+        entry: elm-format --validate
+        language: system
+        files: \.elm$
+
+      - id: nixpkgs-fmt
+        name: nixpkgs-fmt
+        entry: nixpkgs-fmt --check
+        language: system
+        types: [nix]

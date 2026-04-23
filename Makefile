@@ -22,5 +22,4 @@ reinstall:
 	yarn
 
 lint:
-	npx elm-analyse
-	npx elm-format --validate src/
+	prek run --all-files
