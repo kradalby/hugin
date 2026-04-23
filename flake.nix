@@ -78,7 +78,7 @@
                 cp -r ${huginElm} dist
               '';
 
-              vendorHash = "sha256-rZ5CJW9iRi7Ozhg/cBCyByIqlKYLw1GtgGWiE3iTtDE=";
+              vendorHash = "sha256-GhosEPXxhcBng9OrkX7VvfhnGZr6/0UkkM66cILfZRY=";
 
               meta = {
                 description = "Image gallery frontend for munin";
