@@ -5,38 +5,24 @@ on:
     branches:
       - master
   pull_request:
-  schedule:
-    - cron: "30 2 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - uses: cachix/install-nix-action@616559265b40713947b9c190a8ff4b507b5df49b # v31
         with:
-          fetch-depth: 2
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
-      - uses: cachix/install-nix-action@v16
+      - name: Check flake
+        run: nix flake check
 
-      - name: Install dependencies
-        run: nix develop --command -- yarn
+      - name: Lint
+        run: nix develop --command -- prek run --all-files --show-diff-on-failure
 
       - name: Build
-        uses: nick-invision/retry@v2
-        with:
-          timeout_minutes: 10
-          # Allow the build to retry, elm has an issue were
-          # it fails to build because "constraints are too wide"
-          # but it isnt correct.
-          max_attempts: 3
-          retry_on: error
-          command: nix develop --command -- make build
-
-      # - name: Deploy to Github Pages
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   if: ${{ github.ref == 'refs/heads/main' }}
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./dist
-      #     cname: beta.aspargesgaarden.no
+        run: nix build .#hugin
