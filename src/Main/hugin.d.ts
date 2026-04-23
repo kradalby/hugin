@@ -6,5 +6,5 @@ declare function gtag(
   id: string,
   info: {
     page_path: string;
-  }
+  },
 ): void;

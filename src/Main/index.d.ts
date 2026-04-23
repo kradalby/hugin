@@ -11,7 +11,7 @@ export namespace Elm {
         };
         initMap: {
           subscribe(
-            callback: (data: [string, [number, number][]]) => void
+            callback: (data: [string, [number, number][]]) => void,
           ): void;
         };
         analytics: {
