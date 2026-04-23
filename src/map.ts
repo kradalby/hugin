@@ -2,15 +2,12 @@
 import mapboxgl from "mapbox-gl";
 
 async function setMapboxToken() {
-  const response = await fetch(
-    "/tokens"
-  );
+  const response = await fetch("/tokens");
 
-  let body = await response.json()
+  let body = await response.json();
 
-  mapboxgl.accessToken = body.mapbox
+  mapboxgl.accessToken = body.mapbox;
 }
-
 
 let map: mapboxgl.Map | null = null;
 
@@ -19,7 +16,7 @@ export default async function initMap(data: [string, [number, number][]]) {
   console.log("DEBUG: initMap called with: ", data);
 
   if (mapboxgl.accessToken === null) {
-    await setMapboxToken()
+    await setMapboxToken();
   }
 
   // ----------------------------------------------
@@ -44,7 +41,7 @@ export default async function initMap(data: [string, [number, number][]]) {
   let divName = "map-" + data[0];
   let coordinates = data[1];
 
-  await resolveElementById(divName)
+  await resolveElementById(divName);
 
   // Create map
   map = new mapboxgl.Map({

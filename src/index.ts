@@ -29,7 +29,7 @@ library.add(
   faCaretSquareRight,
   faSpinner,
   faImages,
-  faAngleRight
+  faAngleRight,
 );
 
 dom.watch();
@@ -49,19 +49,19 @@ Sentry.init({
 });
 
 let log = {
-  critical: function(val: string): void {
+  critical: function (val: string): void {
     Sentry.captureMessage(`[CRITICAL]: ${val}`);
   },
-  error: function(val: string): void {
+  error: function (val: string): void {
     Sentry.captureMessage(`[ERROR]: ${val}`);
   },
-  warning: function(val: string): void {
+  warning: function (val: string): void {
     Sentry.captureMessage(`[WARNING]: ${val}`);
   },
-  info: function(val: string): void {
+  info: function (val: string): void {
     Sentry.captureMessage(`[INFO]: ${val}`);
   },
-  debug: function(val: string): void {
+  debug: function (val: string): void {
     Sentry.captureMessage(`[DEBUG]: ${val}`);
   },
 };
@@ -89,7 +89,7 @@ const analytics = Analytics({
 // ELM
 import { Elm } from "./Main.elm";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   let app = Elm.Main.init({
     node: document.getElementById("root"),
     flags: null,
