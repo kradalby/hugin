@@ -6,23 +6,31 @@ on:
       - master
   pull_request:
 
+# Every `run:` step executes inside `nix develop`, so devShell tools come
+# straight from the flake with no per-step prefix.
+defaults:
+  run:
+    shell: nix develop --command bash -e {0}
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
-      - uses: cachix/install-nix-action@616559265b40713947b9c190a8ff4b507b5df49b # v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
+      - name: Install Nix
+        uses: NixOS/nix-installer-action@main
+
+      - name: Setup Nix cache (hestia)
+        uses: Mic92/hestia/action@main
 
       - name: Check flake
         run: nix flake check
 
       - name: Lint
-        run: nix develop --command -- prek run --all-files --show-diff-on-failure
+        run: prek run --all-files --show-diff-on-failure
 
       - name: Build
         run: nix build .#hugin
