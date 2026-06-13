@@ -145,9 +145,38 @@
           default = hugin;
         };
 
+        # `nix fmt`
+        formatter = pkgs.writeShellApplication {
+          name = "hugin-fmt";
+          runtimeInputs = with pkgs; [ nixpkgs-fmt prettier ];
+          text = ''
+            nixpkgs-fmt "''${@:-.}"
+            prettier --write '**/*.{ts,js,md,yaml,yml,sass,css,scss,html}'
+          '';
+        };
+
         checks = {
-          format =
-            pkgs.runCommand "check-format"
+          # Full Go+Elm build (compiles the Go incl. the dist/* embed).
+          build = self.packages.${system}.hugin;
+
+          # gotest / golangci-lint run against the Go source with the Elm
+          # build output (huginElm) injected into dist/, mirroring the
+          # package's patchPhase so the //go:embed dist/* target exists.
+          gotest = pkgs.hugin.overrideAttrs (_old: {
+            pname = "hugin-gotest";
+            doCheck = true;
+          });
+
+          golangci-lint = pkgs.hugin.overrideAttrs (old: {
+            pname = "hugin-golangci-lint";
+            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.golangci-lint ];
+            postBuild = (old.postBuild or "") + ''
+              HOME=$TMPDIR golangci-lint run ./...
+            '';
+          });
+
+          formatting =
+            pkgs.runCommand "check-formatting"
               {
                 buildInputs = with pkgs; [
                   nixpkgs-fmt
@@ -157,8 +186,8 @@
               cp -r ${./.} source
               chmod -R u+w source
               cd source
-              ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check .
-              ${pkgs.prettier}/bin/prettier --check '**/*.{ts,js,md,yaml,yml,sass,css,scss,html}'
+              nixpkgs-fmt --check .
+              prettier --check '**/*.{ts,js,md,yaml,yml,sass,css,scss,html}'
               touch $out
             '';
         };
