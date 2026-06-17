@@ -19,50 +19,45 @@
         else "dev";
 
       huginOverlay = _final: prev: rec {
-        huginDeps = prev.yarn2nix-moretea.mkYarnPackage {
-          name = "huginYarnDeps";
-          src = prev.nix-gitignore.gitignoreSource [ "Makefile" "go.mod" "go.sum" "*.go" ] ./.;
-          publishBinsFor = [
-            "parcel"
-          ];
-        };
-
         huginElm = prev.stdenv.mkDerivation {
           name = "huginElm";
           src = prev.nix-gitignore.gitignoreSource [ "Makefile" "go.mod" "go.sum" "*.go" ] ./.;
 
-          buildInputs = with prev; [
-            huginDeps
-
-            elmPackages.elm
-            yarn
+          # yarn2nix was removed from nixpkgs; use the standard yarn v1 hooks.
+          # yarnConfigHook populates ./node_modules from yarnOfflineCache.
+          nativeBuildInputs = with prev; [
+            yarnConfigHook
             nodejs
+            elmPackages.elm
             sass
-
             python313
           ];
+
+          yarnOfflineCache = prev.fetchYarnDeps {
+            yarnLock = ./yarn.lock;
+            sha256 = "0jjhnj5fxnz981zwsv9qcczji6bfi2iv6mlvjkmbzf5gwhg5a5ri";
+          };
 
           postUnpack = ''
             export HOME="$TMP"
           '';
 
-          patchPhase = ''
-            rm -rf elm-stuff
-            ln -fs ${huginDeps}/libexec/hugin/node_modules .
-          '';
-
-          configurePhase = prev.elmPackages.fetchElmDeps {
+          # Fetch Elm 0.19.1 packages into ELM_HOME before the parcel build.
+          preBuild = prev.elmPackages.fetchElmDeps {
             elmVersion = "0.19.1";
             elmPackages = import ./elm-srcs.nix;
             registryDat = ./registry.dat;
           };
 
-          dontBuild = true;
-
-          installPhase = ''
+          buildPhase = ''
+            runHook preBuild
+            rm -rf elm-stuff
             mkdir -p $out
-            parcel build --log-level verbose --dist-dir $out src/index.html
+            node_modules/.bin/parcel build --log-level verbose --dist-dir $out src/index.html
+            runHook postBuild
           '';
+
+          dontInstall = true;
         };
 
         hugin = prev.callPackage
@@ -101,7 +96,8 @@
           inherit system;
         };
         buildDeps = with pkgs; [
-          huginDeps
+          nodejs
+          yarn
           elmPackages.elm
           sass
           git
