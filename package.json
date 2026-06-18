@@ -33,7 +33,7 @@
     "@parcel/config-default": "2.10.3",
     "@parcel/core": "2.10.3",
     "@parcel/reporter-bundle-buddy": "2.10.3",
-    "@parcel/reporter-dev-server": "2.10.3",
+    "@parcel/reporter-dev-server": "2.16.4",
     "@parcel/transformer-elm": "2.10.3",
     "@parcel/transformer-image": "2.10.3",
     "@parcel/transformer-sass": "2.10.3",
