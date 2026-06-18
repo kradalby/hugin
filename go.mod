@@ -1,6 +1,6 @@
 module github.com/kradalby/hugin
 
-go 1.26.1
+go 1.26.4
 
 require github.com/kradalby/kraweb v0.0.0-20241010194200-c56492e7e39c
 
