@@ -65,6 +65,7 @@
             buildGoModule {
               pname = "hugin";
               version = huginVersion;
+              go = prev.go_1_26; # match go.mod
               src = prev.nix-gitignore.gitignoreSource [ ] ./.;
 
               buildInputs = [ huginElm ];
@@ -102,7 +103,7 @@
           sass
           git
           gnumake
-          go
+          go_1_26 # match go.mod
         ];
         devDeps = with pkgs;
           buildDeps
@@ -110,6 +111,8 @@
             # Tooling
             elm2nix
             golangci-lint
+            gofumpt
+            gopls
             nixpkgs-fmt
             prek
             prettier
@@ -186,6 +189,34 @@
               prettier --check '**/*.{ts,js,md,yaml,yml,sass,css,scss,html}'
               touch $out
             '';
+
+          # Eval-only smoke test: evaluate the NixOS module with a stub
+          # package so options/config materialize without the heavy Elm+Go
+          # build. Fails the check if the module stops evaluating.
+          nixos-module =
+            let
+              eval = nixpkgs.lib.nixosSystem {
+                inherit system;
+                modules = [
+                  self.nixosModules.default
+                  {
+                    boot.loader.grub.enable = false;
+                    fileSystems."/" = { device = "nodev"; fsType = "tmpfs"; };
+                    system.stateVersion = "24.05";
+                    services.hugin = {
+                      enable = true;
+                      package = pkgs.hello; # stub, avoids building hugin
+                      tailscaleKeyPath = "/run/secrets/hugin";
+                      album = "/var/lib/hugin/album";
+                    };
+                  }
+                ];
+              };
+            in
+            pkgs.runCommand "check-nixos-module" { } ''
+              test -n "${eval.config.systemd.services.hugin.script}"
+              touch $out
+            '';
         };
       })
     // {
@@ -231,31 +262,37 @@
 
               tailscaleKeyPath = mkOption {
                 type = types.path;
+                description = "Path to the Tailscale auth key used to join the tailnet.";
               };
 
               album = mkOption {
                 type = types.path;
+                description = "Directory containing the Munin album to serve.";
               };
 
               verbose = mkOption {
                 type = types.bool;
                 default = false;
+                description = "Enable verbose logging.";
               };
 
               controlUrl = mkOption {
                 type = types.str;
                 default = "";
+                description = "Tailscale control server URL; empty uses upstream.";
               };
 
               localhostPort = mkOption {
                 type = types.port;
                 default = 56664;
+                description = "Local address port hugin listens on.";
               };
 
               environmentFile = mkOption {
                 type = types.nullOr types.path;
                 default = null;
                 example = "/var/lib/secrets/huginSecrets";
+                description = "Path to an EnvironmentFile passed to the systemd service for secrets.";
               };
             };
           };
