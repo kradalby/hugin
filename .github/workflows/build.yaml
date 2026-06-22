@@ -6,6 +6,10 @@ on:
       - master
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # Gate jobs only call `nix build .#checks.<sys>.<name>`, so no `nix develop`
 # default shell is needed. The check logic lives in flake.nix.
 permissions:
