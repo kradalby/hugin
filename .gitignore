@@ -17,6 +17,7 @@ elm-stuff/
 
 # Env
 .env
+.envrc.local
 
 # Editor / OS
 .idea/
