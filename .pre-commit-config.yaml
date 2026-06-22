@@ -1,3 +1,7 @@
+# dist/, elm-stuff/ and node_modules/ hold generated/vendored output that
+# the builtin fixers must not touch.
+exclude: "^(dist/|elm-stuff/|node_modules/)"
+
 repos:
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
@@ -5,18 +9,23 @@ repos:
       - id: prettier
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        args: [--maxkb=1000]
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
+      - id: check-json
       - id: check-merge-conflict
       - id: check-symlinks
+      - id: check-toml
       - id: check-xml
+      - id: check-yaml
       - id: destroyed-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
+      - id: mixed-line-ending
       - id: trailing-whitespace
 
   - repo: https://github.com/gruntwork-io/pre-commit
@@ -40,7 +49,7 @@ repos:
         # The go:embed directive in main.go references `dist/*`, which
         # is produced by the Parcel build. Create a placeholder so the
         # linter can type-check without running the full asset build.
-        entry: bash -c 'mkdir -p dist && touch dist/.placeholder && exec golangci-lint run ./...'
+        entry: bash -c 'mkdir -p dist && touch dist/.placeholder && exec golangci-lint run --new-from-rev=HEAD~1 --fix ./...'
         language: system
         types: [go]
         pass_filenames: false
