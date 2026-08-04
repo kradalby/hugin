@@ -1,0 +1,80 @@
+# enable-all / disable-few; the disable list is copied from headscale (the
+# house reference config), not curated per-repo.
+version: "2"
+
+linters:
+  default: all
+  disable:
+    - cyclop
+    - depguard
+    - dupl
+    - exhaustruct
+    - funcorder
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - godox
+    - gomodguard
+    - interfacebloat
+    - ireturn
+    - lll
+    - maintidx
+    - makezero
+    - mnd
+    - musttag
+    - nestif
+    - nolintlint
+    - paralleltest
+    - revive
+    - tagliatelle
+    - testpackage
+    - varnamelen
+    - wrapcheck
+    - wsl
+  settings:
+    goconst:
+      # Test fixtures repeat strings by their nature; extracting them obscures
+      # the test rather than helping. Production code stays strict.
+      ignore-tests: true
+      min-occurrences: 5
+      min-len: 6
+    forbidigo:
+      forbid:
+        - pattern: 'time\.Sleep'
+          msg: >-
+            time.Sleep is forbidden.
+            In tests: use assert.EventuallyWithT for polling/waiting patterns.
+            In production code: use a backoff strategy (e.g., cenkalti/backoff)
+            or proper synchronization primitives.
+      analyze-types: true
+    gocritic:
+      disabled-checks:
+        - appendAssign
+        - ifElseChain
+    nlreturn:
+      block-size: 4
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - gen
+
+# Mirrors the treefmt formatting check (the source of truth) so `golangci-lint
+# fmt` produces the same result: gofumpt + goimports grouping local packages last.
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/kradalby/hugin
+  exclusions:
+    paths:
+      - gen/
+      - testdata/

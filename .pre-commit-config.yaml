@@ -46,7 +46,7 @@ repos:
         # The go:embed directive in main.go references `dist/*`, which
         # is produced by the Parcel build. Create a placeholder so the
         # linter can type-check without running the full asset build.
-        entry: bash -c 'mkdir -p dist && touch dist/.placeholder && exec golangci-lint run --new-from-rev=HEAD~1 --fix ./...'
+        entry: bash -c 'mkdir -p dist && touch dist/.placeholder && exec golangci-lint run ./...'
         language: system
         types: [go]
         pass_filenames: false

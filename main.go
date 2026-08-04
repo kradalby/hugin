@@ -17,6 +17,8 @@ import (
 
 const defaultHostname = "hugin"
 
+var errHostnameEmpty = errors.New("--hostname, if specified, cannot be empty")
+
 var (
 	verbose = flag.Bool("verbose", false, "be verbose")
 
@@ -46,7 +48,8 @@ var (
 )
 
 func main() {
-	if err := Run(); err != nil {
+	err := Run()
+	if err != nil {
 		log.Fatalf("failed to start hugin: %s", err)
 	}
 }
@@ -64,7 +67,8 @@ func tokenHandler() http.Handler {
 			}
 		}
 
-		if err := json.NewEncoder(w).Encode(tokens); err != nil {
+		err := json.NewEncoder(w).Encode(tokens)
+		if err != nil {
 			log.Printf("encoding tokens: %s", err)
 		}
 	})
@@ -84,7 +88,12 @@ func distHandler() http.Handler {
 
 func loggingHandler(h http.Handler, dir string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s - %s: %s", r.Method, r.URL.Path, dir+r.URL.Path)
+		// gosec flags any http.Request-derived value reaching a log sink as
+		// log injection (G706), regardless of transformation. This is
+		// operator-facing debug logging of the requested path, not a
+		// security/audit log, and %q already escapes newlines/control
+		// characters so a request can't forge extra log lines.
+		log.Printf("%s - %q: %q", r.Method, r.URL.Path, dir+r.URL.Path) //nolint:gosec
 		h.ServeHTTP(w, r)
 	})
 }
@@ -93,7 +102,7 @@ func Run() error {
 	flag.Parse()
 
 	if *hostname == "" {
-		return errors.New("--hostname, if specified, cannot be empty")
+		return errHostnameEmpty
 	}
 
 	logger := log.New(os.Stdout, "hugin: ", log.LstdFlags)
