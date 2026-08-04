@@ -30,103 +30,7 @@
         hugin = self.packages.${prev.system}.default;
       };
 
-      nixosModules.default =
-        {
-          pkgs,
-          lib,
-          config,
-          ...
-        }:
-        let
-          cfg = config.services.hugin;
-        in
-        {
-          options = with lib; {
-            services.hugin = {
-              enable = mkEnableOption "Enable hugin";
-
-              package = mkOption {
-                type = types.package;
-                description = ''
-                  hugin package to use
-                '';
-                default = pkgs.hugin;
-              };
-
-              dataDir = mkOption {
-                type = types.path;
-                default = "/var/lib/hugin";
-                description = "Path to data dir";
-              };
-
-              user = mkOption {
-                type = types.str;
-                default = "hugin";
-                description = "User account under which hugin runs.";
-              };
-
-              group = mkOption {
-                type = types.str;
-                default = "hugin";
-                description = "Group account under which hugin runs.";
-              };
-
-              tailscaleKeyPath = mkOption { type = types.path; };
-
-              album = mkOption { type = types.path; };
-
-              verbose = mkOption {
-                type = types.bool;
-                default = false;
-              };
-
-              controlUrl = mkOption {
-                type = types.str;
-                default = "";
-              };
-
-              localhostPort = mkOption {
-                type = types.port;
-                default = 56664;
-              };
-
-              environmentFile = mkOption {
-                type = types.nullOr types.path;
-                default = null;
-                example = "/var/lib/secrets/huginSecrets";
-              };
-            };
-          };
-          config = lib.mkIf cfg.enable {
-            systemd.services.hugin = {
-              enable = true;
-              script =
-                let
-                  args = [
-                    "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
-                    "--album ${cfg.album}"
-                    "--addr localhost:${toString cfg.localhostPort}"
-                  ]
-                  ++ lib.optionals cfg.verbose [ "--verbose" ];
-                in
-                ''
-                  ${cfg.package}/bin/hugin ${builtins.concatStringsSep " " args}
-                '';
-              wantedBy = [ "multi-user.target" ];
-              after = [ "network-online.target" ];
-              serviceConfig = {
-                User = cfg.user;
-                Group = cfg.group;
-                Restart = "always";
-                RestartSec = "15";
-                WorkingDirectory = "${cfg.dataDir}";
-                EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-              };
-              path = [ cfg.package ];
-              environment = { };
-            };
-          };
-        };
+      nixosModules.default = import ./module.nix self;
     }
     // flake-utils.lib.eachDefaultSystem (
       system:
@@ -288,6 +192,17 @@
           golangci-lint = (fc.goLint common).overrideAttrs withDist;
 
           formatting = treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.);
+        }
+        # NixOS module evaluation needs a Linux system.
+        // pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+          module-eval = import ./module-eval.nix {
+            inherit
+              pkgs
+              self
+              nixpkgs
+              system
+              ;
+          };
         };
       }
     );

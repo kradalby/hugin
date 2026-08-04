@@ -74,7 +74,9 @@ fronts it with a Tailscale sidecar for access control:
         {
           services.hugin = {
             enable = true;
-            album = "/var/lib/munin/gallery";
+            # The directory Munin generated (its targetFolder), holding
+            # root/ and keywords/.
+            contentDir = "/var/lib/munin/gallery/content";
             tailscaleKeyPath = "/run/secrets/hugin-tailscale-key";
           };
         }
