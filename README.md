@@ -126,13 +126,17 @@ The same hooks run automatically on `git commit`.
 
 ### Environment variables
 
-For all features of the Hugin to work, you need tokens for a few services:
+Third-party tokens are read by the hugin server at runtime, not baked into
+the bundle: every `HUGIN_TOKEN_<NAME>` variable in the server's environment is
+served from `/tokens` as a lowercased `name` key, which the frontend fetches on
+demand.
 
-- `HUGIN_MAPBOX_ACCESS_TOKEN` - For rendering maps on Album and Photos pages
-- `HUGIN_ROLLBAR_ACCESS_TOKEN` - For runtime error reporting (can be ommitted)
-- `HUGIN_SENTRY_DSN` For runtime error reporting (can be ommitted)
+- `HUGIN_TOKEN_MAPBOX` - For rendering maps on Album and Photo pages
 
-This should be exported as environment variables and will be picked up by webpack.
+Under the NixOS module these belong in an `environmentFile`, so the token never
+reaches the Nix store:
+
+    services.hugin.environmentFile = "/run/secrets/hugin-tokens";
 
 ## Screenshots
 
