@@ -42,27 +42,25 @@ let screenfull = <Screenfull>sf;
 ///////////////////////////////////////////////////
 // Error reporting and Analytics
 
-import * as Sentry from "@sentry/browser";
-
-Sentry.init({
-  dsn: process.env.HUGIN_SENTRY_DSN,
-});
-
+// Errors from Elm land in the browser console. This used to go to Sentry,
+// dropped because a supported SDK version costs ~0.7 MB of bundle to report
+// errors that nobody collected: it no-op'd unless a DSN was baked in at build
+// time, and nothing set one.
 let log = {
   critical: function (val: string): void {
-    Sentry.captureMessage(`[CRITICAL]: ${val}`);
+    console.error(`[CRITICAL]: ${val}`);
   },
   error: function (val: string): void {
-    Sentry.captureMessage(`[ERROR]: ${val}`);
+    console.error(`[ERROR]: ${val}`);
   },
   warning: function (val: string): void {
-    Sentry.captureMessage(`[WARNING]: ${val}`);
+    console.warn(`[WARNING]: ${val}`);
   },
   info: function (val: string): void {
-    Sentry.captureMessage(`[INFO]: ${val}`);
+    console.info(`[INFO]: ${val}`);
   },
   debug: function (val: string): void {
-    Sentry.captureMessage(`[DEBUG]: ${val}`);
+    console.debug(`[DEBUG]: ${val}`);
   },
 };
 

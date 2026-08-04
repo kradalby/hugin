@@ -1,11 +1,15 @@
 install:
 	yarn
 
+# --no-autoinstall: parcel otherwise writes newly-discovered polyfills straight
+# into package.json/yarn.lock mid-build, which desyncs the flake's
+# fetchYarnDeps hash. The nix build is offline and never autoinstalls, so a
+# missing dep should fail here too rather than be papered over.
 build: clean
-	npx parcel build src/index.html
+	npx parcel build --no-autoinstall src/index.html
 
 dev:
-	npx parcel serve src/index.html
+	npx parcel serve --no-autoinstall src/index.html
 
 upgrade:
 	yarn upgrade-interactive --latest
