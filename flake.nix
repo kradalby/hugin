@@ -4,227 +4,38 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    flake-checks.url = "github:kradalby/flake-checks";
+    flake-checks.inputs.nixpkgs.follows = "nixpkgs";
+    flake-checks.inputs.flake-utils.follows = "flake-utils";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , flake-utils
-    , ...
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      flake-checks,
+      treefmt-nix,
     }:
     let
-      huginVersion =
-        if (self ? shortRev)
-        then self.shortRev
-        else "dev";
-
-      huginOverlay = _final: prev: rec {
-        huginElm = prev.stdenv.mkDerivation {
-          name = "huginElm";
-          src = prev.nix-gitignore.gitignoreSource [ "Makefile" "go.mod" "go.sum" "*.go" ] ./.;
-
-          # yarn2nix was removed from nixpkgs; use the standard yarn v1 hooks.
-          # yarnConfigHook populates ./node_modules from yarnOfflineCache.
-          nativeBuildInputs = with prev; [
-            yarnConfigHook
-            nodejs
-            elmPackages.elm
-            sass
-            python313
-          ];
-
-          yarnOfflineCache = prev.fetchYarnDeps {
-            yarnLock = ./yarn.lock;
-            sha256 = "0jjhnj5fxnz981zwsv9qcczji6bfi2iv6mlvjkmbzf5gwhg5a5ri";
-          };
-
-          postUnpack = ''
-            export HOME="$TMP"
-          '';
-
-          # Fetch Elm 0.19.1 packages into ELM_HOME before the parcel build.
-          preBuild = prev.elmPackages.fetchElmDeps {
-            elmVersion = "0.19.1";
-            elmPackages = import ./elm-srcs.nix;
-            registryDat = ./registry.dat;
-          };
-
-          buildPhase = ''
-            runHook preBuild
-            rm -rf elm-stuff
-            mkdir -p $out
-            node_modules/.bin/parcel build --log-level verbose --dist-dir $out src/index.html
-            runHook postBuild
-          '';
-
-          dontInstall = true;
-        };
-
-        hugin = prev.callPackage
-          ({ buildGoModule, lib }:
-            buildGoModule {
-              pname = "hugin";
-              version = huginVersion;
-              go = prev.go_1_26; # match go.mod
-              src = prev.nix-gitignore.gitignoreSource [ ] ./.;
-
-              buildInputs = [ huginElm ];
-
-              patchPhase = ''
-                cp -r ${huginElm} dist
-              '';
-
-              vendorHash = "sha256-GhosEPXxhcBng9OrkX7VvfhnGZr6/0UkkM66cILfZRY=";
-
-              meta = {
-                description = "Image gallery frontend for munin";
-                homepage = "https://github.com/kradalby/hugin";
-                license = lib.licenses.agpl3Only;
-                mainProgram = "hugin";
-              };
-            })
-          { };
-      };
+      huginVersion = if (self ? shortRev) then self.shortRev else "dev";
     in
     {
-      overlays.default = huginOverlay;
-    }
-    // flake-utils.lib.eachDefaultSystem
-      (system:
-      let
-        pkgs = import nixpkgs {
-          overlays = [ self.overlays.default ];
-          inherit system;
-        };
-        buildDeps = with pkgs; [
-          nodejs
-          yarn
-          elmPackages.elm
-          sass
-          git
-          gnumake
-          go_1_26 # match go.mod
-        ];
-        devDeps = with pkgs;
-          buildDeps
-          ++ [
-            # Tooling
-            elm2nix
-            golangci-lint
-            gofumpt
-            gopls
-            nixpkgs-fmt
-            prek
-            prettier
-            yarn
+      # A thin alias onto the per-system package, so downstream flakes can
+      # `overlays.default` their way to `pkgs.hugin` without re-evaluating the
+      # build recipe against a partial (pre-overlay) package set.
+      overlays.default = _final: prev: {
+        hugin = self.packages.${prev.system}.default;
+      };
 
-            # Elm toolchain
-            elmPackages.elm
-            elmPackages.elm-format
-            elmPackages.elm-json
-          ];
-      in
-      {
-        # `nix develop`
-        devShells.default = pkgs.mkShell { buildInputs = devDeps; };
-
-        # `nix build`
-        packages = {
-          inherit (pkgs) hugin;
-          default = pkgs.hugin;
-        };
-
-        # `nix run`
-        apps = rec {
-          hugin = (flake-utils.lib.mkApp {
-            drv = pkgs.hugin;
-          }) // {
-            meta = pkgs.hugin.meta or { };
-          };
-          default = hugin;
-        };
-
-        # `nix fmt`
-        formatter = pkgs.writeShellApplication {
-          name = "hugin-fmt";
-          runtimeInputs = with pkgs; [ nixpkgs-fmt prettier ];
-          text = ''
-            nixpkgs-fmt "''${@:-.}"
-            prettier --write '**/*.{ts,js,md,yaml,yml,sass,css,scss,html}'
-          '';
-        };
-
-        checks = {
-          # Full Go+Elm build (compiles the Go incl. the dist/* embed).
-          build = self.packages.${system}.hugin;
-
-          # gotest / golangci-lint run against the Go source with the Elm
-          # build output (huginElm) injected into dist/, mirroring the
-          # package's patchPhase so the //go:embed dist/* target exists.
-          gotest = pkgs.hugin.overrideAttrs (_old: {
-            pname = "hugin-gotest";
-            doCheck = true;
-          });
-
-          golangci-lint = pkgs.hugin.overrideAttrs (old: {
-            pname = "hugin-golangci-lint";
-            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.golangci-lint ];
-            postBuild = (old.postBuild or "") + ''
-              HOME=$TMPDIR golangci-lint run ./...
-            '';
-          });
-
-          formatting =
-            pkgs.runCommand "check-formatting"
-              {
-                buildInputs = with pkgs; [
-                  nixpkgs-fmt
-                  prettier
-                ];
-              } ''
-              cp -r ${./.} source
-              chmod -R u+w source
-              cd source
-              nixpkgs-fmt --check .
-              prettier --check '**/*.{ts,js,md,yaml,yml,sass,css,scss,html}'
-              touch $out
-            '';
-
-          # Eval-only smoke test: evaluate the NixOS module with a stub
-          # package so options/config materialize without the heavy Elm+Go
-          # build. Fails the check if the module stops evaluating.
-          nixos-module =
-            let
-              eval = nixpkgs.lib.nixosSystem {
-                inherit system;
-                modules = [
-                  self.nixosModules.default
-                  {
-                    boot.loader.grub.enable = false;
-                    fileSystems."/" = { device = "nodev"; fsType = "tmpfs"; };
-                    system.stateVersion = "24.05";
-                    services.hugin = {
-                      enable = true;
-                      package = pkgs.hello; # stub, avoids building hugin
-                      tailscaleKeyPath = "/run/secrets/hugin";
-                      album = "/var/lib/hugin/album";
-                    };
-                  }
-                ];
-              };
-            in
-            pkgs.runCommand "check-nixos-module" { } ''
-              test -n "${eval.config.systemd.services.hugin.script}"
-              touch $out
-            '';
-        };
-      })
-    // {
       nixosModules.default =
-        { pkgs
-        , lib
-        , config
-        , ...
+        {
+          pkgs,
+          lib,
+          config,
+          ...
         }:
         let
           cfg = config.services.hugin;
@@ -260,39 +71,29 @@
                 description = "Group account under which hugin runs.";
               };
 
-              tailscaleKeyPath = mkOption {
-                type = types.path;
-                description = "Path to the Tailscale auth key used to join the tailnet.";
-              };
+              tailscaleKeyPath = mkOption { type = types.path; };
 
-              album = mkOption {
-                type = types.path;
-                description = "Directory containing the Munin album to serve.";
-              };
+              album = mkOption { type = types.path; };
 
               verbose = mkOption {
                 type = types.bool;
                 default = false;
-                description = "Enable verbose logging.";
               };
 
               controlUrl = mkOption {
                 type = types.str;
                 default = "";
-                description = "Tailscale control server URL; empty uses upstream.";
               };
 
               localhostPort = mkOption {
                 type = types.port;
                 default = 56664;
-                description = "Local address port hugin listens on.";
               };
 
               environmentFile = mkOption {
                 type = types.nullOr types.path;
                 default = null;
                 example = "/var/lib/secrets/huginSecrets";
-                description = "Path to an EnvironmentFile passed to the systemd service for secrets.";
               };
             };
           };
@@ -301,13 +102,12 @@
               enable = true;
               script =
                 let
-                  args =
-                    [
-                      "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
-                      "--album ${cfg.album}"
-                      "--addr localhost:${toString cfg.localhostPort}"
-                    ]
-                    ++ lib.optionals cfg.verbose [ "--verbose" ];
+                  args = [
+                    "--tailscale-auth-key-path ${cfg.tailscaleKeyPath}"
+                    "--album ${cfg.album}"
+                    "--addr localhost:${toString cfg.localhostPort}"
+                  ]
+                  ++ lib.optionals cfg.verbose [ "--verbose" ];
                 in
                 ''
                   ${cfg.package}/bin/hugin ${builtins.concatStringsSep " " args}
@@ -327,5 +127,168 @@
             };
           };
         };
-    };
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        fc = flake-checks.lib;
+
+        # The Elm/parcel frontend, built entirely in nix (no ad-hoc `npm run`).
+        # yarn deps are vendored via fetchYarnDeps/yarnConfigHook (the standard
+        # yarn v1 hooks; yarn2nix itself was removed from nixpkgs). Elm deps
+        # via fetchElmDeps + the pinned elm-srcs.nix/registry.dat (elm2nix).
+        huginElm = pkgs.stdenv.mkDerivation {
+          pname = "huginElm";
+          version = huginVersion;
+          src = pkgs.nix-gitignore.gitignoreSource [ "Makefile" "go.mod" "go.sum" "*.go" ] ./.;
+
+          yarnOfflineCache = pkgs.fetchYarnDeps {
+            yarnLock = ./yarn.lock;
+            hash = "sha256-MRdVHuSvuL/qlJtWs6OIbpkoP2M4bc1/QOnb7oq0UEo=";
+          };
+
+          nativeBuildInputs = with pkgs; [
+            yarnConfigHook
+            nodejs
+            elmPackages.elm
+            sass
+            python313
+          ];
+
+          postUnpack = ''
+            export HOME="$TMP"
+          '';
+
+          # yarnConfigHook already installed node_modules by this point (it
+          # runs as part of the default configurePhase's postConfigureHooks);
+          # this fetches the pinned Elm packages into ELM_HOME so `elm make`
+          # never touches the network.
+          postConfigure = pkgs.elmPackages.fetchElmDeps {
+            elmVersion = "0.19.1";
+            elmPackages = import ./elm-srcs.nix;
+            registryDat = ./registry.dat;
+          };
+
+          buildPhase = ''
+            runHook preBuild
+            mkdir -p $out
+            yarn --offline parcel build --log-level verbose --dist-dir $out src/index.html
+            runHook postBuild
+          '';
+
+          dontInstall = true;
+        };
+
+        common = {
+          inherit pkgs;
+          root = ./.;
+          pname = "hugin";
+          version = huginVersion;
+          vendorHash = "sha256-GhosEPXxhcBng9OrkX7VvfhnGZr6/0UkkM66cILfZRY=";
+          goPkg = pkgs.go_1_26;
+        };
+
+        # flake-checks only knows about Go sources, so the Elm/parcel build
+        # (huginElm) is layered on top here: copy its output into dist/ so
+        # main.go's `//go:embed dist/*` has something to embed, mirroring
+        # what the patchPhase used to do directly against buildGoModule.
+        withDist = old: {
+          buildInputs = (old.buildInputs or [ ]) ++ [ huginElm ];
+          postPatch = (old.postPatch or "") + "cp -r ${huginElm} dist";
+        };
+
+        meta = {
+          description = "Image gallery frontend for munin";
+          homepage = "https://github.com/kradalby/hugin";
+          license = pkgs.lib.licenses.agpl3Only;
+          mainProgram = "hugin";
+        };
+
+        hugin = (fc.goBuild common).overrideAttrs (old: (withDist old) // { inherit meta; });
+
+        # gofumpt + goimports -local + nixfmt (RFC 166, the fleet-wide nix
+        # formatter) + prettier (web/doc) + elm-format. flake-checks'
+        # `formatter` helper is Go-only and doesn't know about Elm, so this
+        # repo wires its own treefmt-nix instead of routing through it.
+        treefmtEval = treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "go.mod";
+          programs = {
+            gofumpt.enable = true;
+            goimports.enable = true;
+            nixfmt.enable = true;
+            prettier.enable = true;
+            elm-format.enable = true;
+          };
+          settings.formatter.goimports.options = [
+            "-w"
+            "-local"
+            "github.com/kradalby/hugin"
+          ];
+        };
+
+        devDeps = with pkgs; [
+          # Go toolchain
+          go_1_26
+          gopls
+          golangci-lint
+          gofumpt
+
+          # Elm/parcel toolchain
+          elmPackages.elm
+          elmPackages.elm-format
+          elmPackages.elm-json
+          elm2nix
+          sass
+          yarn
+          nodejs
+          python313
+
+          # Tooling
+          git
+          gnumake
+          prek
+          treefmtEval.config.build.wrapper
+        ];
+      in
+      {
+        # `nix develop`
+        devShells.default = pkgs.mkShell { buildInputs = devDeps; };
+
+        # `nix build`
+        packages = {
+          inherit hugin huginElm;
+          default = hugin;
+        };
+
+        # `nix run`. The meta passthrough is what makes `nix run` report a
+        # description/mainProgram instead of the bare app path.
+        apps =
+          let
+            app = flake-utils.lib.mkApp { drv = hugin; } // {
+              inherit (hugin) meta;
+            };
+          in
+          {
+            hugin = app;
+            default = app;
+          };
+
+        # `nix fmt`
+        formatter = treefmtEval.config.build.wrapper;
+
+        checks = {
+          # Full Go+Elm build (compiles the Go incl. the dist/* embed).
+          build = hugin;
+
+          # go test / golangci-lint against the Go source with the Elm build
+          # output (huginElm) injected into dist/, mirroring hugin's own
+          # postPatch so the //go:embed dist/* target exists.
+          gotest = (fc.goTest common).overrideAttrs withDist;
+          golangci-lint = (fc.goLint common).overrideAttrs withDist;
+
+          formatting = treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.);
+        };
+      }
+    );
 }

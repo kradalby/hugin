@@ -3,11 +3,6 @@
 exclude: "^(dist/|elm-stuff/|node_modules/)"
 
 repos:
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -33,16 +28,18 @@ repos:
     hooks:
       - id: shellcheck
 
-  # Language-specific linters run as local hooks so they come from the
-  # flake's devShell (nixpkgs pin), keeping tool versions reproducible.
-  # `nix develop` (or direnv) must be active for these to resolve.
+  # Language-specific tools run as local hooks so they come from the flake's
+  # devShell (nixpkgs pin), keeping tool versions reproducible. `nix develop`
+  # (or direnv) must be active for these to resolve.
   - repo: local
     hooks:
-      - id: gofmt
-        name: gofmt
-        entry: gofmt -l -d -s
+      - id: treefmt
+        name: treefmt
+        # One entrypoint for every formatter (gofumpt, goimports, nixfmt,
+        # prettier, elm-format) instead of a standalone hook per tool.
+        entry: treefmt --fail-on-change
         language: system
-        types: [go]
+        pass_filenames: false
 
       - id: golangci-lint
         name: golangci-lint
@@ -53,15 +50,3 @@ repos:
         language: system
         types: [go]
         pass_filenames: false
-
-      - id: elm-format
-        name: elm-format
-        entry: elm-format --validate
-        language: system
-        files: \.elm$
-
-      - id: nixpkgs-fmt
-        name: nixpkgs-fmt
-        entry: nixpkgs-fmt --check
-        language: system
-        types: [nix]

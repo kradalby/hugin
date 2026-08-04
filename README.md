@@ -86,7 +86,7 @@ fronts it with a Tailscale sidecar for access control:
 
 ## Development
 
-Hugin is made with Elm and Node is required to install the compilers, and webpack.
+Hugin is made with Elm; Node is required to install the compilers and parcel.
 
 To set up the development environment:
 
@@ -107,10 +107,10 @@ Where `<MUNIN GALLERY>` is a directory containing a `root/` and a `keywords/` fo
 
 Linters and formatters are driven by [prek](https://github.com/j178/prek)
 (a drop-in, Rust-native replacement for pre-commit) and configured in
-`.pre-commit-config.yaml`. The current set covers prettier, gofmt,
-golangci-lint, elm-format, nixpkgs-fmt and shellcheck. All tool binaries
-are provided by the flake's devShell, so `nix develop` (or direnv)
-must be active.
+`.pre-commit-config.yaml`. Formatting runs through a single `treefmt`
+entrypoint (gofumpt, goimports, nixfmt, prettier, elm-format); golangci-lint
+and shellcheck run alongside it. All tool binaries are provided by the
+flake's devShell, so `nix develop` (or direnv) must be active.
 
 Install the git hook once per checkout:
 
