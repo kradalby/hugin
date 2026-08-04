@@ -2,7 +2,9 @@
   description = "hugin - Image gallery frontend for munin";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
+    # Spelled out rather than the `nixpkgs/...` indirect ref, which resolves
+    # through the local flake registry and so re-locks differently per machine.
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     flake-checks.url = "github:kradalby/flake-checks";
     flake-checks.inputs.nixpkgs.follows = "nixpkgs";
@@ -57,7 +59,7 @@
             nodejs
             elmPackages.elm
             sass
-            python313
+            python3
           ];
 
           postUnpack = ''
@@ -146,7 +148,7 @@
           sass
           yarn
           nodejs
-          python313
+          python3
 
           # Tooling
           git
