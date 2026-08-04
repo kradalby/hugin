@@ -10,24 +10,30 @@ type Image
 
 
 -- IMAGES --
+-- Elm cannot ask the bundler for an asset URL, so these used to be
+-- hand-copied content hashes and silently 404'd the moment the bundler
+-- changed how it hashed. The build copies src/images/ to dist/images/
+-- verbatim instead, so these paths are a contract rather than a
+-- checksum. Anything that needs cache-busting should be imported from
+-- TypeScript with `url:` and reach Elm through a port or a flag.
 -- error : Image
 -- error =
---     Image "/error.jpg"
+--     Image "/images/error.jpg"
 
 
 placeholder : Image
 placeholder =
-    Image "/placeholder.fe8e4556.png"
+    Image "/images/placeholder.png"
 
 
 notFound : Image
 notFound =
-    Image "/404.f70fed75.jpg"
+    Image "/images/404.jpg"
 
 
 loading : Image
 loading =
-    Image "/loading.fb790484.svg"
+    Image "/images/loading.svg"
 
 
 

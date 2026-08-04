@@ -7,6 +7,7 @@ install:
 # missing dep should fail here too rather than be papered over.
 build: clean
 	npx parcel build --no-autoinstall src/index.html
+	cp -r src/images dist/images
 
 dev:
 	npx parcel serve --no-autoinstall src/index.html
