@@ -91,7 +91,7 @@
           root = ./.;
           pname = "hugin";
           version = huginVersion;
-          vendorHash = "sha256-GhosEPXxhcBng9OrkX7VvfhnGZr6/0UkkM66cILfZRY=";
+          vendorHash = "sha256-gjZAe5N7Q1mHYix6AGFLkYBcbxYhqG4F3N4CSHrA0bY=";
           goPkg = pkgs.go_1_26;
         };
 
