@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"embed"
 	"encoding/json"
 	"errors"
@@ -27,7 +28,17 @@ var (
 
 	hostname = flag.String("hostname", defaultHostname, "service name")
 
-	albumDir = flag.String("album", "", "directory containing a Munin album")
+	contentDir = flag.String(
+		"content-dir",
+		"",
+		"directory containing a Munin-generated gallery (its targetFolder), served at /content/",
+	)
+
+	rootDir = flag.String(
+		"root-dir",
+		"",
+		"directory served at /album/ (defaults to --content-dir if unset)",
+	)
 
 	controlURL = flag.String("controlurl", "", "Tailscale Control server, if empty, upstream")
 
@@ -81,6 +92,10 @@ func loggingHandler(h http.Handler, dir string) http.Handler {
 func Run() error {
 	flag.Parse()
 
+	if *hostname == "" {
+		return errors.New("--hostname, if specified, cannot be empty")
+	}
+
 	logger := log.New(os.Stdout, "hugin: ", log.LstdFlags)
 
 	k := kraweb.NewKraWeb(
@@ -96,16 +111,23 @@ func Run() error {
 	k.Handle("/", distHandler())
 	k.Handle("/tokens", tokenHandler())
 
-	if *albumDir == "" {
-		log.Printf("--album is required to serve an album")
-	} else {
-		log.Printf("Serving content from %s", *albumDir)
-		k.Handle("/album/", http.StripPrefix("/album", loggingHandler(http.FileServer(http.Dir(*albumDir)), *albumDir)))
-		k.Handle("/content/", http.StripPrefix("/content", loggingHandler(http.FileServer(http.Dir(*albumDir)), *albumDir)))
+	serveDir := func(prefix, dir string) {
+		handler := loggingHandler(http.FileServer(http.Dir(dir)), dir)
+		k.Handle(prefix+"/", http.StripPrefix(prefix, handler))
 	}
 
-	if *hostname == "" {
-		return errors.New("--hostname, if specified, cannot be empty")
+	if *contentDir == "" {
+		log.Printf("--content-dir is required to serve a gallery")
+	} else {
+		log.Printf("Serving content from %s", *contentDir)
+		serveDir("/content", *contentDir)
+	}
+
+	// /album/ predates /content/ and is kept for anything still linking to it;
+	// hugin's own frontend only uses /album as a client-side route.
+	root := cmp.Or(*rootDir, *contentDir)
+	if root != "" {
+		serveDir("/album", root)
 	}
 
 	return k.ListenAndServe()
