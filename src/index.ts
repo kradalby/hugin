@@ -1,9 +1,3 @@
-import placeholder from "url:./images/placeholder.png";
-import loading from "url:./images/loading.svg";
-import notFound from "url:./images/404.jpg";
-
-console.log(placeholder, loading, notFound);
-
 import initMap from "./map";
 
 // FONT AWESOME

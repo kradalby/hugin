@@ -80,6 +80,10 @@
             runHook preBuild
             mkdir -p $out
             yarn --offline parcel build --log-level verbose --dist-dir $out src/index.html
+            # Verbatim, unhashed copies for Views.Assets: Elm has no way to
+            # learn parcel's content hashes, so it references these by a
+            # stable path instead.
+            cp -r src/images $out/images
             runHook postBuild
           '';
 
