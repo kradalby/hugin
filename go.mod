@@ -2,7 +2,10 @@ module github.com/kradalby/hugin
 
 go 1.26.5
 
-require github.com/kradalby/kraweb v0.0.0-20241010194200-c56492e7e39c
+require (
+	github.com/google/go-cmp v0.7.0
+	github.com/kradalby/kraweb v0.0.0-20241010194200-c56492e7e39c
+)
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
@@ -23,7 +26,6 @@ require (
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/nftables v0.3.0 // indirect
 	github.com/hdevalence/ed25519consensus v0.2.0 // indirect
 	github.com/huin/goupnp v1.3.0 // indirect

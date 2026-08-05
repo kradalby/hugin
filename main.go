@@ -54,20 +54,37 @@ func main() {
 	}
 }
 
-func tokenHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokens := make(map[string]string)
-		env := os.Environ()
+// tokensFromEnv collects HUGIN_TOKEN_<NAME> variables into a lowercased
+// name -> value map, which is what the frontend fetches from /tokens.
+//
+// Takes the environment rather than reading it, so the mapping can be tested
+// without the ambient environment leaking into the result.
+func tokensFromEnv(env []string) map[string]string {
+	tokens := make(map[string]string)
 
-		for _, kv := range env {
-			if rest, ok := strings.CutPrefix(kv, "HUGIN_TOKEN_"); ok {
-				parts := strings.Split(rest, "=")
-
-				tokens[strings.ToLower(parts[0])] = parts[1]
-			}
+	for _, kv := range env {
+		rest, ok := strings.CutPrefix(kv, "HUGIN_TOKEN_")
+		if !ok {
+			continue
 		}
 
-		err := json.NewEncoder(w).Encode(tokens)
+		// Cut, not Split: a token value may itself contain "=" — base64
+		// padding is the common case — and splitting on every separator
+		// silently truncates the value at the first one.
+		name, value, ok := strings.Cut(rest, "=")
+		if !ok || name == "" {
+			continue
+		}
+
+		tokens[strings.ToLower(name)] = value
+	}
+
+	return tokens
+}
+
+func tokenHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := json.NewEncoder(w).Encode(tokensFromEnv(os.Environ()))
 		if err != nil {
 			log.Printf("encoding tokens: %s", err)
 		}
