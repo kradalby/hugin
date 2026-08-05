@@ -1,0 +1,224 @@
+module Fixtures.MuninOutput exposing (albumIndexJson, keywordJson, photoJson)
+
+{-| Real Munin output, copied verbatim from munin's checked-in `example/content`
+gallery.
+
+Hand-written JSON would only ever prove that hugin's decoders agree with
+hugin's idea of the format. These fixtures make the decoder tests fail if
+Munin's published shape drifts, which is the half of the contract hugin cannot
+see from its own repository.
+
+Regenerate with `munin` in munin's `example/` directory and re-copy.
+
+-}
+
+
+{-| `root/2024/index.json` — an album index with a nested sub-album.
+-}
+albumIndexJson : String
+albumIndexJson =
+    """
+{
+  "albums": [
+    {
+      "name": "2024-06-21_Håkon_har_nytt_kamera",
+      "scaledPhotos": [
+        {
+          "maxResolution": 180,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_180.JPG"
+        },
+        {
+          "maxResolution": 220,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_220.JPG"
+        },
+        {
+          "maxResolution": 340,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_340.JPG"
+        },
+        {
+          "maxResolution": 576,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_576.JPG"
+        },
+        {
+          "maxResolution": 768,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_768.JPG"
+        },
+        {
+          "maxResolution": 992,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_992.JPG"
+        },
+        {
+          "maxResolution": 1200,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_1200.JPG"
+        },
+        {
+          "maxResolution": 1600,
+          "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/_DSF0055_1600.JPG"
+        }
+      ],
+      "url": "root/2024/2024-06-21_Håkon_har_nytt_kamera/index.json"
+    }
+  ],
+  "keywords": [],
+  "name": "2024",
+  "parents": [
+    {
+      "name": "root",
+      "url": "root/index.json"
+    }
+  ],
+  "path": "content/root/2024",
+  "people": [],
+  "photos": [],
+  "url": "root/2024/index.json"
+}
+"""
+
+
+{-| `root/Misc/portrait_mm.json` — a single photo, including scaledPhotos and originalImageURL.
+-}
+photoJson : String
+photoJson =
+    """
+{
+  "aperture": 1.696,
+  "apertureFormatted": "1.70 EV (f/1.8)",
+  "cameraMake": "Canon",
+  "cameraModel": "Canon EOS 400D DIGITAL",
+  "dateTime": "2017-04-30T13:00:04Z",
+  "encodingFingerprint": "q100_r180_220_340_576_768_992_1200_1600",
+  "exposureTime": 0.0004,
+  "exposureTimeFormatted": "1/2500 sec.",
+  "fNumber": 1.8,
+  "fNumberFormatted": "f/1.8",
+  "fileSize": 4358523,
+  "focalLength": 50,
+  "focalLengthFormatted": "50.0 mm",
+  "height": 2592,
+  "isoSpeed": [
+    1600
+  ],
+  "keywords": [
+    {
+      "name": "Martin Peter Meuche",
+      "url": "keywords/Martin_Peter_Meuche.json"
+    },
+    {
+      "name": "Spring",
+      "url": "keywords/Spring.json"
+    }
+  ],
+  "meteringMode": 1,
+  "meteringModeFormatted": "Average",
+  "modifiedDate": "2026-08-05T13:43:26Z",
+  "name": "portrait_mm",
+  "next": "content/root/Misc/20180510-171752-IMG_7165.json",
+  "orientation": "portrait",
+  "originalImagePath": "album/Misc/portrait_mm.jpeg",
+  "originalImageURL": "root/Misc/portrait_mm_original.jpeg",
+  "parents": [
+    {
+      "name": "root",
+      "url": "root/index.json"
+    },
+    {
+      "name": "Misc",
+      "url": "root/Misc/index.json"
+    }
+  ],
+  "people": [],
+  "previous": "content/root/Misc/test_special_chars.json",
+  "scaledPhotos": [
+    {
+      "maxResolution": 1600,
+      "url": "root/Misc/portrait_mm_1600.jpeg"
+    },
+    {
+      "maxResolution": 1200,
+      "url": "root/Misc/portrait_mm_1200.jpeg"
+    },
+    {
+      "maxResolution": 992,
+      "url": "root/Misc/portrait_mm_992.jpeg"
+    },
+    {
+      "maxResolution": 768,
+      "url": "root/Misc/portrait_mm_768.jpeg"
+    },
+    {
+      "maxResolution": 576,
+      "url": "root/Misc/portrait_mm_576.jpeg"
+    },
+    {
+      "maxResolution": 340,
+      "url": "root/Misc/portrait_mm_340.jpeg"
+    },
+    {
+      "maxResolution": 220,
+      "url": "root/Misc/portrait_mm_220.jpeg"
+    },
+    {
+      "maxResolution": 180,
+      "url": "root/Misc/portrait_mm_180.jpeg"
+    }
+  ],
+  "shutterSpeed": 11.28772,
+  "shutterSpeedFormatted": "11.29 EV (1/2500 sec.)",
+  "sourceHash": "cd75fd60d893c18ef7e5ad9d0cfd322eeee093a9c8d6cc08d8492338937d0463",
+  "url": "root/Misc/portrait_mm.json",
+  "width": 3888
+}
+"""
+
+
+{-| `keywords/Spring.json` — a keyword page.
+-}
+keywordJson : String
+keywordJson =
+    """
+{
+  "name": "Spring",
+  "photos": [
+    {
+      "dateTime": "2017-04-30T13:00:04Z",
+      "originalImageURL": "root/Misc/portrait_mm_original.jpeg",
+      "scaledPhotos": [
+        {
+          "maxResolution": 1600,
+          "url": "root/Misc/portrait_mm_1600.jpeg"
+        },
+        {
+          "maxResolution": 1200,
+          "url": "root/Misc/portrait_mm_1200.jpeg"
+        },
+        {
+          "maxResolution": 992,
+          "url": "root/Misc/portrait_mm_992.jpeg"
+        },
+        {
+          "maxResolution": 768,
+          "url": "root/Misc/portrait_mm_768.jpeg"
+        },
+        {
+          "maxResolution": 576,
+          "url": "root/Misc/portrait_mm_576.jpeg"
+        },
+        {
+          "maxResolution": 340,
+          "url": "root/Misc/portrait_mm_340.jpeg"
+        },
+        {
+          "maxResolution": 220,
+          "url": "root/Misc/portrait_mm_220.jpeg"
+        },
+        {
+          "maxResolution": 180,
+          "url": "root/Misc/portrait_mm_180.jpeg"
+        }
+      ],
+      "url": "root/Misc/portrait_mm.json"
+    }
+  ],
+  "url": "keywords/Spring.json"
+}
+"""
