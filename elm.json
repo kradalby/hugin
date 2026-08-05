@@ -27,7 +27,10 @@
     }
   },
   "test-dependencies": {
-    "direct": {},
+    "direct": {
+      "elm-explorations/test": "2.2.1",
+      "mpizenberg/elm-test-runner": "6.0.1"
+    },
     "indirect": {}
   }
 }

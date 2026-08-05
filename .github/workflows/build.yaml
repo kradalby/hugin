@@ -27,6 +27,7 @@ jobs:
       matrix:
         check:
           - build
+          - elm-test
           - gotest
           - golangci-lint
           - formatting
