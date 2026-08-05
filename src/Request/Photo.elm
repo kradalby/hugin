@@ -13,5 +13,5 @@ get : Url -> (Result Http.Error Photo -> msg) -> Cmd msg
 get url msg =
     Http.get
         { expect = Http.expectJson msg Photo.decoder
-        , url = Url.urlToString url
+        , url = Url.toContentUrl url
         }

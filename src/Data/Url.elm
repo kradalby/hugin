@@ -1,15 +1,71 @@
-module Data.Url exposing (Url(..), fromString, rest, urlDecoder, urlToString)
+module Data.Url exposing
+    ( Url(..)
+    , contentBase
+    , contentUrl
+    , fromString
+    , rest
+    , toContentUrl
+    , toRoute
+    , urlDecoder
+    )
 
 import Json.Decode as Decode exposing (Decoder)
 import Url.Parser as Parser exposing ((</>))
 
 
+{-| A path inside a Munin gallery, exactly as Munin publishes it: relative to
+the gallery root, e.g. `root/2001/index.json` or `keywords/Spring.json`.
+
+One string used to be handed straight to `Http.get`, to `img src`, and to the
+router. Those want different things — the first two need an absolute path
+under the mount hugin serves the gallery from, the router wants the bare
+gallery path — so resolving them identically meant the same photo resolved to
+a different request depending on which page you were on. Use
+`toContentUrl`/`contentUrl` to fetch or render, and `toRoute` to address a
+page.
+
+-}
 type Url
     = Url String
 
 
-urlToString : Url -> String
-urlToString (Url url) =
+{-| HTTP path hugin serves `--content-dir` from. Everything Munin publishes is
+relative to this.
+-}
+contentBase : String
+contentBase =
+    "/content"
+
+
+{-| Absolute path to fetch or render: for `Http.get` and `img src`.
+
+Absolute rather than relative, because a relative path resolves against
+whatever SPA route is currently in the address bar.
+
+-}
+toContentUrl : Url -> String
+toContentUrl (Url url) =
+    contentUrl url
+
+
+{-| As `toContentUrl`, for gallery paths that arrive as plain strings rather
+than as `Url` — `scaledPhotos[].url` and `originalImageURL`.
+-}
+contentUrl : String -> String
+contentUrl url =
+    if String.startsWith "/" url then
+        url
+
+    else
+        contentBase ++ "/" ++ url
+
+
+{-| The bare gallery path, used as the key in hugin's own routes
+(`/album/root/2001/index.json`). Never prefixed: a route is not a content
+location.
+-}
+toRoute : Url -> String
+toRoute (Url url) =
     url
 
 

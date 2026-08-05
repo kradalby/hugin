@@ -115,14 +115,14 @@ viewHelpButton =
 
 previousHref : Photo -> Attribute msg
 previousHref photo =
-    Maybe.map Url.urlToString photo.previous
+    Maybe.map Url.toRoute photo.previous
         |> Maybe.map (\url -> Route.href (Route.Photo url))
         |> Maybe.withDefault (href "")
 
 
 nextHref : Photo -> Attribute msg
 nextHref photo =
-    Maybe.map Url.urlToString photo.next
+    Maybe.map Url.toRoute photo.next
         |> Maybe.map (\url -> Route.href (Route.Photo url))
         |> Maybe.withDefault (href "")
 
@@ -307,7 +307,7 @@ update msg model =
                             [ "Remember to ask and credit the photographer before using the image!"
                             ]
                       }
-                    , Download.url photo.originalImageURL
+                    , Download.url (Url.contentUrl photo.originalImageURL)
                     )
 
                 _ ->
@@ -326,7 +326,7 @@ update msg model =
                                     ( model
                                     , Route.pushUrl
                                         (Session.navKey model.session)
-                                        (Route.Photo (Url.urlToString url))
+                                        (Route.Photo (Url.toRoute url))
                                     )
 
                         "ArrowRight" ->
@@ -338,7 +338,7 @@ update msg model =
                                     ( model
                                     , Route.pushUrl
                                         (Session.navKey model.session)
-                                        (Route.Photo (Url.urlToString url))
+                                        (Route.Photo (Url.toRoute url))
                                     )
 
                         _ ->

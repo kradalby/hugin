@@ -24,7 +24,7 @@ viewKeywords name keywords =
                 List.map
                     (\keyword ->
                         a
-                            [ class "", Route.href (Route.Keyword (Url.urlToString keyword.url)) ]
+                            [ class "", Route.href (Route.Keyword (Url.toRoute keyword.url)) ]
                             [ text keyword.name ]
                     )
                     keywords
@@ -49,9 +49,9 @@ viewPath parents current =
                     (span [ class "text-light ml-2 mr-2" ] [ text ">" ])
                     (List.map
                         (\parent ->
-                            a [ class "text-light", Route.href (Route.Album (Url.urlToString parent.url)) ] [ text parent.name ]
+                            a [ class "text-light", Route.href (Route.Album (Url.toRoute parent.url)) ] [ text parent.name ]
                         )
-                        (List.sortBy (\parent -> Url.urlToString parent.url |> String.length) parents)
+                        (List.sortBy (\parent -> Url.toRoute parent.url |> String.length) parents)
                         ++ [ span [ class "text-secondary" ] [ text current ] ]
                     )
 
@@ -65,7 +65,7 @@ scaledImgCount widthFactor scaledPhotos count =
         srcset =
             List.map
                 (\scaledPhoto ->
-                    scaledPhoto.url ++ " " ++ String.fromInt (scaledPhoto.maxResolution * widthFactor) ++ "w"
+                    Url.contentUrl scaledPhoto.url ++ " " ++ String.fromInt (scaledPhoto.maxResolution * widthFactor) ++ "w"
                 )
                 sp
                 |> String.join ", "
@@ -113,7 +113,7 @@ viewPhotos photos =
 
 viewPhoto : PhotoInAlbum -> Html msg
 viewPhoto photo =
-    a [ Route.href (Route.Photo (Url.urlToString photo.url)) ]
+    a [ Route.href (Route.Photo (Url.toRoute photo.url)) ]
         [ scaledImgCount 2 photo.scaledPhotos 3 ]
 
 

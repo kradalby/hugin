@@ -115,7 +115,7 @@ view model =
 
 viewSlideShowButton : Album -> Html Msg
 viewSlideShowButton album =
-    div [ class "ml-auto mr-2" ] [ a [ Route.href <| Route.SlideShow <| Url.urlToString album.url ] [ i [ class "fas fa-images text-white" ] [] ] ]
+    div [ class "ml-auto mr-2" ] [ a [ Route.href <| Route.SlideShow <| Url.toRoute album.url ] [ i [ class "fas fa-images text-white" ] [] ] ]
 
 
 viewDownloadModal : Model -> Html Msg
@@ -165,7 +165,7 @@ viewNestedAlbum : AlbumInAlbum -> Html Msg
 viewNestedAlbum album =
     div [ class "col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mt-3 d-flex justify-content-around" ]
         [ div [ class "image-album-container" ]
-            [ a [ class "", Route.href (Route.Album (Url.urlToString album.url)) ]
+            [ a [ class "", Route.href (Route.Album (Url.toRoute album.url)) ]
                 [ case album.scaledPhotos of
                     [] ->
                         img [ Assets.src Assets.placeholder, alt "Placeholder image", width 300, loading "lazy" ] []
