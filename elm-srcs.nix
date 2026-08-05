@@ -89,4 +89,14 @@
     sha256 = "0zc3dfzqsma8lrkbm6nkjqbsfcv6h5nja1rh7ybkinw1jk0kfdv6";
     version = "1.0.5";
   };
+
+  "elm-explorations/test" = {
+    sha256 = "15ayrylxancgjbdnmb0x7297vx86mn7206mdzihbf1yr4g6hlq3i";
+    version = "2.2.1";
+  };
+
+  "mpizenberg/elm-test-runner" = {
+    sha256 = "0r9y2mmsqky7w3gq4hx25yxm0qw4j950iaqnc4kzpiaw0rg1xaf5";
+    version = "6.0.1";
+  };
 }

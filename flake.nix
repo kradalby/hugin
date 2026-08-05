@@ -148,6 +148,7 @@
           elmPackages.elm
           elmPackages.elm-format
           elmPackages.elm-json
+          elmPackages.elm-test-rs
           elm2nix
           sass
           yarn
@@ -190,6 +191,51 @@
         checks = {
           # Full Go+Elm build (compiles the Go incl. the dist/* embed).
           build = hugin;
+
+          # elm-test-rs rather than the node elm-test: a single binary, no
+          # node_modules, and it runs offline against the ELM_HOME that
+          # fetchElmDeps populates (elm-srcs.nix carries the test-dependencies
+          # from elm.json, so elm-explorations/test is vendored too).
+          elm-test = pkgs.stdenv.mkDerivation {
+            pname = "hugin-elm-test";
+            version = huginVersion;
+            src = pkgs.nix-gitignore.gitignoreSource [
+              "Makefile"
+              "go.mod"
+              "go.sum"
+              "*.go"
+            ] ./.;
+
+            nativeBuildInputs = with pkgs; [
+              elmPackages.elm
+              elmPackages.elm-test-rs
+              nodejs # elm-test-rs compiles the suite to JS and runs it on node
+            ];
+
+            postUnpack = ''
+              export HOME="$TMP"
+            '';
+
+            postConfigure = pkgs.elmPackages.fetchElmDeps {
+              elmVersion = "0.19.1";
+              elmPackages = import ./elm-srcs.nix;
+              registryDat = ./registry.dat;
+            };
+
+            buildPhase = ''
+              runHook preBuild
+              # --offline: the sandbox has no network, and every package the
+              # runner needs is already in ELM_HOME via fetchElmDeps.
+              elm-test-rs --offline --compiler ${pkgs.elmPackages.elm}/bin/elm
+              runHook postBuild
+            '';
+
+            installPhase = ''
+              runHook preInstall
+              touch $out
+              runHook postInstall
+            '';
+          };
 
           # go test / golangci-lint against the Go source with the Elm build
           # output (huginElm) injected into dist/, mirroring hugin's own
