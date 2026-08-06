@@ -124,6 +124,23 @@ Run every hook against every tracked file:
 
 The same hooks run automatically on `git commit`.
 
+### Continuous integration
+
+[garnix](https://garnix.io) is the only CI, and it builds flake outputs
+directly. A check is therefore added by adding it to `checks` in `flake.nix`,
+not by editing a workflow, and `nix flake check` runs locally exactly what CI
+runs:
+
+    nix flake check
+
+Test suites live there too — `gotest`, `elm-test`, `golangci-lint`,
+`formatting`, `shellcheck` and `module-eval` are all flake checks.
+
+prek is a local pre-commit concern rather than a CI one. Its formatting hooks
+are covered by the `formatting` check and its shellcheck hook by the
+`shellcheck` check; the remaining hygiene hooks (private keys, large files,
+line endings) only run on `git commit`.
+
 ### Environment variables
 
 Third-party tokens are read by the hugin server at runtime, not baked into
