@@ -244,6 +244,29 @@
           golangci-lint = (fc.goLint common).overrideAttrs withDist;
 
           formatting = treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.);
+
+          # prek still runs the full hook set on `git commit`, but its hooks
+          # come from remote repos and so cannot run in a sandbox. shellcheck
+          # is the one hook doing analysis rather than formatting that no
+          # other check covers, so it moves into the flake where garnix runs
+          # it. Everything else prek does is either a formatter treefmt
+          # already gates, or a local-only guard.
+          shellcheck = pkgs.runCommand "hugin-shellcheck" { buildInputs = [ pkgs.shellcheck ]; } ''
+            cd ${pkgs.nix-gitignore.gitignoreSource [ ] ./.}
+            found=0
+            while IFS= read -r script; do
+              found=1
+              echo "shellcheck $script"
+              shellcheck "$script"
+            done < <(find . -name '*.sh' -type f)
+
+            if [ "$found" -eq 0 ]; then
+              echo "no shell scripts found; the check would be vacuous" >&2
+              exit 1
+            fi
+
+            touch $out
+          '';
         }
         # NixOS module evaluation needs a Linux system.
         // pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
