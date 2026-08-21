@@ -1,0 +1,14 @@
+{
+  "name": "Martin Peter Meuche",
+  "photos": [
+    {
+      "dateTime": "2017-04-30T13:00:04Z",
+      "originalImageURL": "root/Misc/portrait_mm_original.jpeg",
+      "scaledPhotos": [
+        { "maxResolution": 180, "url": "root/Misc/portrait_mm_180.jpeg" }
+      ],
+      "url": "root/Misc/portrait_mm.json"
+    }
+  ],
+  "url": "keywords/Martin_Peter_Meuche.json"
+}

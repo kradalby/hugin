@@ -115,6 +115,39 @@ func loggingHandler(h http.Handler, dir string) http.Handler {
 	})
 }
 
+// routes builds everything hugin serves.
+//
+// Separate from Run so the served surface can be exercised without standing up
+// a tailnet: kraweb owns a real tsnet node, which a test has no way to reach.
+// Whatever a test drives through this mux is what production serves.
+func routes(contentDir, rootDir string) *http.ServeMux {
+	mux := http.NewServeMux()
+
+	mux.Handle("/", distHandler())
+	mux.Handle("/tokens", tokenHandler())
+
+	serveDir := func(prefix, dir string) {
+		handler := loggingHandler(http.FileServer(http.Dir(dir)), dir)
+		mux.Handle(prefix+"/", http.StripPrefix(prefix, handler))
+	}
+
+	if contentDir == "" {
+		log.Printf("--content-dir is required to serve a gallery")
+	} else {
+		log.Printf("Serving content from %s", contentDir)
+		serveDir("/content", contentDir)
+	}
+
+	// /album/ predates /content/ and is kept for anything still linking to it;
+	// hugin's own frontend only uses /album as a client-side route.
+	root := cmp.Or(rootDir, contentDir)
+	if root != "" {
+		serveDir("/album", root)
+	}
+
+	return mux
+}
+
 func Run() error {
 	flag.Parse()
 
@@ -134,27 +167,7 @@ func Run() error {
 		true,
 	)
 
-	k.Handle("/", distHandler())
-	k.Handle("/tokens", tokenHandler())
-
-	serveDir := func(prefix, dir string) {
-		handler := loggingHandler(http.FileServer(http.Dir(dir)), dir)
-		k.Handle(prefix+"/", http.StripPrefix(prefix, handler))
-	}
-
-	if *contentDir == "" {
-		log.Printf("--content-dir is required to serve a gallery")
-	} else {
-		log.Printf("Serving content from %s", *contentDir)
-		serveDir("/content", *contentDir)
-	}
-
-	// /album/ predates /content/ and is kept for anything still linking to it;
-	// hugin's own frontend only uses /album as a client-side route.
-	root := cmp.Or(*rootDir, *contentDir)
-	if root != "" {
-		serveDir("/album", root)
-	}
+	k.Handle("/", routes(*contentDir, *rootDir))
 
 	return k.ListenAndServe()
 }

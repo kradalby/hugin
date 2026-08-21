@@ -1,0 +1,19 @@
+{
+  "name": "IL",
+  "photos": [
+    {
+      "dateTime": "2018-05-10T17:17:52Z",
+      "gps": {
+        "altitude": 24.8,
+        "latitude": 32.05405277777778,
+        "longitude": 34.755833333333335
+      },
+      "originalImageURL": "root/Misc/test_special_chars_original.jpg",
+      "scaledPhotos": [
+        { "maxResolution": 180, "url": "root/Misc/test_special_chars_180.jpg" }
+      ],
+      "url": "root/Misc/test_special_chars.json"
+    }
+  ],
+  "url": "keywords/IL.json"
+}
