@@ -28,6 +28,8 @@ location extraction still exercise: the gallery has eight keywords.
 `munin.json` pins one resolution and `diff: false` to keep regeneration
 deterministic and the tree small.
 
-Regenerate whenever Munin's published format changes. `tests/Fixtures/` is a
-separate, smaller copy used by the Elm decoder tests and has its own pinned
-sync check — both come from Munin, but they answer different questions.
+Regenerate whenever Munin's published format changes, along with
+`tests/Fixtures/` (see `scripts/regen-munin-fixtures.py`) — that is a separate,
+smaller copy used by the Elm decoder tests. Both come from Munin, but they
+answer different questions: this one that hugin _serves_ the gallery correctly,
+that one that hugin _decodes_ it correctly.

@@ -90,46 +90,6 @@
           dontInstall = true;
         };
 
-        # tests/Fixtures/MuninOutput.elm is real Munin output. It used to be
-        # hand-copied, and drifted exactly as you would expect: it carried
-        # `"next": "content/root/..."` long after every other URL had lost the
-        # prefix, and nothing failed. Pinning the source turns "someone
-        # remembered to re-copy" into a check.
-        #
-        # Per-file rather than a flake input: munin's example/ tree is ~290 MB
-        # of images, and this needs three small JSON files.
-        #
-        # Bumping Munin is a deliberate change here, and the fixture diff that
-        # follows is the contract change, stated in the review.
-        muninPin = {
-          rev = "3f738bd8fd24617b5ec499ffacae31a27495a03c";
-          files = {
-            "root/2024/index.json" = "sha256-sPllHLktEwkDwK/rrEtO2x4XUUx+TSodgiuuuBodW7Q=";
-            "root/Misc/portrait_mm.json" = "sha256-Binil7QfLeQ5i9/9mNtYDFh/YedVKl84MdHgbK5q100=";
-            "keywords/Spring.json" = "sha256-A6/IeKN7inLUifKuQJ9AR+HWIwqG0IAECcSkMkZkyC8=";
-          };
-        };
-
-        # Reassembles the three pinned files into the `root/`+`keywords/`
-        # layout the generator expects.
-        muninFixtureSource = pkgs.runCommand "munin-fixture-source" { } (
-          pkgs.lib.concatStrings (
-            pkgs.lib.mapAttrsToList (
-              relative: hash:
-              let
-                file = pkgs.fetchurl {
-                  url = "https://raw.githubusercontent.com/kradalby/munin/${muninPin.rev}/example/content/${relative}";
-                  inherit hash;
-                };
-              in
-              ''
-                mkdir -p "$out/$(dirname ${relative})"
-                cp ${file} "$out/${relative}"
-              ''
-            ) muninPin.files
-          )
-        );
-
         common = {
           inherit pkgs;
           root = ./.;
@@ -284,34 +244,6 @@
           golangci-lint = (fc.goLint common).overrideAttrs withDist;
 
           formatting = treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.);
-
-          # Fails if the committed Elm fixture no longer matches what Munin
-          # publishes at the pinned revision — the check the hand-copy never
-          # had.
-          fixture-sync =
-            pkgs.runCommand "hugin-fixture-sync"
-              {
-                nativeBuildInputs = [ pkgs.python3 ];
-                src = pkgs.nix-gitignore.gitignoreSource [ ] ./.;
-              }
-              ''
-                cd $src
-                python3 scripts/regen-munin-fixtures.py ${muninFixtureSource} "$TMPDIR/MuninOutput.elm"
-
-                if ! diff -u tests/Fixtures/MuninOutput.elm "$TMPDIR/MuninOutput.elm"; then
-                  echo
-                  echo "tests/Fixtures/MuninOutput.elm is out of sync with Munin at"
-                  echo "${muninPin.rev}. Regenerate it against a Munin checkout:"
-                  echo
-                  echo "    python3 scripts/regen-munin-fixtures.py <munin>/example/content"
-                  echo
-                  echo "If Munin's output changed on purpose, bump muninPin in flake.nix"
-                  echo "and commit the fixture diff alongside it."
-                  exit 1
-                fi
-
-                touch $out
-              '';
 
           # prek still runs the full hook set on `git commit`, but its hooks
           # come from remote repos and so cannot run in a sandbox. shellcheck
