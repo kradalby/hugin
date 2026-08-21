@@ -80,6 +80,51 @@ suite =
                     Decode.decodeString Photo.decoder Fixture.photoJson
                         |> Result.map (.originalImageURL >> String.startsWith "/")
                         |> Expect.equal (Ok False)
+            , -- These two were published with the content/ prefix while every
+              -- other url was relative, and both suites stayed green: Munin's
+              -- walk only looked at url/originalImageURL, and these assertions
+              -- did not exist. Page.Photo renders them through Url.toRoute for
+              -- the prev/next arrows, so unfixed those two links pointed at
+              -- /photo/content/root/... while the rest of the app was correct.
+              test "previous and next are gallery-relative" <|
+                \_ ->
+                    Decode.decodeString Photo.decoder Fixture.photoJson
+                        |> Result.map
+                            (\photo ->
+                                [ photo.previous, photo.next ]
+                                    |> List.filterMap identity
+                                    |> List.map Url.toRoute
+                                    |> List.filter
+                                        (\u ->
+                                            String.startsWith "content/" u
+                                                || String.startsWith "/" u
+                                        )
+                            )
+                        |> Expect.equal (Ok [])
+            , test "previous and next are present and point at sibling photos" <|
+                \_ ->
+                    Decode.decodeString Photo.decoder Fixture.photoJson
+                        |> Result.map
+                            (\photo ->
+                                [ photo.previous, photo.next ]
+                                    |> List.filterMap identity
+                                    |> List.map Url.toRoute
+                                    |> List.filter (String.startsWith "root/Misc/")
+                                    |> List.length
+                            )
+                        |> Expect.equal (Ok 2)
+            , test "previous and next resolve under the content mount" <|
+                \_ ->
+                    Decode.decodeString Photo.decoder Fixture.photoJson
+                        |> Result.map
+                            (\photo ->
+                                [ photo.previous, photo.next ]
+                                    |> List.filterMap identity
+                                    |> List.map Url.toContentUrl
+                                    |> List.filter (String.startsWith "/content/root/")
+                                    |> List.length
+                            )
+                        |> Expect.equal (Ok 2)
             ]
         , describe "keyword"
             [ test "decodes" <|

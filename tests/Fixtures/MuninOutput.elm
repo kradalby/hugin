@@ -8,7 +8,10 @@ hugin's idea of the format. These fixtures make the decoder tests fail if
 Munin's published shape drifts, which is the half of the contract hugin cannot
 see from its own repository.
 
-Regenerate with `munin` in munin's `example/` directory and re-copy.
+Do not edit by hand. `checks.fixture-sync` regenerates this from Munin at a
+pinned revision and fails if the result differs, so a stale hand-copy cannot
+survive review — the previous copy carried `"next": "content/root/..."` for
+weeks precisely because nothing checked it.
 
 -}
 
@@ -75,7 +78,7 @@ albumIndexJson =
 """
 
 
-{-| `root/Misc/portrait_mm.json` — a single photo, including scaledPhotos and originalImageURL.
+{-| `root/Misc/portrait_mm.json` — a single photo: scaledPhotos, originalImageURL, and the cyclic previous/next links.
 -}
 photoJson : String
 photoJson =
@@ -110,9 +113,9 @@ photoJson =
   ],
   "meteringMode": 1,
   "meteringModeFormatted": "Average",
-  "modifiedDate": "2026-08-05T13:43:26Z",
+  "modifiedDate": "2001-01-01T00:00:00Z",
   "name": "portrait_mm",
-  "next": "content/root/Misc/20180510-171752-IMG_7165.json",
+  "next": "root/Misc/20180510-171752-IMG_7165.json",
   "orientation": "portrait",
   "originalImagePath": "album/Misc/portrait_mm.jpeg",
   "originalImageURL": "root/Misc/portrait_mm_original.jpeg",
@@ -127,7 +130,7 @@ photoJson =
     }
   ],
   "people": [],
-  "previous": "content/root/Misc/test_special_chars.json",
+  "previous": "root/Misc/test_special_chars.json",
   "scaledPhotos": [
     {
       "maxResolution": 1600,
