@@ -1,0 +1,46 @@
+{
+  "aperture": 1.696,
+  "apertureFormatted": "1.70 EV (f/1.8)",
+  "cameraMake": "Canon",
+  "cameraModel": "Canon EOS 400D DIGITAL",
+  "dateTime": "2017-04-30T13:00:04Z",
+  "encodingFingerprint": "q50_r180",
+  "exposureTime": 0.0004,
+  "exposureTimeFormatted": "1/2500 sec.",
+  "fNumber": 1.8,
+  "fNumberFormatted": "f/1.8",
+  "fileSize": 40632,
+  "focalLength": 50,
+  "focalLengthFormatted": "50.0 mm",
+  "height": 640,
+  "isoSpeed": [1600],
+  "keywords": [
+    {
+      "name": "Martin Peter Meuche",
+      "url": "keywords/Martin_Peter_Meuche.json"
+    },
+    { "name": "Spring", "url": "keywords/Spring.json" }
+  ],
+  "meteringMode": 1,
+  "meteringModeFormatted": "Average",
+  "modifiedDate": "2026-08-21T07:46:29Z",
+  "name": "portrait_mm",
+  "next": "root/Misc/test_special_chars.json",
+  "orientation": "portrait",
+  "originalImagePath": "album/Misc/portrait_mm.jpeg",
+  "originalImageURL": "root/Misc/portrait_mm_original.jpeg",
+  "parents": [
+    { "name": "root", "url": "root/index.json" },
+    { "name": "Misc", "url": "root/Misc/index.json" }
+  ],
+  "people": [],
+  "previous": "root/Misc/test_special_chars.json",
+  "scaledPhotos": [
+    { "maxResolution": 180, "url": "root/Misc/portrait_mm_180.jpeg" }
+  ],
+  "shutterSpeed": 11.28772,
+  "shutterSpeedFormatted": "11.29 EV (1/2500 sec.)",
+  "sourceHash": "f9f1c30f42c7bef857e376927e0e6c85fe01a289a32ecd654d2df2db36a938b6",
+  "url": "root/Misc/portrait_mm.json",
+  "width": 427
+}

@@ -1,0 +1,10 @@
+{
+  "name": "root",
+  "sourceFolder": "album",
+  "targetFolder": "content",
+  "resolutions": [180],
+  "jpegCompression": 0.5,
+  "diff": false,
+  "progress": false,
+  "logLevel": "warning"
+}

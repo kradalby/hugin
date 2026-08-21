@@ -1,0 +1,15 @@
+{
+  "locations": [
+    {
+      "gps": {
+        "altitude": 24.8,
+        "latitude": 32.05405277777778,
+        "longitude": 34.755833333333335
+      },
+      "scaledPhotos": [
+        { "maxResolution": 180, "url": "root/Misc/test_special_chars_180.jpg" }
+      ],
+      "url": "root/Misc/test_special_chars.json"
+    }
+  ]
+}
