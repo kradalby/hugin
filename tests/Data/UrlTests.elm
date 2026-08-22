@@ -39,17 +39,18 @@ suite =
                 \_ ->
                     Url.fromString "root/a.json"
                         |> Url.toContentUrl
-                        |> Url.contentUrl
+                        |> Url.fromString
+                        |> Url.toContentUrl
                         |> Expect.equal "/content/root/a.json"
-            ]
-        , describe "contentUrl"
-            [ test "prefixes a scaled photo path" <|
+            , test "prefixes a scaled photo path" <|
                 \_ ->
-                    Url.contentUrl "root/2001/2001-01-12_340.jpeg"
+                    Url.fromString "root/2001/2001-01-12_340.jpeg"
+                        |> Url.toContentUrl
                         |> Expect.equal "/content/root/2001/2001-01-12_340.jpeg"
             , test "preserves non-ASCII album names" <|
                 \_ ->
-                    Url.contentUrl "root/2024/Håkon_har_nytt_/a.jpeg"
+                    Url.fromString "root/2024/Håkon_har_nytt_/a.jpeg"
+                        |> Url.toContentUrl
                         |> Expect.equal "/content/root/2024/Håkon_har_nytt_/a.jpeg"
             ]
         , describe "toRoute"

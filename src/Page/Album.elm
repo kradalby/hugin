@@ -218,7 +218,7 @@ update msg model =
                     case model.album of
                         Loaded album ->
                             List.map
-                                .originalImageURL
+                                (.originalImageURL >> Url.toContentUrl)
                                 album.photos
 
                         _ ->

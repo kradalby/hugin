@@ -26,7 +26,7 @@ type alias Photo =
     , dateTime : Maybe Time.Posix
     , name : String
     , keywords : List KeywordPointer
-    , originalImageURL : String
+    , originalImageURL : Url
     , modifiedDate : Time.Posix
     , fNumber : Maybe Float
     , fNumberFormatted : Maybe String
@@ -65,7 +65,7 @@ decoder =
         |> optional "dateTime" (Decode.nullable Iso8601.decoder) Nothing
         |> required "name" Decode.string
         |> required "keywords" (Decode.list keywordPointerDecoder)
-        |> required "originalImageURL" Decode.string
+        |> required "originalImageURL" Url.urlDecoder
         |> required "modifiedDate" Iso8601.decoder
         |> optional "fNumber" (Decode.nullable Decode.float) Nothing
         |> optional "fNumberFormatted" (Decode.nullable Decode.string) Nothing
@@ -89,6 +89,9 @@ decoder =
 
 
 -- HELPERS --
+-- Both return a rendered image location, absolute under the content mount,
+-- because every caller feeds the result to `img src`, a `background-image` or
+-- a preload. Returning the bare gallery path is what broke album covers.
 -- Return image closest to width
 
 
@@ -108,7 +111,7 @@ thumbnail scaledPhotos width =
             ""
 
         Just photo ->
-            photo.url
+            Url.toContentUrl photo.url
 
 
 biggest : List ScaledPhoto -> String
@@ -122,4 +125,4 @@ biggest scaledPhotos =
             ""
 
         Just photo ->
-            photo.url
+            Url.toContentUrl photo.url

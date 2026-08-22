@@ -65,7 +65,7 @@ scaledImgCount widthFactor scaledPhotos count =
         srcset =
             List.map
                 (\scaledPhoto ->
-                    Url.contentUrl scaledPhoto.url ++ " " ++ String.fromInt (scaledPhoto.maxResolution * widthFactor) ++ "w"
+                    Url.toContentUrl scaledPhoto.url ++ " " ++ String.fromInt (scaledPhoto.maxResolution * widthFactor) ++ "w"
                 )
                 sp
                 |> String.join ", "

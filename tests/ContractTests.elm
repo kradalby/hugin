@@ -62,7 +62,7 @@ suite =
             , test "scaled photo urls are relative and resolve under the mount" <|
                 \_ ->
                     Decode.decodeString Photo.decoder Fixture.photoJson
-                        |> Result.map (.scaledPhotos >> List.map .url)
+                        |> Result.map (.scaledPhotos >> List.map (.url >> Url.toRoute))
                         |> Result.map (List.filter (String.startsWith "/"))
                         |> Expect.equal (Ok [])
             , test "a scaled photo url becomes an absolute content url" <|
@@ -70,7 +70,7 @@ suite =
                     Decode.decodeString Photo.decoder Fixture.photoJson
                         |> Result.map
                             (.scaledPhotos
-                                >> List.map (.url >> Url.contentUrl)
+                                >> List.map (.url >> Url.toContentUrl)
                                 >> List.filter (String.startsWith "/content/")
                                 >> List.isEmpty
                             )
@@ -78,8 +78,25 @@ suite =
             , test "the original image url is relative" <|
                 \_ ->
                     Decode.decodeString Photo.decoder Fixture.photoJson
-                        |> Result.map (.originalImageURL >> String.startsWith "/")
+                        |> Result.map (.originalImageURL >> Url.toRoute >> String.startsWith "/")
                         |> Expect.equal (Ok False)
+            , -- The bug the screenshots showed: an album card rendered a
+              -- broken image while the photos below it were fine, because
+              -- covers go through `thumbnail` and photos got their src from a
+              -- srcset the browser preferred. Both feed `img src`, so both
+              -- have to come back absolute.
+              test "thumbnail and biggest render absolute image locations" <|
+                \_ ->
+                    Decode.decodeString Photo.decoder Fixture.photoJson
+                        |> Result.map
+                            (\photo ->
+                                [ Photo.thumbnail photo.scaledPhotos 300
+                                , Photo.biggest photo.scaledPhotos
+                                ]
+                                    |> List.filter (String.startsWith "/content/root/")
+                                    |> List.length
+                            )
+                        |> Expect.equal (Ok 2)
             , -- These two were published with the content/ prefix while every
               -- other url was relative, and both suites stayed green: Munin's
               -- walk only looked at url/originalImageURL, and these assertions

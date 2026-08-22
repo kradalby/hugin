@@ -98,7 +98,7 @@ view model =
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
     span [ class "" ]
-        [ a [ onClick CopyRightNotice, href photo.originalImageURL ]
+        [ a [ onClick CopyRightNotice, href (Url.toContentUrl photo.originalImageURL) ]
             [ i [ class "fas fa-download text-white" ] []
             ]
         ]
@@ -173,7 +173,7 @@ viewInformation photo =
             tr []
                 [ th [ scope "row" ]
                     [ text "Original" ]
-                , td [] [ a [ href photo.originalImageURL ] [ text "Link" ] ]
+                , td [] [ a [ href (Url.toContentUrl photo.originalImageURL) ] [ text "Link" ] ]
                 ]
 
         rows =
@@ -307,7 +307,7 @@ update msg model =
                             [ "Remember to ask and credit the photographer before using the image!"
                             ]
                       }
-                    , Download.url (Url.contentUrl photo.originalImageURL)
+                    , Download.url (Url.toContentUrl photo.originalImageURL)
                     )
 
                 _ ->

@@ -1,7 +1,6 @@
 module Data.Url exposing
     ( Url(..)
     , contentBase
-    , contentUrl
     , fromString
     , rest
     , toContentUrl
@@ -21,8 +20,12 @@ router. Those want different things — the first two need an absolute path
 under the mount hugin serves the gallery from, the router wants the bare
 gallery path — so resolving them identically meant the same photo resolved to
 a different request depending on which page you were on. Use
-`toContentUrl`/`contentUrl` to fetch or render, and `toRoute` to address a
-page.
+`toContentUrl` to fetch or render, and `toRoute` to address a page.
+
+Everything Munin publishes is a `Url`, including `scaledPhotos[].url` and
+`originalImageURL`. Those two stayed `String` when the split was introduced,
+so they kept reaching `img src` unresolved — which is what left album covers
+broken.
 
 -}
 type Url
@@ -45,14 +48,6 @@ whatever SPA route is currently in the address bar.
 -}
 toContentUrl : Url -> String
 toContentUrl (Url url) =
-    contentUrl url
-
-
-{-| As `toContentUrl`, for gallery paths that arrive as plain strings rather
-than as `Url` — `scaledPhotos[].url` and `originalImageURL`.
--}
-contentUrl : String -> String
-contentUrl url =
     if String.startsWith "/" url then
         url
 

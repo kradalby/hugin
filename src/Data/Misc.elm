@@ -10,7 +10,7 @@ import Time
 type alias PhotoInAlbum =
     { url : Url
     , dateTime : Time.Posix
-    , originalImageURL : String
+    , originalImageURL : Url
     , scaledPhotos : List ScaledPhoto
     , gps : Maybe GPS
     }
@@ -23,8 +23,15 @@ type alias AlbumInAlbum =
     }
 
 
+{-| `url` is a `Url`, not a `String`, on purpose. As a `String` it escaped
+`Data.Url`'s split between a content location and a route: nothing stopped a
+view from handing Munin's gallery-relative path straight to `img src`, where
+the browser resolves it against the current SPA route. Album covers did
+exactly that and 404'd. Typed, the compiler asks every call site which one it
+means.
+-}
 type alias ScaledPhoto =
-    { url : String
+    { url : Url
     , maxResolution : Int
     }
 
@@ -65,7 +72,7 @@ photoInAlbumDecoder =
     Decode.succeed PhotoInAlbum
         |> required "url" Url.urlDecoder
         |> required "dateTime" Iso8601.decoder
-        |> required "originalImageURL" Decode.string
+        |> required "originalImageURL" Url.urlDecoder
         |> required "scaledPhotos" (Decode.list scaledPhotoDecoder)
         |> optional "gps" (Decode.nullable gpsDecoder) Nothing
 
@@ -81,7 +88,7 @@ albumInAlbumDecoder =
 scaledPhotoDecoder : Decoder ScaledPhoto
 scaledPhotoDecoder =
     Decode.succeed ScaledPhoto
-        |> required "url" Decode.string
+        |> required "url" Url.urlDecoder
         |> required "maxResolution" Decode.int
 
 
