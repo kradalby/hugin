@@ -5,6 +5,7 @@ module Data.Url exposing
     , rest
     , toContentUrl
     , toRoute
+    , toZipUrl
     , urlDecoder
     )
 
@@ -53,6 +54,27 @@ toContentUrl (Url url) =
 
     else
         contentBase ++ "/" ++ url
+
+
+{-| Mount the Go backend serves collection downloads from. Only hugin's own
+server answers here, which is what makes it a capability probe.
+-}
+zipBase : String
+zipBase =
+    "/zip"
+
+
+{-| Streams a collection's originals as a zip. A third meaning for the same
+Munin path, so it belongs here rather than at a call site — that is how
+`scaledPhotos[].url` came to reach `img src` unresolved.
+-}
+toZipUrl : Url -> String
+toZipUrl (Url url) =
+    if String.startsWith "/" url then
+        zipBase ++ url
+
+    else
+        zipBase ++ "/" ++ url
 
 
 {-| The bare gallery path, used as the key in hugin's own routes

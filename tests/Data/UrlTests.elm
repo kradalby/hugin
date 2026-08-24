@@ -53,6 +53,51 @@ suite =
                         |> Url.toContentUrl
                         |> Expect.equal "/content/root/2024/Håkon_har_nytt_/a.jpeg"
             ]
+        , describe "toZipUrl"
+            [ test "prefixes the zip mount" <|
+                \_ ->
+                    Url.fromString "root/2001/index.json"
+                        |> Url.toZipUrl
+                        |> Expect.equal "/zip/root/2001/index.json"
+            , test "handles a keyword or person path" <|
+                \_ ->
+                    Url.fromString "keywords/Spring.json"
+                        |> Url.toZipUrl
+                        |> Expect.equal "/zip/keywords/Spring.json"
+            , test "preserves non-ASCII collection names" <|
+                \_ ->
+                    Url.fromString "keywords/Midtøsten.json"
+                        |> Url.toZipUrl
+                        |> Expect.equal "/zip/keywords/Midtøsten.json"
+            , test "is absolute, so it does not resolve against the current route" <|
+                \_ ->
+                    Url.fromString "root/2001/index.json"
+                        |> Url.toZipUrl
+                        |> String.startsWith "/"
+                        |> Expect.equal True
+            , test "keeps the mount when the path is already rooted" <|
+                \_ ->
+                    Url.fromString "/root/2001/index.json"
+                        |> Url.toZipUrl
+                        |> Expect.equal "/zip/root/2001/index.json"
+            , -- One string, three meanings: resolved as content this serves
+              -- the album's JSON as a .zip, as a route it 404s.
+              test "is distinct from a content url and a route" <|
+                \_ ->
+                    let
+                        url =
+                            Url.fromString "root/Misc/index.json"
+                    in
+                    Expect.equal
+                        { zip = "/zip/root/Misc/index.json"
+                        , content = "/content/root/Misc/index.json"
+                        , route = "root/Misc/index.json"
+                        }
+                        { zip = Url.toZipUrl url
+                        , content = Url.toContentUrl url
+                        , route = Url.toRoute url
+                        }
+            ]
         , describe "toRoute"
             [ -- A route is a page address, not a content location. Prefixing
               -- it would put /content into the address bar and break the

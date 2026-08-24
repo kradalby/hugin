@@ -2,7 +2,7 @@ module Util exposing
     ( Status(..)
     , cleanOwnerToName
     , formatAltitude
-    , formatExposureTime
+    , formatBytes
     , formatPhotoDate
     , fuzzyKeywordReduce
     , initMap
@@ -106,6 +106,49 @@ fuzzyKeywordReduce searchString keywordPointers =
 formatAltitude : Float -> String
 formatAltitude altitude =
     String.fromInt (round altitude) ++ " meter"
+
+
+{-| Decimal units, not binary: this sits beside the browser's own readout for
+the same transfer, and two numbers that disagree read as a bug.
+-}
+formatBytes : Int -> String
+formatBytes bytes =
+    let
+        units =
+            [ ( 1000000000, "GB" ), ( 1000000, "MB" ), ( 1000, "kB" ) ]
+
+        -- "1.4 GB" is useful, "12.0 MB" is noise.
+        round1 value =
+            let
+                tenths =
+                    round (value * 10)
+            in
+            if modBy 10 tenths == 0 then
+                String.fromInt (tenths // 10)
+
+            else
+                String.fromInt (tenths // 10) ++ "." ++ String.fromInt (modBy 10 tenths)
+
+        pick remaining =
+            case remaining of
+                [] ->
+                    String.fromInt bytes ++ " bytes"
+
+                ( scale, suffix ) :: smaller ->
+                    -- Promote on the ROUNDED value, not the raw one: 999999
+                    -- must read "1 MB", never the "1000 kB" nobody writes.
+                    if round (toFloat bytes / toFloat scale * 10) >= 10 then
+                        round1 (toFloat bytes / toFloat scale) ++ " " ++ suffix
+
+                    else
+                        pick smaller
+    in
+    -- Guarded separately so the rounding rule cannot turn 999 into "1 kB".
+    if bytes < 1000 then
+        String.fromInt bytes ++ " bytes"
+
+    else
+        pick units
 
 
 formatPhotoDate : Time.Posix -> String
