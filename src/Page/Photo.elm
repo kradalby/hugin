@@ -3,9 +3,8 @@ module Page.Photo exposing (Model, Msg, init, subscriptions, toSession, update, 
 import Browser.Events
 import Data.Photo as Photo exposing (Photo)
 import Data.Url as Url exposing (Url)
-import File.Download as Download
 import Html exposing (Attribute, Html, a, button, div, h5, hr, i, img, p, span, table, tbody, td, text, th, tr)
-import Html.Attributes exposing (attribute, class, href, id, scope, src, style, type_)
+import Html.Attributes exposing (attribute, class, download, href, id, scope, src, style, title, type_)
 import Html.Events exposing (onClick)
 import Html.Lazy
 import Http
@@ -95,10 +94,23 @@ view model =
     }
 
 
+{-| `download ""` rather than a `File.Download.url` command: the anchor already
+has the href, so firing both made one click do the work twice. It is also what
+stops `elm/browser`'s link diverter swallowing the click.
+-}
 viewDownloadButton : Photo -> Html Msg
 viewDownloadButton photo =
     span [ class "" ]
-        [ a [ onClick CopyRightNotice, href (Url.toContentUrl photo.originalImageURL) ]
+        [ a
+            [ onClick CopyRightNotice
+            , href (Url.toContentUrl photo.originalImageURL)
+            , download ""
+
+            -- Font Awesome makes the icon aria-hidden, so without this the
+            -- link has no accessible name.
+            , attribute "aria-label" "Download the original image"
+            , title "Download the original image"
+            ]
             [ i [ class "fas fa-download text-white" ] []
             ]
         ]
@@ -299,19 +311,15 @@ update msg model =
             , Cmd.none
             )
 
+        -- The anchor downloads; this only raises the notice alongside it.
         CopyRightNotice ->
-            case model.photo of
-                Loaded photo ->
-                    ( { model
-                        | errors =
-                            [ "Remember to ask and credit the photographer before using the image!"
-                            ]
-                      }
-                    , Download.url (Url.toContentUrl photo.originalImageURL)
-                    )
-
-                _ ->
-                    ( model, Cmd.none )
+            ( { model
+                | errors =
+                    [ "Remember to ask and credit the photographer before using the image!"
+                    ]
+              }
+            , Cmd.none
+            )
 
         KeyMsg code ->
             case model.photo of
