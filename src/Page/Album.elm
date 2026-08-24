@@ -1,4 +1,4 @@
-module Page.Album exposing (Model, Msg(..), init, initMap, subscriptions, toSession, update, view)
+module Page.Album exposing (Model, Msg(..), init, initMap, subscriptions, toSession, update, view, viewDownloadButton)
 
 {-| Viewing a user's album.
 -}
@@ -7,19 +7,19 @@ import Data.Album exposing (Album)
 import Data.Misc exposing (AlbumInAlbum)
 import Data.Photo as Photo
 import Data.Url as Url exposing (Url)
-import Html exposing (Html, a, button, div, h4, h5, hr, i, img, input, p, span, text)
-import Html.Attributes exposing (alt, attribute, class, id, src, style, type_, value, width)
+import Html exposing (Html, a, div, h4, i, img, input, span, text)
+import Html.Attributes exposing (alt, attribute, class, download, href, id, src, title, type_, value, width)
 import Html.Events exposing (onClick, onInput)
 import Html.Lazy
 import Http
 import Loading
 import Log
-import Ports
 import Request.Album
+import Request.Zip
 import Route
 import Session exposing (Session)
 import Task
-import Util exposing (Status(..), viewIf)
+import Util exposing (Status(..))
 import Views.Assets as Assets
 import Views.Errors as Errors
 import Views.Misc exposing (loading, viewKeywords, viewMap, viewPath, viewPhotos)
@@ -32,7 +32,9 @@ import Views.Misc exposing (loading, viewKeywords, viewMap, viewPath, viewPhotos
 type alias Model =
     { session : Session
     , errors : List String
-    , showDownloadModal : Bool
+
+    -- Nothing means the backend offered no archive, so no button.
+    , archive : Maybe Request.Zip.Archive
     , keywordFilter : String
     , album : Status Album
     }
@@ -42,12 +44,13 @@ init : Session -> Url -> ( Model, Cmd Msg )
 init session url =
     ( { session = session
       , errors = []
-      , showDownloadModal = False
+      , archive = Nothing
       , keywordFilter = ""
       , album = Loading
       }
     , Cmd.batch
         [ Request.Album.get url CompletedAlbumLoad
+        , Request.Zip.available url CompletedZipProbe
         , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
         ]
     )
@@ -80,10 +83,8 @@ view model =
                         [ div [ class "row bg-darklight" ]
                             [ viewPath album.parents album.name
                             , viewSlideShowButton album
-
-                            --, viewIf (album.photos /= []) viewDownloadButton
+                            , viewDownloadButton album model.archive
                             ]
-                        , viewIf model.showDownloadModal (viewDownloadModal model)
                         , div [ class "row" ]
                             [ Html.Lazy.lazy viewNestedAlbums album.albums ]
                         , div [ class "row" ] [ Html.Lazy.lazy viewPhotos album.photos ]
@@ -107,45 +108,39 @@ view model =
     }
 
 
-
--- viewDownloadButton : Html Msg
--- viewDownloadButton =
---     div [ class "ml-auto mr-2" ] [ span [ onClick ToggleDownloadModal ] [ i [ class "fas fa-download text-white" ] [] ] ]
-
-
 viewSlideShowButton : Album -> Html Msg
 viewSlideShowButton album =
     div [ class "ml-auto mr-2" ] [ a [ Route.href <| Route.SlideShow <| Url.toRoute album.url ] [ i [ class "fas fa-images text-white" ] [] ] ]
 
 
-viewDownloadModal : Model -> Html Msg
-viewDownloadModal _ =
-    div [ style "display" "block", attribute "aria-hidden" "false", attribute "aria-labelledby" "downloadModal", class "modal", id "downloadModal", attribute "role" "dialog", attribute "tabindex" "-1" ]
-        [ div [ class "modal-dialog modal-dialog-centered", attribute "role" "document" ]
-            [ div [ class "modal-content" ]
-                [ div [ class "modal-header" ]
-                    [ h5 [ class "modal-title", id "downloadModalTitle" ]
-                        [ text "Download album" ]
-                    , button [ onClick ToggleDownloadModal, attribute "aria-label" "Close", class "close", attribute "data-dismiss" "modal", type_ "button" ]
-                        [ span [ attribute "aria-hidden" "true" ]
-                            [ text "×" ]
-                        ]
+{-| Absent unless the backend answered the probe. `download ""` also makes
+`elm/browser`'s link diverter skip the click; without it `Main`'s `ClickedLink`
+swallows it and the button does nothing.
+-}
+viewDownloadButton : Album -> Maybe Request.Zip.Archive -> Html Msg
+viewDownloadButton album archive =
+    case archive of
+        Nothing ->
+            text ""
+
+        Just { size } ->
+            let
+                label =
+                    "Download album" ++ Views.Misc.sizeSuffix size
+            in
+            div [ class "mr-2" ]
+                [ a
+                    [ href (Url.toZipUrl album.url)
+                    , download ""
+                    , title label
+
+                    -- Font Awesome makes the icon aria-hidden, so without this
+                    -- the link has no accessible name.
+                    , attribute "aria-label" label
+                    , onClick CopyRightNotice
                     ]
-                , div [ class "modal-body" ]
-                    [ div [ class "alert alert-danger", attribute "role" "alert" ]
-                        [ text "This feature is experimental, and will probably only work in Chrome-based browsers." ]
-                    , hr [] []
-                    , p [ class "ml-2 mr-2" ] [ text "If you want to republish or use the photos you download, please ask the photographer and remember to credit." ]
-                    ]
-                , div [ class "modal-footer" ]
-                    [ button [ onClick ToggleDownloadModal, class "btn btn-secondary", attribute "data-dismiss" "modal", type_ "button" ]
-                        [ text "Close" ]
-                    , button [ onClick Download, class "btn btn-primary", type_ "button" ]
-                        [ text "Download" ]
-                    ]
+                    [ i [ class "fas fa-download text-white" ] [] ]
                 ]
-            ]
-        ]
 
 
 viewNestedAlbums : List AlbumInAlbum -> Html Msg
@@ -192,10 +187,10 @@ viewKeywordFilter keywordFilter =
 
 type Msg
     = DismissErrors
-    | ToggleDownloadModal
-    | Download
+    | CopyRightNotice
     | UpdateKeywordFilter String
     | CompletedAlbumLoad (Result Http.Error Album)
+    | CompletedZipProbe (Result Http.Error (Maybe Request.Zip.Archive))
     | PassedSlowLoadThreshold
 
 
@@ -205,29 +200,26 @@ update msg model =
         DismissErrors ->
             ( { model | errors = [] }, Cmd.none )
 
-        ToggleDownloadModal ->
+        -- The anchor downloads; this only raises the notice alongside it.
+        CopyRightNotice ->
             ( { model
-                | showDownloadModal = not model.showDownloadModal
+                | errors =
+                    [ "Remember to ask and credit the photographer before using the images!"
+                    ]
               }
             , Cmd.none
             )
 
-        Download ->
-            let
-                urls =
-                    case model.album of
-                        Loaded album ->
-                            List.map
-                                (.originalImageURL >> Url.toContentUrl)
-                                album.photos
-
-                        _ ->
-                            []
-            in
-            ( model, Ports.downloadImages urls )
-
         UpdateKeywordFilter value ->
             ( { model | keywordFilter = value }, Cmd.none )
+
+        CompletedZipProbe (Ok archive) ->
+            ( { model | archive = archive }, Cmd.none )
+
+        -- A 404 is an ordinary answer and never reaches here; a timeout or a
+        -- network error silently removing the button is worth a console line.
+        CompletedZipProbe (Err err) ->
+            ( { model | archive = Nothing }, Log.httpError err )
 
         CompletedAlbumLoad (Ok album) ->
             ( { model | album = Loaded album }, initMap album )

@@ -1,17 +1,19 @@
-module Page.Keyword exposing (Model, Msg(..), init, initMap, subscriptions, toSession, update, view)
+module Page.Keyword exposing (Model, Msg(..), init, initMap, subscriptions, toSession, update, view, viewDownloadButton)
 
 {-| Viewing a user's album.
 -}
 
 import Data.Keyword exposing (Keyword)
-import Data.Url exposing (Url)
-import Html exposing (Html, div, h1, text)
-import Html.Attributes exposing (class)
+import Data.Url as Url exposing (Url)
+import Html exposing (Html, a, div, h1, i, text)
+import Html.Attributes exposing (attribute, class, download, href, title)
+import Html.Events exposing (onClick)
 import Html.Lazy
 import Http
 import Loading
 import Log
 import Request.Keyword
+import Request.Zip
 import Session exposing (Session)
 import Task
 import Util exposing (Status(..))
@@ -26,6 +28,9 @@ import Views.Misc exposing (viewMap, viewPhotos)
 type alias Model =
     { session : Session
     , errors : List String
+
+    -- Nothing means the backend offered no archive, so no button.
+    , archive : Maybe Request.Zip.Archive
     , keyword : Status Keyword
     }
 
@@ -34,10 +39,12 @@ init : Session -> Url -> ( Model, Cmd Msg )
 init session url =
     ( { session = session
       , errors = []
+      , archive = Nothing
       , keyword = Loading
       }
     , Cmd.batch
         [ Request.Keyword.get url CompletedKeywordLoad
+        , Request.Zip.available url CompletedZipProbe
         , Task.perform (\_ -> PassedSlowLoadThreshold) Loading.slowThreshold
         ]
     )
@@ -67,7 +74,10 @@ view model =
                         model.errors
                     , div
                         [ class "container-fluid" ]
-                        [ div [ class "row" ] [ h1 [ class "ml-2" ] [ text keyword.name ] ]
+                        [ div [ class "row align-items-center" ]
+                            [ h1 [ class "ml-2" ] [ text keyword.name ]
+                            , viewDownloadButton keyword model.archive
+                            ]
                         , div [ class "row" ] [ Html.Lazy.lazy viewPhotos keyword.photos ]
                         , div [ class "row" ] [ viewMap keyword.name 12 12 12 12 12 ]
                         ]
@@ -78,9 +88,37 @@ view model =
     }
 
 
+{-| As Page.Album's, but on a light background so the icon is dark. Ten
+duplicated lines beats a shared Views.Zip at this size.
+-}
+viewDownloadButton : Keyword -> Maybe Request.Zip.Archive -> Html Msg
+viewDownloadButton keyword archive =
+    case archive of
+        Nothing ->
+            text ""
+
+        Just { size } ->
+            let
+                label =
+                    "Download all photos" ++ Views.Misc.sizeSuffix size
+            in
+            div [ class "ml-auto mr-3" ]
+                [ a
+                    [ href (Url.toZipUrl keyword.url)
+                    , download ""
+                    , title label
+                    , attribute "aria-label" label
+                    , onClick CopyRightNotice
+                    ]
+                    [ i [ class "fas fa-download text-dark" ] [] ]
+                ]
+
+
 type Msg
     = DismissErrors
+    | CopyRightNotice
     | CompletedKeywordLoad (Result Http.Error Keyword)
+    | CompletedZipProbe (Result Http.Error (Maybe Request.Zip.Archive))
     | PassedSlowLoadThreshold
 
 
@@ -89,6 +127,21 @@ update msg model =
     case msg of
         DismissErrors ->
             ( { model | errors = [] }, Cmd.none )
+
+        CopyRightNotice ->
+            ( { model
+                | errors =
+                    [ "Remember to ask and credit the photographer before using the images!"
+                    ]
+              }
+            , Cmd.none
+            )
+
+        CompletedZipProbe (Ok archive) ->
+            ( { model | archive = archive }, Cmd.none )
+
+        CompletedZipProbe (Err err) ->
+            ( { model | archive = Nothing }, Log.httpError err )
 
         CompletedKeywordLoad (Ok keyword) ->
             ( { model | keyword = Loaded keyword }, initMap keyword )
