@@ -291,9 +291,10 @@ func TestPlanDecodesEveryCollectionShape(t *testing.T) {
 			entries: []string{"portrait_mm.jpeg"},
 		},
 		{
-			// Munin writes person files with the same encoder into the same
-			// keywords/ directory, which is why one page type serves both.
-			name:    "person page",
+			// A person is a keyword listed in the gallery's `people` config:
+			// same pointer, same keywords/<name>.json, same encoder. Named for
+			// what it is so nobody "fixes" the missing person support.
+			name:    "person page, which is a keyword page",
 			doc:     "keywords/Martin_Peter_Meuche.json",
 			want:    "Martin Peter Meuche.zip",
 			entries: []string{"portrait_mm.jpeg"},
