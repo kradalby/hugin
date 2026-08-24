@@ -26,6 +26,28 @@ For example
     https://hugin.example.no ⬅  Hugin static files
     https://hugin.example.no/content ⬅ Munin gallery
 
+### Originals live outside the gallery
+
+Munin symlinks the full-resolution originals rather than copying them, so every
+`content/**/*_original.*` points out of Munin's `targetFolder` and into its
+`sourceFolder`:
+
+    content/root/2001/photo_original.jpg -> ../../../album/2001/photo.jpg
+
+Whatever serves the gallery therefore needs read access to **both** trees, not
+just the one it is pointed at. Serving only `targetFolder`, or running as a user
+that cannot traverse into `sourceFolder`, produces a gallery where every page
+and thumbnail loads correctly, every original download returns `403`, and the
+album download button silently disappears — the server log is the only place
+that says why.
+
+### Collection downloads
+
+`/zip/<gallery path>` streams an album, keyword or person as a zip archive. It
+is served by the hugin binary itself, so under a plain static webserver that
+mount does not exist, the frontend's probe fails, and the download button is
+simply absent. Everything else works.
+
 ### Nginx
 
 Here is an example configuration with Nginx:
@@ -79,6 +101,11 @@ fronts it with a Tailscale sidecar for access control:
             contentDir = "/var/lib/munin/gallery/content";
             tailscaleKeyPath = "/run/secrets/hugin-tailscale-key";
           };
+
+          # Originals symlink into Munin's sourceFolder (see above), so the
+          # service user needs read access there as well. Grant it however
+          # the source tree is owned — a shared group is usually simplest:
+          systemd.services.hugin.serviceConfig.SupplementaryGroups = [ "photos" ];
         }
       ];
     };
