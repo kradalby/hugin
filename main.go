@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -103,15 +104,45 @@ func distHandler() http.Handler {
 	return http.FileServer(http.FS(sub))
 }
 
+// http.FileServer swallows the os.Open error, so the status is all that
+// separates "missing" from "unreadable".
+type statusRecorder struct {
+	http.ResponseWriter
+
+	status int
+}
+
+func (s *statusRecorder) WriteHeader(status int) {
+	s.status = status
+	s.ResponseWriter.WriteHeader(status)
+}
+
+// Embedding alone would hide io.ReaderFrom from ServeContent's sendfile path;
+// io.Copy re-asserts on the wrapped writer. Only reachable on --addr — neither
+// crypto/tls.Conn nor tsnet's connections implement it.
+func (s *statusRecorder) ReadFrom(src io.Reader) (int64, error) {
+	return io.Copy(s.ResponseWriter, src)
+}
+
+// So http.ResponseController can still reach the Flusher/Hijacker this wrapper
+// hides.
+func (s *statusRecorder) Unwrap() http.ResponseWriter {
+	return s.ResponseWriter
+}
+
 func loggingHandler(h http.Handler, dir string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// A handler that writes a body without WriteHeader has served a 200.
+		recorder := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+
+		h.ServeHTTP(recorder, r)
+
 		// gosec flags any http.Request-derived value reaching a log sink as
 		// log injection (G706), regardless of transformation. This is
 		// operator-facing debug logging of the requested path, not a
 		// security/audit log, and %q already escapes newlines/control
 		// characters so a request can't forge extra log lines.
-		log.Printf("%s - %q: %q", r.Method, r.URL.Path, dir+r.URL.Path) //nolint:gosec
-		h.ServeHTTP(w, r)
+		log.Printf("%s %d - %q: %q", r.Method, recorder.status, r.URL.Path, dir+r.URL.Path) //nolint:gosec
 	})
 }
 
