@@ -177,6 +177,11 @@ in
         # is deliberately left unset here — it would hide them outright,
         # unlike ReadOnlyPaths which only allow-lists specific paths under
         # ProtectSystem=strict.
+        #
+        # contentDir alone is not enough: Munin symlinks originals into its
+        # sourceFolder, which the operator must grant separately
+        # (SupplementaryGroups, or mode bits). ProtectSystem=strict hides
+        # nothing, so no setting here substitutes for it.
         NoNewPrivileges = true;
         ProtectSystem = "strict";
         PrivateTmp = true;
