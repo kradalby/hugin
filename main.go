@@ -167,6 +167,12 @@ func routes(contentDir, rootDir string) *http.ServeMux {
 	} else {
 		log.Printf("Serving content from %s", contentDir)
 		serveDir("/content", contentDir)
+
+		// Only mounted with a real gallery, so the frontend's probe 404s when
+		// there is nothing to zip. Logged like the other mounts — otherwise a
+		// download leaves no trace at all.
+		mux.Handle("/zip/", http.StripPrefix("/zip",
+			loggingHandler(zipHandler(contentDir), contentDir)))
 	}
 
 	// /album/ predates /content/ and is kept for anything still linking to it;

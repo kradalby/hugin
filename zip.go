@@ -5,10 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"math"
+	"mime"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -239,9 +244,8 @@ func plan(dir, docPath string) (string, []member, error) {
 		return "", nil, err
 	}
 
-	// #nosec G304 -- confined by localize above, which rejects any path that
-	// is not strictly inside dir.
-	raw, err := os.ReadFile(filepath.Join(dir, local))
+	// G304: confined by localize above.
+	raw, err := os.ReadFile(filepath.Join(dir, local)) //nolint:gosec
 	if err != nil {
 		return "", nil, fmt.Errorf("reading collection %q: %w", docPath, err)
 	}
@@ -325,4 +329,132 @@ func storedHeader(m member) *zip.FileHeader {
 		Method:   zip.Store,
 		Modified: modified,
 	}
+}
+
+// Used only when a file has no mtime at all. One merely outside the MS-DOS
+// range is left alone: archive/zip clamps and still writes the extra.
+var msdosEpoch = time.Date(1980, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+// Streams a collection's originals. Nothing accumulates, so heap scales with
+// photo count, not bytes moved.
+//
+// The length is computed rather than dry-run because HEAD doubles as the
+// frontend's probe on every page view, so it must stay O(photos) rather than
+// reading the album. Only a Go-served gallery answers application/zip.
+func zipHandler(dir string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet && r.Method != http.MethodHead {
+			w.Header().Set("Allow", "GET, HEAD")
+			http.Error(w, "405 method not allowed", http.StatusMethodNotAllowed)
+
+			return
+		}
+
+		// StripPrefix leaves the path rooted; localize refuses to trim it.
+		docPath := strings.TrimPrefix(r.URL.Path, "/")
+
+		name, members, err := plan(dir, docPath)
+		if err != nil {
+			// Always 404: telling a prober which paths exist buys nothing.
+			// Both verbs quote — the error carries the decoded request path and
+			// fs.ValidPath permits newlines, so %s would forge log lines.
+			// errNoPhotos/errNotJSON are ordinary answers to a per-page-view
+			// probe, not faults worth a line each time.
+			switch {
+			case errors.Is(err, errNoPhotos), errors.Is(err, errNotJSON):
+				if *verbose {
+					log.Printf("zip %q: %q", docPath, err.Error()) //nolint:gosec
+				}
+			default:
+				log.Printf("zip %q: %q", docPath, err.Error()) //nolint:gosec
+			}
+
+			http.NotFound(w, r)
+
+			return
+		}
+
+		total := zipSize(members)
+
+		// FormatMediaType percent-encodes CRLF and emits RFC 2231 for
+		// non-ASCII, so a Munin-derived name cannot inject a header.
+		disposition := mime.FormatMediaType("attachment", map[string]string{"filename": name})
+
+		w.Header().Set("Content-Type", "application/zip")
+		w.Header().Set("Content-Length", strconv.FormatInt(total, 10))
+		w.Header().Set("Content-Disposition", disposition)
+		// A cached probe would show a stale tooltip, and nothing should store a
+		// multi-gigabyte body.
+		w.Header().Set("Cache-Control", "no-store")
+		// Advisory only: wget -c ignores it. What saves a resume is the archive
+		// being byte-deterministic.
+		w.Header().Set("Accept-Ranges", "none")
+
+		// Cost, not protocol: net/http discards a HEAD body anyway, but without
+		// this every probe reads the whole album off disk to feed it.
+		if r.Method == http.MethodHead {
+			return
+		}
+
+		err = writeZip(w, dir, members)
+		if err != nil {
+			// Headers are long gone, so there is no status left to set.
+			// Aborting makes the browser report a failed download instead of
+			// leaving a truncated archive.
+			if r.Context().Err() == nil {
+				log.Printf("zip %q: streaming: %q", docPath, err.Error()) //nolint:gosec
+			}
+
+			panic(http.ErrAbortHandler)
+		}
+	})
+}
+
+// writeZip streams the manifest into w as a stored zip archive.
+func writeZip(w io.Writer, dir string, members []member) error {
+	archive := zip.NewWriter(w)
+
+	for _, m := range members {
+		entry, err := archive.CreateHeader(storedHeader(m))
+		if err != nil {
+			return fmt.Errorf("creating entry %q: %w", m.name, err)
+		}
+
+		// G304: confined by localize in plan.
+		file, err := os.Open(filepath.Join(dir, m.source)) //nolint:gosec
+		if err != nil {
+			return fmt.Errorf("opening %q: %w", m.source, err)
+		}
+
+		// CopyN, not Copy: a photo rewritten mid-download must not desync the
+		// body from the sent Content-Length. Shrinking returns io.EOF; growing
+		// would ship a well-formed archive holding a truncated photo, hence the
+		// probe for one byte too many.
+		_, err = io.CopyN(entry, file, m.size)
+		if err == nil {
+			var extra [1]byte
+
+			n, _ := file.Read(extra[:])
+			if n > 0 {
+				err = fmt.Errorf("%w: grew past %d bytes", errResized, m.size)
+			}
+		}
+
+		closeErr := file.Close()
+
+		if err != nil {
+			return fmt.Errorf("streaming %q: %w", m.source, err)
+		}
+
+		if closeErr != nil {
+			return fmt.Errorf("closing %q: %w", m.source, closeErr)
+		}
+	}
+
+	err := archive.Close()
+	if err != nil {
+		return fmt.Errorf("finishing archive: %w", err)
+	}
+
+	return nil
 }

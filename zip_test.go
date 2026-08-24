@@ -2,11 +2,14 @@ package main
 
 import (
 	"archive/zip"
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"math"
+	"mime"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -421,6 +424,52 @@ func TestArchiveName(t *testing.T) {
 			got := archiveName(tt.name)
 			if got != tt.want {
 				t.Errorf("archiveName(%q) = %q, want %q", tt.name, got, tt.want)
+			}
+		})
+	}
+}
+
+// archiveName folds separators and nothing else; FormatMediaType is what makes
+// the value header-safe. Assert that rather than trusting it.
+func TestArchiveNameCannotInjectAHeader(t *testing.T) {
+	for _, name := range []string{
+		"evil\r\nX-Injected: yes",
+		"quote\"name",
+		"Midtøsten",
+		"tab\there",
+		"semi;colon",
+	} {
+		t.Run(name, func(t *testing.T) {
+			header := mime.FormatMediaType("attachment", map[string]string{
+				"filename": archiveName(name),
+			})
+
+			raw := "HTTP/1.1 200 OK\r\nContent-Disposition: " + header + "\r\nContent-Length: 0\r\n\r\n"
+
+			resp, err := http.ReadResponse(bufio.NewReader(strings.NewReader(raw)), nil)
+			if err != nil {
+				t.Fatalf("header %q produced an unparseable response: %s", header, err)
+			}
+
+			defer resp.Body.Close()
+
+			if got := resp.Header.Get("X-Injected"); got != "" {
+				t.Errorf("name %q injected X-Injected: %q", name, got)
+			}
+
+			// Nothing smuggled in alongside the two expected headers.
+			if len(resp.Header) != 2 {
+				t.Errorf("name %q produced %d headers, want 2: %v", name, len(resp.Header), resp.Header)
+			}
+
+			// Safe is not enough; the name must survive.
+			_, params, err := mime.ParseMediaType(header)
+			if err != nil {
+				t.Fatalf("reparsing %q: %s", header, err)
+			}
+
+			if params["filename"] == "" {
+				t.Errorf("name %q lost its filename entirely: %q", name, header)
 			}
 		})
 	}
