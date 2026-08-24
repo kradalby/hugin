@@ -1,12 +1,18 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
+	"hash/crc32"
+	"io"
 	"io/fs"
+	"mime"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -191,6 +197,312 @@ func TestFrontendEntryPointResolves(t *testing.T) {
 		if resp.StatusCode != http.StatusOK {
 			t.Errorf("sub-album %s = %d, want %d", sub.URL, resp.StatusCode, http.StatusOK)
 		}
+	}
+}
+
+// The originals are read through Munin's symlinks, which point out of the
+// served tree. That is the assumption that broke in production, so assert the
+// bytes arrive rather than that the request succeeds.
+func TestZipAlbumRoundTrips(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	resp := get(t, server.URL+"/zip/root/Misc/index.json")
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("GET /zip/root/Misc/index.json = %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	if got := resp.Header.Get("Content-Type"); got != "application/zip" {
+		t.Errorf("Content-Type = %q, want application/zip", got)
+	}
+
+	if got := resp.Header.Get("Content-Disposition"); !strings.Contains(got, "Misc.zip") {
+		t.Errorf("Content-Disposition = %q, want a Misc.zip filename", got)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("reading the archive: %s", err)
+	}
+
+	archive, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
+	if err != nil {
+		t.Fatalf("reopening the archive: %s", err)
+	}
+
+	// Archive carries the photographer's filenames, not the _original suffix.
+	want := map[string]string{
+		"portrait_mm.jpeg":       "root/Misc/portrait_mm_original.jpeg",
+		"test_special_chars.jpg": "root/Misc/test_special_chars_original.jpg",
+	}
+
+	if len(archive.File) != len(want) {
+		t.Fatalf("archive holds %d entries, want %d", len(archive.File), len(want))
+	}
+
+	for _, entry := range archive.File {
+		source, ok := want[entry.Name]
+		if !ok {
+			t.Errorf("unexpected archive entry %q", entry.Name)
+
+			continue
+		}
+
+		onDisk, err := os.ReadFile(filepath.Join(galleryRoot, source))
+		if err != nil {
+			t.Fatalf("reading %s: %s", source, err)
+		}
+
+		rc, err := entry.Open()
+		if err != nil {
+			t.Fatalf("opening %q: %s", entry.Name, err)
+		}
+
+		got, err := io.ReadAll(rc)
+		rc.Close()
+
+		if err != nil {
+			t.Fatalf("reading %q: %s", entry.Name, err)
+		}
+
+		if !bytes.Equal(got, onDisk) {
+			t.Errorf("entry %q holds %d bytes, want the %d bytes of %s",
+				entry.Name, len(got), len(onDisk), source)
+		}
+
+		if entry.CRC32 != crc32.ChecksumIEEE(onDisk) {
+			t.Errorf("entry %q has a CRC that does not match %s", entry.Name, source)
+		}
+	}
+}
+
+// An inexact Content-Length is worse than none: too large hangs the transfer,
+// too small truncates. Only this proves the handler declares what it writes.
+func TestZipContentLengthIsExact(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	for _, doc := range []string{
+		"root/Misc/index.json",
+		"keywords/Spring.json",
+		"keywords/Martin_Peter_Meuche.json",
+		"keywords/Midtøsten.json",
+	} {
+		t.Run(doc, func(t *testing.T) {
+			resp := get(t, server.URL+"/zip/"+doc)
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusOK {
+				t.Fatalf("GET /zip/%s = %d, want %d", doc, resp.StatusCode, http.StatusOK)
+			}
+
+			// Chunked has no total, so the browser falls back to a spinner.
+			if resp.TransferEncoding != nil {
+				t.Errorf("Transfer-Encoding = %v, want none so the browser has a total", resp.TransferEncoding)
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatalf("reading the archive: %s", err)
+			}
+
+			if resp.ContentLength != int64(len(body)) {
+				t.Errorf("declared Content-Length %d, wrote %d bytes", resp.ContentLength, len(body))
+			}
+
+			_, err = zip.NewReader(bytes.NewReader(body), int64(len(body)))
+			if err != nil {
+				t.Errorf("archive does not reopen: %s", err)
+			}
+		})
+	}
+}
+
+// The frontend hides its button unless HEAD answers application/zip, and takes
+// the tooltip size from the same response.
+func TestZipHeadMatchesGet(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodHead, server.URL+"/zip/root/Misc/index.json", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	head, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("HEAD: %s", err)
+	}
+	defer head.Body.Close()
+
+	if head.StatusCode != http.StatusOK {
+		t.Fatalf("HEAD = %d, want %d", head.StatusCode, http.StatusOK)
+	}
+
+	// Status alone is not enough: an nginx SPA fallback answers 200 text/html
+	// for any path, giving a button that downloads index.html renamed .zip.
+	if got := head.Header.Get("Content-Type"); got != "application/zip" {
+		t.Errorf("HEAD Content-Type = %q, want application/zip", got)
+	}
+
+	// Through a server this proves nothing — net/http discards a HEAD body on
+	// its own, so the handler could read the whole album off disk and no test
+	// would see it. A recorder does not strip, so it does.
+	rec := httptest.NewRecorder()
+	zipHandler(galleryRoot).ServeHTTP(rec,
+		httptest.NewRequestWithContext(t.Context(), http.MethodHead, "/root/Misc/index.json", nil))
+
+	if rec.Body.Len() != 0 {
+		t.Errorf("HEAD wrote %d bytes; it should not read the album at all", rec.Body.Len())
+	}
+
+	if got := rec.Header().Get("Content-Length"); got == "" {
+		t.Error("HEAD set no Content-Length, so the frontend has no size to show")
+	}
+
+	full := get(t, server.URL+"/zip/root/Misc/index.json")
+	defer full.Body.Close()
+
+	if head.ContentLength != full.ContentLength {
+		t.Errorf("HEAD Content-Length %d, GET %d", head.ContentLength, full.ContentLength)
+	}
+
+	if head.Header.Get("Content-Disposition") != full.Header.Get("Content-Disposition") {
+		t.Errorf("HEAD Content-Disposition %q, GET %q",
+			head.Header.Get("Content-Disposition"), full.Header.Get("Content-Disposition"))
+	}
+}
+
+// A non-ASCII name has to survive into the saved filename, via RFC 2231.
+func TestZipNonASCIICollection(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	resp := get(t, server.URL+"/zip/keywords/Midt%C3%B8sten.json")
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("GET /zip/keywords/Midt%%C3%%B8sten.json = %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	disposition := resp.Header.Get("Content-Disposition")
+
+	_, params, err := mime.ParseMediaType(disposition)
+	if err != nil {
+		t.Fatalf("parsing Content-Disposition %q: %s", disposition, err)
+	}
+
+	if params["filename"] != "Midtøsten.zip" {
+		t.Errorf("filename = %q, want %q", params["filename"], "Midtøsten.zip")
+	}
+}
+
+// The collection path is the endpoint's whole trust boundary.
+//
+// Two layers refuse these: ServeMux normalises dot segments first, redirecting
+// a real traversal out of /zip/ entirely, and whatever survives reaches
+// filepath.Localize. Asserting "not 200" rather than a status, because how it
+// is refused is an implementation detail and that nothing escapes is not.
+func TestZipRefusesTraversal(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	for _, path := range []string{
+		"/zip/../munin.json",
+		"/zip/root/../../munin.json",
+		"/zip/./../munin.json",
+		"/zip/%2e%2e%2fmunin.json",
+		"/zip/..%2f..%2fmunin.json",
+		"/zip/root/%2e%2e/%2e%2e/munin.json",
+		"/zip//etc/passwd.json",
+		"/zip/root/Misc/index.json%00.json",
+	} {
+		t.Run(path, func(t *testing.T) {
+			// Not parsed through url.Parse: rejection has to happen on the wire.
+			resp := get(t, server.URL+path)
+			defer resp.Body.Close()
+
+			if resp.StatusCode == http.StatusOK {
+				t.Errorf("GET %s = 200, want a refusal", path)
+			}
+		})
+	}
+}
+
+// A dot segment resolving back inside the gallery is normalisation, not an
+// attack. Recorded because it looks like the cases above but must not refuse.
+func TestZipNormalisesHarmlessDotSegments(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	resp := get(t, server.URL+"/zip/./root/Misc/index.json")
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("GET /zip/./root/Misc/index.json = %d, want %d", resp.StatusCode, http.StatusOK)
+	}
+
+	if got := resp.Request.URL.Path; got != "/zip/root/Misc/index.json" {
+		t.Errorf("normalised to %q, want %q", got, "/zip/root/Misc/index.json")
+	}
+}
+
+// Everything that is not a leaf collection is a 404, including an album that
+// only holds sub-albums — which is what stops this becoming a gallery crawl.
+func TestZipRejectsNonCollections(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	for _, doc := range []string{
+		"root/index.json",
+		"root/Misc/portrait_mm_180.jpeg",
+		"root/Misc/portrait_mm.json",
+		"keywords/NoSuchKeyword.json",
+		"root/Misc",
+		"",
+	} {
+		t.Run(doc, func(t *testing.T) {
+			resp := get(t, server.URL+"/zip/"+doc)
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusNotFound {
+				t.Errorf("GET /zip/%s = %d, want %d", doc, resp.StatusCode, http.StatusNotFound)
+			}
+		})
+	}
+}
+
+// Without Munin's source tree every original dangles. That must fail loudly
+// rather than produce a valid archive holding nothing.
+func TestZipWithoutOriginals(t *testing.T) {
+	dir := t.TempDir()
+
+	err := os.CopyFS(dir, os.DirFS(galleryRoot))
+	if err != nil {
+		t.Fatalf("copying the fixture: %s", err)
+	}
+
+	// os.CopyFS resolves symlinks, so break them explicitly.
+	for _, name := range []string{
+		"root/Misc/portrait_mm_original.jpeg",
+		"root/Misc/test_special_chars_original.jpg",
+	} {
+		err = os.Remove(filepath.Join(dir, name))
+		if err != nil {
+			t.Fatalf("removing %s: %s", name, err)
+		}
+	}
+
+	server := httptest.NewServer(routes(dir, ""))
+	defer server.Close()
+
+	resp := get(t, server.URL+"/zip/root/Misc/index.json")
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNotFound {
+		t.Fatalf("GET /zip/root/Misc/index.json = %d, want %d", resp.StatusCode, http.StatusNotFound)
 	}
 }
 
