@@ -1,7 +1,4 @@
-port module Ports exposing (analytics, downloadImages, httpError, initMap, requestFullscreen)
-
-
-port downloadImages : List String -> Cmd msg
+port module Ports exposing (analytics, httpError, initMap, requestFullscreen)
 
 
 port initMap : ( String, List ( Float, Float ) ) -> Cmd msg

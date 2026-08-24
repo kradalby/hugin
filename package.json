@@ -37,22 +37,16 @@
     "@parcel/transformer-elm": "2.16.4",
     "@parcel/transformer-image": "2.16.4",
     "@parcel/transformer-sass": "2.16.4",
-    "@types/google.analytics": "0.0.46",
-    "@types/jszip": "3.4.1",
     "@types/mapbox-gl": "3.5.0",
     "@types/node": "26.1.2",
     "@types/umami": "2.10.1",
     "analytics": "^0.8.9",
     "bootstrap": "<5.0.0",
     "flexbin": "^0.2.0",
-    "jszip": "^3.10.0",
-    "jszip-utils": "0.1.0",
     "mapbox-gl": "3.27.0",
     "parcel": "^2.16.4",
     "screenfull": "^6.0.2",
-    "streamsaver": "^2.0.6",
-    "typescript": "7.0.2",
-    "web-streams-polyfill": "^4.3.0"
+    "typescript": "7.0.2"
   },
   "devDependencies": {
     "process": "^0.11.10"
