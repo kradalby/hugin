@@ -6,9 +6,6 @@ export namespace Elm {
   namespace Main {
     export interface App {
       ports: {
-        downloadImages: {
-          subscribe(callback: (data: string[]) => void): void;
-        };
         initMap: {
           subscribe(
             callback: (data: [string, [number, number][]]) => void,

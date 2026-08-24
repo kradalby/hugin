@@ -87,10 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
     flags: null,
   });
 
-  // Download albums
-  app.ports.downloadImages.subscribe((urls: [string]) => {
-    // downloadImages(urls);
-  });
   // Google Analytics
   app.ports.analytics.subscribe((url: string) => {
     console.log("DEBUG: gtag called with: ", url);
