@@ -60,15 +60,20 @@ func publishedURLs(node any, out *[]string) {
 
 // get keeps the call sites readable while carrying the test's context, which
 // the linter requires over the http.Get convenience wrapper.
-func get(t *testing.T, url string) *http.Response {
+func get(t *testing.T, server *httptest.Server, path string) *http.Response {
 	t.Helper()
+
+	// Client() starts the in-memory server and is what populates server.URL,
+	// so it has to run before the URL is read.
+	client := server.Client()
+	url := server.URL + path
 
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, url, nil)
 	if err != nil {
 		t.Fatalf("building request for %s: %s", url, err)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Fatalf("GET %s: %s", url, err)
 	}
@@ -146,12 +151,11 @@ func TestPublishedURLsAreGalleryRelative(t *testing.T) {
 // The regression that shipped: URLs that resolved against the current SPA route
 // rather than the content mount, so every thumbnail 404'd.
 func TestEveryPublishedURLResolvesThroughTheContentMount(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
 	for _, u := range galleryURLs(t) {
 		t.Run(u, func(t *testing.T) {
-			resp := get(t, server.URL+"/content/"+u)
+			resp := get(t, server, "/content/"+u)
 			defer resp.Body.Close()
 
 			if resp.StatusCode != http.StatusOK {
@@ -164,10 +168,9 @@ func TestEveryPublishedURLResolvesThroughTheContentMount(t *testing.T) {
 // rootUrl in Request/Helpers.elm. If Munin's gallery name or hugin's mount
 // moves, this is the request that breaks first and takes the whole app with it.
 func TestFrontendEntryPointResolves(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
-	resp := get(t, server.URL+"/content/root/index.json")
+	resp := get(t, server, "/content/root/index.json")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -193,7 +196,7 @@ func TestFrontendEntryPointResolves(t *testing.T) {
 	// Following a link out of the index is what the frontend does next, and it
 	// is where a prefix mismatch shows up as a 404 rather than a decode error.
 	for _, sub := range album.Albums {
-		resp := get(t, server.URL+"/content/"+sub.URL)
+		resp := get(t, server, "/content/"+sub.URL)
 		resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
@@ -206,10 +209,9 @@ func TestFrontendEntryPointResolves(t *testing.T) {
 // served tree. That is the assumption that broke in production, so assert the
 // bytes arrive rather than that the request succeeds.
 func TestZipAlbumRoundTrips(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
-	resp := get(t, server.URL+"/zip/root/Misc/index.json")
+	resp := get(t, server, "/zip/root/Misc/index.json")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -283,8 +285,7 @@ func TestZipAlbumRoundTrips(t *testing.T) {
 // An inexact Content-Length is worse than none: too large hangs the transfer,
 // too small truncates. Only this proves the handler declares what it writes.
 func TestZipContentLengthIsExact(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
 	for _, doc := range []string{
 		"root/Misc/index.json",
@@ -293,7 +294,7 @@ func TestZipContentLengthIsExact(t *testing.T) {
 		"keywords/Midtøsten.json",
 	} {
 		t.Run(doc, func(t *testing.T) {
-			resp := get(t, server.URL+"/zip/"+doc)
+			resp := get(t, server, "/zip/"+doc)
 			defer resp.Body.Close()
 
 			if resp.StatusCode != http.StatusOK {
@@ -325,15 +326,16 @@ func TestZipContentLengthIsExact(t *testing.T) {
 // The frontend hides its button unless HEAD answers application/zip, and takes
 // the tooltip size from the same response.
 func TestZipHeadMatchesGet(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
+
+	client := server.Client()
 
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodHead, server.URL+"/zip/root/Misc/index.json", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	head, err := http.DefaultClient.Do(req)
+	head, err := client.Do(req)
 	if err != nil {
 		t.Fatalf("HEAD: %s", err)
 	}
@@ -364,7 +366,7 @@ func TestZipHeadMatchesGet(t *testing.T) {
 		t.Error("HEAD set no Content-Length, so the frontend has no size to show")
 	}
 
-	full := get(t, server.URL+"/zip/root/Misc/index.json")
+	full := get(t, server, "/zip/root/Misc/index.json")
 	defer full.Body.Close()
 
 	if head.ContentLength != full.ContentLength {
@@ -379,10 +381,9 @@ func TestZipHeadMatchesGet(t *testing.T) {
 
 // A non-ASCII name has to survive into the saved filename, via RFC 2231.
 func TestZipNonASCIICollection(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
-	resp := get(t, server.URL+"/zip/keywords/Midt%C3%B8sten.json")
+	resp := get(t, server, "/zip/keywords/Midt%C3%B8sten.json")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -408,8 +409,7 @@ func TestZipNonASCIICollection(t *testing.T) {
 // filepath.Localize. Asserting "not 200" rather than a status, because how it
 // is refused is an implementation detail and that nothing escapes is not.
 func TestZipRefusesTraversal(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
 	for _, path := range []string{
 		"/zip/../munin.json",
@@ -423,7 +423,7 @@ func TestZipRefusesTraversal(t *testing.T) {
 	} {
 		t.Run(path, func(t *testing.T) {
 			// Not parsed through url.Parse: rejection has to happen on the wire.
-			resp := get(t, server.URL+path)
+			resp := get(t, server, path)
 			defer resp.Body.Close()
 
 			if resp.StatusCode == http.StatusOK {
@@ -436,10 +436,9 @@ func TestZipRefusesTraversal(t *testing.T) {
 // A dot segment resolving back inside the gallery is normalisation, not an
 // attack. Recorded because it looks like the cases above but must not refuse.
 func TestZipNormalisesHarmlessDotSegments(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
-	resp := get(t, server.URL+"/zip/./root/Misc/index.json")
+	resp := get(t, server, "/zip/./root/Misc/index.json")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -454,8 +453,7 @@ func TestZipNormalisesHarmlessDotSegments(t *testing.T) {
 // Everything that is not a leaf collection is a 404, including an album that
 // only holds sub-albums — which is what stops this becoming a gallery crawl.
 func TestZipRejectsNonCollections(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
 	for _, doc := range []string{
 		"root/index.json",
@@ -466,7 +464,7 @@ func TestZipRejectsNonCollections(t *testing.T) {
 		"",
 	} {
 		t.Run(doc, func(t *testing.T) {
-			resp := get(t, server.URL+"/zip/"+doc)
+			resp := get(t, server, "/zip/"+doc)
 			defer resp.Body.Close()
 
 			if resp.StatusCode != http.StatusNotFound {
@@ -497,10 +495,9 @@ func TestZipWithoutOriginals(t *testing.T) {
 		}
 	}
 
-	server := httptest.NewServer(routes(dir, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(dir, ""))
 
-	resp := get(t, server.URL+"/zip/root/Misc/index.json")
+	resp := get(t, server, "/zip/root/Misc/index.json")
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNotFound {
@@ -511,11 +508,10 @@ func TestZipWithoutOriginals(t *testing.T) {
 // --root-dir defaults to --content-dir, and /album/ is kept for anything still
 // linking to it. Nothing covered either before.
 func TestAlbumMountFallsBackToContentDir(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
 
 	for _, prefix := range []string{"/content", "/album"} {
-		resp := get(t, server.URL+path.Join(prefix, "root/index.json"))
+		resp := get(t, server, path.Join(prefix, "root/index.json"))
 		resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
@@ -559,10 +555,9 @@ func TestZipDeduplicatesCollidingNames(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	server := httptest.NewServer(routes(dir, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(dir, ""))
 
-	resp := get(t, server.URL+"/zip/keywords/Spring.json")
+	resp := get(t, server, "/zip/keywords/Spring.json")
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
@@ -589,8 +584,9 @@ func TestZipDeduplicatesCollidingNames(t *testing.T) {
 }
 
 func TestZipRejectsOtherMethods(t *testing.T) {
-	server := httptest.NewServer(routes(galleryRoot, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(galleryRoot, ""))
+
+	client := server.Client()
 
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost,
 		server.URL+"/zip/root/Misc/index.json", nil)
@@ -598,7 +594,7 @@ func TestZipRejectsOtherMethods(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -616,10 +612,9 @@ func TestZipRejectsOtherMethods(t *testing.T) {
 // The capability probe's contract: no gallery, no mount, so the frontend hides
 // the button instead of rendering one that 404s.
 func TestZipIsNotMountedWithoutAGallery(t *testing.T) {
-	server := httptest.NewServer(routes("", ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes("", ""))
 
-	resp := get(t, server.URL+"/zip/root/Misc/index.json")
+	resp := get(t, server, "/zip/root/Misc/index.json")
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
@@ -667,10 +662,9 @@ func TestKeywordStoredInTheOtherNormalizationStillServes(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			server := httptest.NewServer(routes(dir, ""))
-			defer server.Close()
+			server := httptest.NewTestServer(t, routes(dir, ""))
 
-			resp := get(t, server.URL+"/content/keywords/"+tc.requested)
+			resp := get(t, server, "/content/keywords/"+tc.requested)
 			defer resp.Body.Close()
 
 			if resp.StatusCode != http.StatusOK {
@@ -700,11 +694,10 @@ func TestExactNameWinsOverItsOtherNormalization(t *testing.T) {
 		}
 	}
 
-	server := httptest.NewServer(routes(dir, ""))
-	defer server.Close()
+	server := httptest.NewTestServer(t, routes(dir, ""))
 
 	for name, body := range want {
-		resp := get(t, server.URL+"/content/keywords/"+name)
+		resp := get(t, server, "/content/keywords/"+name)
 
 		got, err := io.ReadAll(resp.Body)
 		resp.Body.Close()
