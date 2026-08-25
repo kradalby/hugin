@@ -94,7 +94,12 @@
           inherit pkgs;
           root = ./.;
           pname = "hugin";
-          version = huginVersion;
+          # Not huginVersion: buildGoModule names the vendored tree
+          # "${pname}-${version}-go-modules", so a rev-based version refetches
+          # every module on every commit. vendorHash already pins the content.
+          # Overriding version afterwards re-derives it, so this stays stable
+          # for the binary too.
+          version = "0";
           vendorHash = "sha256-gjZAe5N7Q1mHYix6AGFLkYBcbxYhqG4F3N4CSHrA0bY=";
           goPkg = pkgs.go_1_26;
         };
