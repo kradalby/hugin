@@ -1,4 +1,4 @@
-module Views.Misc exposing (loading, scaledImg, scaledImgCount, viewKeywords, viewMap, viewPath, viewPhoto, viewPhotos)
+module Views.Misc exposing (loading, scaledImg, sizeSuffix, viewKeywords, viewMap, viewPath, viewPhotos)
 
 {-| Assets, such as images, videos, and audio. (We only have images for now.)
 
@@ -14,6 +14,7 @@ import Html exposing (Html, a, div, h5, img, span, text)
 import Html.Attributes exposing (attribute, class, id, src)
 import Route
 import Time
+import Util
 
 
 viewKeywords : String -> List KeywordPointer -> Html msg
@@ -137,3 +138,16 @@ viewMap name col sm md lg xl =
 loading : String -> Html.Attribute msg
 loading value =
     attribute "loading" value
+
+
+{-| " (243.1 MB)", or nothing when the backend gave no length. Shared so the
+album and keyword buttons cannot drift apart on wording.
+-}
+sizeSuffix : Maybe Int -> String
+sizeSuffix size =
+    case size of
+        Nothing ->
+            ""
+
+        Just bytes ->
+            " (" ++ Util.formatBytes bytes ++ ")"

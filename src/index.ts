@@ -9,9 +9,7 @@ import {
   faChevronRight,
   faCaretSquareLeft,
   faCaretSquareRight,
-  faSpinner,
   faImages,
-  faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -21,9 +19,7 @@ library.add(
   faChevronRight,
   faCaretSquareLeft,
   faCaretSquareRight,
-  faSpinner,
   faImages,
-  faAngleRight,
 );
 
 dom.watch();

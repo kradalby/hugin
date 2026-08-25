@@ -27,15 +27,6 @@ viewIf condition content =
         Html.text ""
 
 
-formatExposureTime : Float -> String
-formatExposureTime exposure =
-    let
-        denominator =
-            1 / exposure
-    in
-    "1/" ++ String.fromFloat denominator
-
-
 cleanOwnerToName : String -> String
 cleanOwnerToName owner =
     let
