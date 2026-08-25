@@ -277,10 +277,10 @@ addOrdinalSuffix : Int -> String
 addOrdinalSuffix number =
     let
         j =
-            modBy number 10
+            modBy 10 number
 
         k =
-            modBy number 100
+            modBy 100 number
     in
     if j == 1 && k /= 11 then
         String.fromInt number ++ "st"
