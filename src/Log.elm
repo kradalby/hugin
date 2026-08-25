@@ -1,4 +1,4 @@
-module Log exposing (error, httpError)
+module Log exposing (httpError)
 
 import Http
 import Ports
@@ -25,8 +25,3 @@ httpError err =
                     "Bad Body: " ++ body
     in
     Ports.httpError value
-
-
-error : Cmd msg
-error =
-    Cmd.none

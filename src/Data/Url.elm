@@ -102,13 +102,8 @@ json =
                 Nothing
 
 
-
--- This is stupid, but it works...
-
-
 rest : Parser.Parser (List String -> a) a
 rest =
-    --    restHelp 10
     Parser.oneOf
         [ Parser.map (\result -> [ result ]) json
         , Parser.map (\a b -> [ a, b ])
@@ -170,19 +165,6 @@ rest =
                 </> json
             )
         ]
-
-
-
---restHelp : Int -> Parser.Parser (List String -> a) a
---restHelp maxDepth =
---    if maxDepth < 1 then
---        Parser.map [] Parser.top
---
---    else
---        Parser.oneOf
---            [ Parser.map [] Parser.top
---            , Parser.map (\str li -> str :: li) (Parser.string </> restHelp (maxDepth - 1))
---            ]
 
 
 urlDecoder : Decoder Url

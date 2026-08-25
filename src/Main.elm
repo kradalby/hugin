@@ -91,8 +91,6 @@ subscriptions model =
         NotFound _ ->
             Sub.none
 
-        --        Redirect _ ->
-        --            Session.changes GotSession (Session.navKey (toSession model))
         Album _ m ->
             Sub.map GotAlbumMsg (Album.subscriptions m)
 
