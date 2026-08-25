@@ -16,6 +16,7 @@ Hugin is a front-end for image galleries generated with [Munin](https://github.c
 - Fuzzy search keywords
 - Use geodata from images to display map
 - Slideshow modus for album
+- Download a whole album, keyword or person as a zip (needs the hugin server)
 
 ## Installation
 
@@ -66,15 +67,12 @@ server {
     server_name _;
 
     location / {
+        alias /var/www/hugin/; # ⬅  Hugin static files
         try_files $uri $uri/ =404;
     }
 
-    location / {
-        alias /var/www/hugin; # ⬅  Hugin static files
-    }
-
-    location /content {
-        alias /storage/pictures/example/munin/content; # ⬅ Munin gallery
+    location /content/ {
+        alias /storage/pictures/example/munin/content/; # ⬅ Munin gallery
     }
 
 }
