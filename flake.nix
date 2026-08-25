@@ -293,7 +293,7 @@
           '';
         }
         # NixOS module evaluation needs a Linux system.
-        // pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+        // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
           module-eval = import ./module-eval.nix {
             inherit
               pkgs
