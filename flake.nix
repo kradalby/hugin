@@ -6,11 +6,9 @@
     # through the local flake registry and so re-locks differently per machine.
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    flake-checks.url = "github:kradalby/flake-checks";
+    flake-checks.url = "github:kradalby/flake-checks/kradalby/treefmt-extra";
     flake-checks.inputs.nixpkgs.follows = "nixpkgs";
     flake-checks.inputs.flake-utils.follows = "flake-utils";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
-    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -19,7 +17,6 @@
       nixpkgs,
       flake-utils,
       flake-checks,
-      treefmt-nix,
     }:
     let
       huginVersion = if (self ? shortRev) then self.shortRev else "dev";
@@ -106,6 +103,24 @@
           # buildGoLatestModule equivalent and tracks the newest Go in
           # nixpkgs instead of needing a bump every release.
           goPkg = pkgs.go_latest;
+
+          # Formatting rides on flake-checks too: gofumpt + goimports -local
+          # (derived from go.mod) + nixfmt, prettier for the web/doc files, and
+          # elm-format for the 36 .elm sources. fmtExts pulls "elm" into the
+          # check's source — goFormat's src is fileset-filtered, so without it
+          # the .elm files are absent and elm-format would format nothing while
+          # the check still went green.
+          prettier = true;
+          fmtExts = [ "elm" ];
+          treefmtExtra = {
+            programs.elm-format.enable = true;
+            # prettier 3.8 reads .editorconfig by default, and walks past the
+            # repo root to find one. hugin has none of its own, so whatever
+            # sits in a developer's home directory would silently restyle the
+            # frontend — while the sandboxed formatting check, which has no
+            # such file, disagrees. Pin it off so both see the same rules.
+            settings.formatter.prettier.options = [ "--no-editorconfig" ];
+          };
         };
 
         # flake-checks only knows about Go sources, so the Elm/parcel build
@@ -125,32 +140,6 @@
         };
 
         hugin = (fc.goBuild common).overrideAttrs (old: (withDist old) // { inherit meta; });
-
-        # gofumpt + goimports -local + nixfmt (RFC 166, the fleet-wide nix
-        # formatter) + prettier (web/doc) + elm-format. flake-checks'
-        # `formatter` helper is Go-only and doesn't know about Elm, so this
-        # repo wires its own treefmt-nix instead of routing through it.
-        treefmtEval = treefmt-nix.lib.evalModule pkgs {
-          projectRootFile = "go.mod";
-          programs = {
-            gofumpt.enable = true;
-            goimports.enable = true;
-            nixfmt.enable = true;
-            prettier.enable = true;
-            elm-format.enable = true;
-          };
-          # No -w here: treefmt-nix's goimports module already passes it.
-          settings.formatter.goimports.options = [
-            "-local"
-            "github.com/kradalby/hugin"
-          ];
-          # prettier 3.8 reads .editorconfig by default, and walks past the
-          # repo root to find one. hugin has none of its own, so whatever
-          # sits in a developer's home directory would silently restyle the
-          # frontend — while the sandboxed formatting check, which has no such
-          # file, disagrees. Pin it off so both see the same rules.
-          settings.formatter.prettier.options = [ "--no-editorconfig" ];
-        };
 
         devDeps = with pkgs; [
           # Go toolchain
@@ -174,7 +163,7 @@
           git
           gnumake
           prek
-          treefmtEval.config.build.wrapper
+          (fc.formatter common)
         ];
       in
       {
@@ -201,7 +190,7 @@
           };
 
         # `nix fmt`
-        formatter = treefmtEval.config.build.wrapper;
+        formatter = fc.formatter common;
 
         checks = {
           # Full Go+Elm build (compiles the Go incl. the dist/* embed).
@@ -271,16 +260,14 @@
           #
           # Either one surfaces as `goimports: exit status 2`, which treefmt
           # then reports as a formatting failure.
-          formatting =
-            (treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.)).overrideAttrs
-              (old: {
-                nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.go_latest ];
-                GOTOOLCHAIN = "local";
-                buildCommand = ''
-                  export HOME="$TMPDIR"
-                ''
-                + old.buildCommand;
-              });
+          formatting = (fc.goFormat common).overrideAttrs (old: {
+            nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.go_latest ];
+            GOTOOLCHAIN = "local";
+            buildCommand = ''
+              export HOME="$TMPDIR"
+            ''
+            + old.buildCommand;
+          });
 
           # prek still runs the full hook set on `git commit`, but its hooks
           # come from remote repos and so cannot run in a sandbox. shellcheck
