@@ -630,3 +630,91 @@ func TestZipIsNotMountedWithoutAGallery(t *testing.T) {
 		t.Errorf("Content-Type = %q, so the probe would show a button", got)
 	}
 }
+
+// The half of the Munin contract that testdata cannot express: the gallery on
+// disk is inconsistent with the URLs Munin published into it.
+//
+// Munin names a keyword file after the IPTC keyword, whose Unicode
+// normalisation is whatever the app that wrote the photo chose, and it can
+// publish both spellings of one word while writing only one file. On the live
+// gallery that is 5 of 3,275 keyword URLs, in both directions. Munin's fix
+// cannot reach a directory generated years ago, so hugin resolves it: the exact
+// name wins, and only a miss retries the other canonical form.
+//
+// Written as escapes, not literal text: the two names render identically, and
+// an editor that normalises on save would otherwise silently gut these tests.
+const (
+	keywordNFD = "Nytt_a\u030Ar.json" // a + U+030A COMBINING RING ABOVE
+	keywordNFC = "Nytt_\u00E5r.json"  // U+00E5 LATIN SMALL LETTER A WITH RING
+)
+
+func TestKeywordStoredInTheOtherNormalizationStillServes(t *testing.T) {
+	for _, tc := range []struct{ label, onDisk, requested string }{
+		{label: "NFC on disk", onDisk: keywordNFC, requested: keywordNFD},
+		{label: "NFD on disk", onDisk: keywordNFD, requested: keywordNFC},
+	} {
+		t.Run(tc.label, func(t *testing.T) {
+			dir := t.TempDir()
+
+			err := os.MkdirAll(filepath.Join(dir, "keywords"), 0o755)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = os.WriteFile(
+				filepath.Join(dir, "keywords", tc.onDisk), []byte(`{"name":"x"}`), 0o600)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			server := httptest.NewServer(routes(dir, ""))
+			defer server.Close()
+
+			resp := get(t, server.URL+"/content/keywords/"+tc.requested)
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusOK {
+				t.Errorf("GET /content/keywords/%s = %d, want %d",
+					tc.requested, resp.StatusCode, http.StatusOK)
+			}
+		})
+	}
+}
+
+// A gallery holding both spellings holds two different collections. Falling
+// back on a hit would serve one under the other's name.
+func TestExactNameWinsOverItsOtherNormalization(t *testing.T) {
+	dir := t.TempDir()
+
+	err := os.MkdirAll(filepath.Join(dir, "keywords"), 0o755)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := map[string]string{keywordNFD: "decomposed", keywordNFC: "composed"}
+
+	for name, body := range want {
+		err = os.WriteFile(filepath.Join(dir, "keywords", name), []byte(body), 0o600)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	server := httptest.NewServer(routes(dir, ""))
+	defer server.Close()
+
+	for name, body := range want {
+		resp := get(t, server.URL+"/content/keywords/"+name)
+
+		got, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if string(got) != body {
+			t.Errorf("GET /content/keywords/%s served %q, want %q", name, got, body)
+		}
+	}
+}

@@ -792,3 +792,83 @@ func TestWriteZipRejectsAFileResizedAfterPlanning(t *testing.T) {
 		})
 	}
 }
+
+// Munin publishes a keyword URL in one Unicode normalisation and writes the
+// file in the other, so on a real gallery a handful of keyword collections name
+// a file that is not there. Both directions occur: of the five unreachable
+// keyword URLs on the live gallery, three asked for NFC and found NFD on disk,
+// two the reverse. Normalising the request one way would have fixed neither
+// set. keywordNFD/keywordNFC are in integration_test.go.
+func TestPlanFindsACollectionStoredInTheOtherNormalization(t *testing.T) {
+	doc := `{"name":"Nytt år","photos":[
+	  {"url":"root/Misc/a.json","originalImageURL":"root/Misc/a_original.jpg"}
+	]}`
+
+	for _, tc := range []struct{ label, onDisk, requested string }{
+		{label: "NFC on disk", onDisk: keywordNFC, requested: keywordNFD},
+		{label: "NFD on disk", onDisk: keywordNFD, requested: keywordNFC},
+	} {
+		t.Run(tc.label, func(t *testing.T) {
+			dir := t.TempDir()
+			writeKeywordCollection(t, dir, tc.onDisk, doc)
+
+			name, members, err := plan(dir, "keywords/"+tc.requested)
+			if err != nil {
+				t.Fatalf("plan() error = %v, want the collection", err)
+			}
+
+			if want := "Nytt år.zip"; name != want || len(members) != 1 {
+				t.Fatalf("plan() = %q, %d members; want %q, 1", name, len(members), want)
+			}
+		})
+	}
+}
+
+// A gallery holding both spellings holds two different collections, and each
+// has to keep serving its own: an exact hit is never second-guessed.
+func TestPlanPrefersTheExactNameOverItsOtherNormalization(t *testing.T) {
+	dir := t.TempDir()
+
+	photo := `{"url":"root/Misc/a.json","originalImageURL":"root/Misc/a_original.jpg"}`
+	want := map[string]string{keywordNFD: "decomposed", keywordNFC: "composed"}
+
+	for name, label := range want {
+		writeKeywordCollection(t, dir, name, fmt.Sprintf(`{"name":%q,"photos":[%s]}`, label, photo))
+	}
+
+	for name, label := range want {
+		got, _, err := plan(dir, "keywords/"+name)
+		if err != nil {
+			t.Fatalf("plan(%q) error = %v", name, err)
+		}
+
+		if got != label+".zip" {
+			t.Errorf("plan(%q) = %q, want %q", name, got, label+".zip")
+		}
+	}
+}
+
+// A keyword collection plus the one original every fixture document points at.
+func writeKeywordCollection(t *testing.T, dir, name, doc string) {
+	t.Helper()
+
+	err := os.MkdirAll(filepath.Join(dir, "root/Misc"), 0o755)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.WriteFile(filepath.Join(dir, "root/Misc/a_original.jpg"), []byte("x"), 0o600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.MkdirAll(filepath.Join(dir, "keywords"), 0o755)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.WriteFile(filepath.Join(dir, "keywords", name), []byte(doc), 0o600)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

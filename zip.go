@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"math"
 	"mime"
@@ -244,8 +245,23 @@ func plan(dir, docPath string) (string, []member, error) {
 		return "", nil, err
 	}
 
-	// G304: confined by localize above.
+	// G304: confined by localize above, and altNormalization only ever swaps
+	// characters for their canonical equivalents — it cannot introduce a
+	// separator or a dot segment that localize did not already accept.
 	raw, err := os.ReadFile(filepath.Join(dir, local)) //nolint:gosec
+	if errors.Is(err, fs.ErrNotExist) {
+		// Same mismatch normalizingDir covers for /content/: Munin published a
+		// keyword URL in one Unicode normalisation and wrote the file in the
+		// other. Only a miss retries, so an exact hit is never second-guessed.
+		alt := altNormalization(local)
+		if alt != local {
+			altRaw, altErr := os.ReadFile(filepath.Join(dir, alt)) //nolint:gosec
+			if altErr == nil {
+				raw, err = altRaw, nil
+			}
+		}
+	}
+
 	if err != nil {
 		return "", nil, fmt.Errorf("reading collection %q: %w", docPath, err)
 	}
