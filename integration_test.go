@@ -45,6 +45,8 @@ func publishedURLs(node any, out *[]string) {
 
 					continue
 				}
+				// Not a string: fall through and recurse, so a nested shape
+				// Munin adds later is still walked.
 			}
 
 			publishedURLs(child, out)
@@ -519,5 +521,112 @@ func TestAlbumMountFallsBackToContentDir(t *testing.T) {
 		if resp.StatusCode != http.StatusOK {
 			t.Errorf("GET %s/root/index.json = %d, want %d", prefix, resp.StatusCode, http.StatusOK)
 		}
+	}
+}
+
+// Keyword and person collections draw from the whole gallery, so two albums
+// that each hold an IMG_0001.jpg collide. Several readers silently keep only
+// one of a duplicate pair, so the photo would vanish with no error anywhere.
+// The committed fixture cannot collide, so this builds a gallery that does.
+func TestZipDeduplicatesCollidingNames(t *testing.T) {
+	dir := t.TempDir()
+
+	for _, album := range []string{"One", "Two"} {
+		err := os.MkdirAll(filepath.Join(dir, "root", album), 0o755)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = os.WriteFile(filepath.Join(dir, "root", album, "IMG_0001_original.jpg"),
+			[]byte("photo from "+album), 0o600)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	doc := `{"name":"Spring","url":"keywords/Spring.json","photos":[
+	  {"url":"root/One/IMG_0001.json","originalImageURL":"root/One/IMG_0001_original.jpg"},
+	  {"url":"root/Two/IMG_0001.json","originalImageURL":"root/Two/IMG_0001_original.jpg"}
+	]}`
+
+	err := os.MkdirAll(filepath.Join(dir, "keywords"), 0o755)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = os.WriteFile(filepath.Join(dir, "keywords/Spring.json"), []byte(doc), 0o600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	server := httptest.NewServer(routes(dir, ""))
+	defer server.Close()
+
+	resp := get(t, server.URL+"/zip/keywords/Spring.json")
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.ContentLength != int64(len(body)) {
+		t.Errorf("declared %d bytes, wrote %d", resp.ContentLength, len(body))
+	}
+
+	archive, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
+	if err != nil {
+		t.Fatalf("reopening the archive: %s", err)
+	}
+
+	if len(archive.File) != 2 {
+		t.Fatalf("archive holds %d entries, want both photos", len(archive.File))
+	}
+
+	if archive.File[0].Name == archive.File[1].Name {
+		t.Errorf("both entries are named %q, so a reader may keep only one", archive.File[0].Name)
+	}
+}
+
+func TestZipRejectsOtherMethods(t *testing.T) {
+	server := httptest.NewServer(routes(galleryRoot, ""))
+	defer server.Close()
+
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost,
+		server.URL+"/zip/root/Misc/index.json", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusMethodNotAllowed {
+		t.Errorf("POST = %d, want %d", resp.StatusCode, http.StatusMethodNotAllowed)
+	}
+
+	if got := resp.Header.Get("Allow"); got != "GET, HEAD" {
+		t.Errorf("Allow = %q, want %q", got, "GET, HEAD")
+	}
+}
+
+// The capability probe's contract: no gallery, no mount, so the frontend hides
+// the button instead of rendering one that 404s.
+func TestZipIsNotMountedWithoutAGallery(t *testing.T) {
+	server := httptest.NewServer(routes("", ""))
+	defer server.Close()
+
+	resp := get(t, server.URL+"/zip/root/Misc/index.json")
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		t.Error("GET /zip/... = 200 without a gallery")
+	}
+
+	if got := resp.Header.Get("Content-Type"); strings.HasPrefix(got, "application/zip") {
+		t.Errorf("Content-Type = %q, so the probe would show a button", got)
 	}
 }
