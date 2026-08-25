@@ -206,6 +206,13 @@ in
       // lib.optionalAttrs (cfg.environmentFile != null) {
         EnvironmentFile = cfg.environmentFile;
       };
+
+      # ReadOnlyPaths gains no implicit mount ordering, unlike WorkingDirectory.
+      # Without this hugin can start before the gallery mounts, and since it
+      # never stats contentDir it stays up and 404s until restarted by hand.
+      unitConfig.RequiresMountsFor = lib.unique (
+        [ cfg.contentDir ] ++ lib.optional (cfg.rootDir != null) cfg.rootDir
+      );
     };
   };
 }
