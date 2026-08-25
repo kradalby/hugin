@@ -11,16 +11,15 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1787682432,
+        "lastModified": 1787683770,
         "narHash": "sha256-WwI0OlV4HNYQeueDlG3e5+9oVhCbBMIo9z5jxV+h/Gk=",
         "owner": "kradalby",
         "repo": "flake-checks",
-        "rev": "19cd7eb99b262614e143170ba944500bdd35002f",
+        "rev": "dfdfa98cf72002576c91c7cbb75ed43c1061237a",
         "type": "github"
       },
       "original": {
         "owner": "kradalby",
-        "ref": "kradalby/treefmt-extra",
         "repo": "flake-checks",
         "type": "github"
       }
