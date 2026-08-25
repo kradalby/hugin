@@ -163,7 +163,7 @@ func routes(contentDir, rootDir string) *http.ServeMux {
 	}
 
 	if contentDir == "" {
-		log.Printf("--content-dir is required to serve a gallery")
+		log.Printf("--content-dir is required to serve a gallery; /content/ and /zip/ are unmounted")
 	} else {
 		log.Printf("Serving content from %s", contentDir)
 		serveDir("/content", contentDir)
