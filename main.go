@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/kradalby/kraweb"
+	"golang.org/x/text/unicode/norm"
 )
 
 const defaultHostname = "hugin"
@@ -104,6 +105,57 @@ func distHandler() http.Handler {
 	return http.FileServer(http.FS(sub))
 }
 
+// Munin names keyword files after the IPTC keyword, which arrives in whichever
+// Unicode normalisation the app that wrote the photo used. The same word
+// reaches the gallery as both "Nytt_\u00e5r" and "Nytt_a\u030ar"; Munin
+// publishes both spellings as URLs but writes only one file. On the gallery
+// this was written against, 5 of 3,275 referenced keyword URLs name a file
+// that is not on disk, and every one of them has its counterpart form sitting
+// in the same directory.
+//
+// Gallery data outlives any Munin release — the fix upstream cannot reach a
+// directory generated years ago — so hugin resolves the mismatch itself.
+// Returns the other canonical form, or name unchanged when there isn't one
+// (which is every pure-ASCII path).
+func altNormalization(name string) string {
+	if composed := norm.NFC.String(name); composed != name {
+		return composed
+	}
+
+	return norm.NFD.String(name)
+}
+
+// A gallery directory that answers for either normalisation of a name.
+//
+// The exact name always wins, so a gallery holding both spellings still serves
+// each on its own name and nothing that works today changes. Only a miss falls
+// back, and only to the one other canonical form, so a request can never be
+// answered by a file it did not ask for. The fallback is logged: it means the
+// gallery is inconsistent, which is worth knowing rather than papering over.
+type normalizingDir string
+
+func (d normalizingDir) Open(name string) (http.File, error) {
+	f, err := http.Dir(d).Open(name)
+	if !errors.Is(err, fs.ErrNotExist) {
+		return f, err
+	}
+
+	alt := altNormalization(name)
+	if alt == name {
+		return f, err
+	}
+
+	altFile, altErr := http.Dir(d).Open(alt)
+	if altErr != nil {
+		// The original miss is the honest answer; the fallback was a guess.
+		return f, err
+	}
+
+	log.Printf("%q served as %q: gallery holds the other Unicode form", name, alt) //nolint:gosec
+
+	return altFile, nil
+}
+
 // http.FileServer swallows the os.Open error, so the status is all that
 // separates "missing" from "unreadable".
 type statusRecorder struct {
@@ -158,7 +210,7 @@ func routes(contentDir, rootDir string) *http.ServeMux {
 	mux.Handle("/tokens", tokenHandler())
 
 	serveDir := func(prefix, dir string) {
-		handler := loggingHandler(http.FileServer(http.Dir(dir)), dir)
+		handler := loggingHandler(http.FileServer(normalizingDir(dir)), dir)
 		mux.Handle(prefix+"/", http.StripPrefix(prefix, handler))
 	}
 
