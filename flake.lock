@@ -11,15 +11,16 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1783015821,
-        "narHash": "sha256-vmzYTZxIAy3OYXwkRL5GQYk8fNnh8TLWcxQRIO3ywOU=",
+        "lastModified": 1787682432,
+        "narHash": "sha256-WwI0OlV4HNYQeueDlG3e5+9oVhCbBMIo9z5jxV+h/Gk=",
         "owner": "kradalby",
         "repo": "flake-checks",
-        "rev": "3c821706eb0bd07f515f9a7726b650ccae927433",
+        "rev": "19cd7eb99b262614e143170ba944500bdd35002f",
         "type": "github"
       },
       "original": {
         "owner": "kradalby",
+        "ref": "kradalby/treefmt-extra",
         "repo": "flake-checks",
         "type": "github"
       }
@@ -62,8 +63,7 @@
       "inputs": {
         "flake-checks": "flake-checks",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs",
-        "treefmt-nix": "treefmt-nix_2"
+        "nixpkgs": "nixpkgs"
       }
     },
     "systems": {
@@ -94,26 +94,6 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "rev": "db947814a175b7ca6ded66e21383d938df01c227",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "treefmt-nix_2": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1786901030,
-        "narHash": "sha256-WSFCsDSE5ffgD2MqzkM2CYjeFiKhRF/dJUN8uedb6YE=",
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "rev": "27b3b12a8e6375f28ebe122f07d230ca5459bbfa",
         "type": "github"
       },
       "original": {
