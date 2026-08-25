@@ -34,15 +34,23 @@ const (
 	centralHeaderSize = 46
 	endRecordSize     = 22
 
-	dataDescriptorSize      = 16
-	dataDescriptorSize64    = 24
-	zip64ExtraSize          = 28
+	dataDescriptorSize   = 16
+	dataDescriptorSize64 = 24
+
+	// The zip64 extra field in the central directory is variable-length: a
+	// 4-byte tag+length, then only those of {uncompressed size, compressed
+	// size, local header offset} that actually overflow 32 bits.
+	zip64ExtraHeaderSize = 4
+	zip64ExtraFieldSize  = 8
+
 	zip64EndRecordSize      = 56
 	zip64EndLocatorSize     = 20
 	zip64EndTotalRecordSize = zip64EndRecordSize + zip64EndLocatorSize
 
-	// Values at or above these go zip64. archive/zip compares with >=, so the
-	// limit itself is already over.
+	// A size or offset at or above this gets a zip64 extra in the central
+	// directory; archive/zip compares with >=, so the limit itself is already
+	// over. The data descriptor is the one place that compares with plain >,
+	// so a file of exactly this length still gets 32-bit sizes there.
 	zip64MagicValue      = math.MaxUint32
 	zip64EntryCountMagic = math.MaxUint16
 )
@@ -56,6 +64,13 @@ const extendedTimestampSize = 9
 // are stored and archive/zip emits sizes in a trailing descriptor, so no CRC
 // pre-pass is needed. Every entry counts the extended-timestamp extra, which
 // holds only because storedHeader guarantees it. TestZipSize pins the lot.
+//
+// This mirrors archive/zip's writer byte for byte, and as of Go 1.27 that
+// writer documents its output as explicitly outside the Go 1 compatibility
+// promise. So expect a toolchain bump to invalidate this arithmetic — 1.27
+// alone moved the data-descriptor threshold and made the central zip64 extra
+// variable-length. TestZipSize is the tripwire; when it trips, re-derive from
+// archive/zip's writer.go rather than patching the number it reports.
 func zipSize(members []member) int64 {
 	var localTotal, centralTotal int64
 
@@ -64,20 +79,31 @@ func zipSize(members []member) int64 {
 	for _, m := range members {
 		nameLen := int64(len(m.name))
 
+		// The trailing descriptor goes 64-bit only once a size genuinely
+		// exceeds 32 bits. Strictly greater, unlike everything else here: a
+		// file of exactly uint32max still fits, so it keeps 32-bit sizes.
 		descriptor := int64(dataDescriptorSize)
-		extra := int64(0)
-
-		// archive/zip compares with >=, so uint32max itself is already zip64.
-		if m.size >= zip64MagicValue {
+		if m.size > zip64MagicValue {
 			descriptor = dataDescriptorSize64
-			extra = zip64ExtraSize
-			needZip64 = true
+		}
+
+		// Entries are stored, so compressed and uncompressed are the same
+		// number and overflow together — hence two fields, not one.
+		fields := int64(0)
+		if m.size >= zip64MagicValue {
+			fields += 2
 		}
 
 		// A large archive pushes later entries past the 32-bit offset limit
-		// even when each file is small.
+		// even when each file is small. Additive: a big file sitting at a big
+		// offset carries all three fields.
 		if localTotal >= zip64MagicValue {
-			extra = zip64ExtraSize
+			fields++
+		}
+
+		extra := int64(0)
+		if fields > 0 {
+			extra = zip64ExtraHeaderSize + fields*zip64ExtraFieldSize
 			needZip64 = true
 		}
 

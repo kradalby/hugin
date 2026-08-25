@@ -101,7 +101,11 @@
           # for the binary too.
           version = "0";
           vendorHash = "sha256-gjZAe5N7Q1mHYix6AGFLkYBcbxYhqG4F3N4CSHrA0bY=";
-          goPkg = pkgs.go_1_26;
+          # go_latest, not a go_1_NN attribute: flake-checks feeds this to
+          # `buildGoModule.override { go = goPkg; }`, so this is the
+          # buildGoLatestModule equivalent and tracks the newest Go in
+          # nixpkgs instead of needing a bump every release.
+          goPkg = pkgs.go_latest;
         };
 
         # flake-checks only knows about Go sources, so the Elm/parcel build
@@ -135,16 +139,22 @@
             prettier.enable = true;
             elm-format.enable = true;
           };
+          # No -w here: treefmt-nix's goimports module already passes it.
           settings.formatter.goimports.options = [
-            "-w"
             "-local"
             "github.com/kradalby/hugin"
           ];
+          # prettier 3.8 reads .editorconfig by default, and walks past the
+          # repo root to find one. hugin has none of its own, so whatever
+          # sits in a developer's home directory would silently restyle the
+          # frontend — while the sandboxed formatting check, which has no such
+          # file, disagrees. Pin it off so both see the same rules.
+          settings.formatter.prettier.options = [ "--no-editorconfig" ];
         };
 
         devDeps = with pkgs; [
           # Go toolchain
-          go_1_26
+          go_latest
           gopls
           golangci-lint
           gofumpt
@@ -248,7 +258,29 @@
           gotest = (fc.goTest common).overrideAttrs withDist;
           golangci-lint = (fc.goLint common).overrideAttrs withDist;
 
-          formatting = treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.);
+          # goimports shells out to `go` to resolve imports, which drags two
+          # sandbox problems in that have nothing to do with formatting:
+          #
+          #   * `go` wants a writable module cache under $HOME, and the sandbox
+          #     points HOME at /homeless-shelter, which it cannot create.
+          #   * go.mod asks for 1.27, so any older `go` on PATH tries to fetch
+          #     that toolchain and the sandbox has no network. goimports uses
+          #     the `go` it finds on PATH, not the one it was built against, so
+          #     rebuilding gotools does not help — putting go_latest first and
+          #     refusing to switch toolchains does.
+          #
+          # Either one surfaces as `goimports: exit status 2`, which treefmt
+          # then reports as a formatting failure.
+          formatting =
+            (treefmtEval.config.build.check (pkgs.nix-gitignore.gitignoreSource [ ] ./.)).overrideAttrs
+              (old: {
+                nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.go_latest ];
+                GOTOOLCHAIN = "local";
+                buildCommand = ''
+                  export HOME="$TMPDIR"
+                ''
+                + old.buildCommand;
+              });
 
           # prek still runs the full hook set on `git commit`, but its hooks
           # come from remote repos and so cannot run in a sandbox. shellcheck

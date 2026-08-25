@@ -157,13 +157,25 @@ func TestZipSize(t *testing.T) {
 			members: members(math.MaxUint32 - 1),
 		},
 		{
+			// Two of the three zip64 extra fields: the sizes overflow, the
+			// offset does not. The trailing descriptor stays 32-bit here,
+			// because that one comparison is > rather than >=.
 			name:    "file at the zip64 threshold",
 			members: members(math.MaxUint32),
 		},
 		{
-			// Tiny file, but its recorded offset is past the 32-bit limit.
+			// One field: tiny file, but its recorded offset is past the
+			// 32-bit limit.
 			name:    "small file pushed past the offset limit by a large one",
 			members: members(math.MaxUint32, 17),
+		},
+		{
+			// All three fields at once. The sizes and the offset each add
+			// their own 8 bytes to the second entry's extra, so this is what
+			// separates an additive zip64 extra from one that merely picks
+			// the larger of two fixed sizes.
+			name:    "large file at an offset past the 32-bit limit",
+			members: members(math.MaxUint32, math.MaxUint32),
 		},
 		{
 			// archive/zip omits the extended-timestamp extra when Modified is

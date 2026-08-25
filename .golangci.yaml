@@ -1,5 +1,11 @@
 # enable-all / disable-few; the disable list is copied from headscale (the
 # house reference config), not curated per-repo.
+#
+# Some linters ship a renamed successor (exhaustruct -> exhaustruct_v5, and so
+# on). Under `default: all` the successor is a separate linter that the legacy
+# name does not cover, so it turns itself on the moment golangci-lint is
+# upgraded. Both spellings stay listed: the old one for older golangci-lint,
+# the new one for current.
 version: "2"
 
 linters:
@@ -9,6 +15,7 @@ linters:
     - depguard
     - dupl
     - exhaustruct
+    - exhaustruct_v5
     - funcorder
     - funlen
     - gochecknoglobals
@@ -16,6 +23,7 @@ linters:
     - gocognit
     - godox
     - gomodguard
+    - gomodguard_v2
     - interfacebloat
     - ireturn
     - lll
@@ -32,6 +40,7 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
+    - wsl_v5
   settings:
     goconst:
       # Test fixtures repeat strings by their nature; extracting them obscures
