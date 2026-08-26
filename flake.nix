@@ -68,7 +68,7 @@
           # this fetches the pinned Elm packages into ELM_HOME so `elm make`
           # never touches the network.
           postConfigure = pkgs.elmPackages.fetchElmDeps {
-            elmVersion = "0.19.1";
+            elmVersion = "0.19.2";
             elmPackages = import ./elm-srcs.nix;
             registryDat = ./registry.dat;
           };
@@ -221,7 +221,7 @@
             '';
 
             postConfigure = pkgs.elmPackages.fetchElmDeps {
-              elmVersion = "0.19.1";
+              elmVersion = "0.19.2";
               elmPackages = import ./elm-srcs.nix;
               registryDat = ./registry.dat;
             };
