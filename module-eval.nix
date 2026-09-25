@@ -22,7 +22,9 @@ let
             device = "/dev/sda1";
             fsType = "ext4";
           };
-          system.stateVersion = "24.11";
+          # Tracks the pinned nixpkgs so the module is checked against the
+          # defaults a fresh install would get, not a frozen old release.
+          system.stateVersion = lib.trivial.release;
           services.hugin = cfg;
         }
       ];
