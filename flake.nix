@@ -97,7 +97,7 @@
           # Overriding version afterwards re-derives it, so this stays stable
           # for the binary too.
           version = "0";
-          vendorHash = "sha256-OOKI2Ha+R/DwXzJhHwnbCRfr5QOBmm1wzZwN15C3Kto=";
+          vendorHash = "sha256-/fd/k/FlMhTeFbXUyj0qoYLxuihfEkE59G2uB5ogrjQ=";
           # go_latest, not a go_1_NN attribute: flake-checks feeds this to
           # `buildGoModule.override { go = goPkg; }`, so this is the
           # buildGoLatestModule equivalent and tracks the newest Go in
