@@ -60,6 +60,14 @@ let log = {
 // ELM
 import { Elm } from "./Main.elm";
 
+// The Umami tracker only wraps pushState/replaceState, so back/forward go
+// unseen and its cached URL goes stale (a later push to the same page is then
+// dropped as a repeat). A no-op replaceState re-syncs it and, after its own
+// delay, reports the page; harmless when the tracker is absent.
+window.addEventListener("popstate", () => {
+  history.replaceState(history.state, "", location.href);
+});
+
 document.addEventListener("DOMContentLoaded", function () {
   let app = Elm.Main.init({
     node: document.getElementById("root"),
