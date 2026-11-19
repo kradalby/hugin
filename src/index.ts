@@ -54,23 +54,6 @@ let log = {
   },
 };
 
-import Analytics from "analytics";
-import googleAnalytics from "@analytics/google-analytics";
-import umamiAnalytics from "@binance-chain/analytics-plugin-umami";
-
-const analytics = Analytics({
-  app: "hugin",
-  plugins: [
-    umamiAnalytics({
-      id: "2145b3cd-1fcf-496c-8b45-c43951ff9129",
-      reportUri: "https://umami.kradalby.no",
-    }),
-    googleAnalytics({
-      measurementIds: ["UA-18856525-25"],
-    }),
-  ],
-});
-
 ///////////////////////////////////////////////////
 //
 
@@ -81,12 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let app = Elm.Main.init({
     node: document.getElementById("root"),
     flags: null,
-  });
-
-  // Google Analytics
-  app.ports.analytics.subscribe((url: string) => {
-    console.log("DEBUG: gtag called with: ", url);
-    analytics.page({ path: "/" + url });
   });
 
   app.ports.initMap.subscribe((data: [string, [number, number][]]) => {

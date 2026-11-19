@@ -11,9 +11,6 @@ export namespace Elm {
             callback: (data: [string, [number, number][]]) => void,
           ): void;
         };
-        analytics: {
-          subscribe(callback: (data: string) => void): void;
-        };
         httpError: {
           subscribe(callback: (data: string) => void): void;
         };
