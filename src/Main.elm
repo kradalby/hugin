@@ -14,7 +14,6 @@ import Page.Locations as Locations
 import Page.NotFound as NotFound
 import Page.Photo as Photo
 import Page.SlideShow as SlideShow
-import Ports
 import Request.Helpers exposing (rootUrl)
 import Route exposing (Route)
 import Session exposing (Session)
@@ -156,14 +155,6 @@ changeRouteTo maybeRoute model =
         session =
             toSession model
 
-        analyticsUrl =
-            case maybeRoute of
-                Nothing ->
-                    ""
-
-                Just route ->
-                    Route.routeToString route
-
         ( m, c ) =
             case maybeRoute of
                 Nothing ->
@@ -215,7 +206,6 @@ changeRouteTo maybeRoute model =
     ( m
     , Cmd.batch
         [ c
-        , Ports.analytics analyticsUrl
 
         -- I am not a 100% sure about this one, will test it for a while...
         , Task.perform (\_ -> Ignored) (setViewport 0 0)
